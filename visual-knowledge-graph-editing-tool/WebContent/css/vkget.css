@@ -1,0 +1,19 @@
+table thead {
+	font-size: 12px;	
+}
+
+table thead .caption {
+	font-size: 14px;
+}
+
+table th {
+	text-align: center;
+}
+
+table tbody tr:hover {
+	background-color: yellow;
+}
+
+table td {
+	padding: 5px;
+}
