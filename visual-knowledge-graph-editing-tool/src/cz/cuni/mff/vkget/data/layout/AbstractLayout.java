@@ -1,11 +1,12 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractLayout {
+import cz.cuni.mff.vkget.data.RdfEntity;
+
+public abstract class AbstractLayout extends RdfEntity {
 	protected String title;
-	protected String uri;
 	protected List<TitleType> titleTypes;
 	protected String fontColor;
 	protected int fontSize;
@@ -84,15 +85,7 @@ public abstract class AbstractLayout {
 	public void setLineThickness(int lineThickness) {
 		this.lineThickness = lineThickness;
 	}
-
-	public String getUri() {
-		return uri;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-
+	
 	public String getTitle() {
 		return title;
 	}

@@ -9,6 +9,11 @@
 
 <body>
 	<jsp:include page="WEB-INF/jsp/fragments/menu.jsp" />
+	
+	<div ng-app="">
+ 	<p>Name : <input type="text" ng-model="name"></p>
+ 	<h1>Hello {{name}}</h1>
+</div>
 
 	<div id="jumbotron" class="jumbotron">
       <div class="container">

@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 public enum AggregateFunction {
 	NOTHING("nothing"), MIN("min"), MAX("max"), AVG("avg");

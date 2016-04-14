@@ -1,6 +1,8 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 import java.util.List;
+
+import cz.cuni.mff.vkget.sparql.Constants;
 
 public class BlockLayout extends AbstractLayout {
 	private String forType;
@@ -12,6 +14,7 @@ public class BlockLayout extends AbstractLayout {
 	private List<RowLayout> properties;
 
 	public BlockLayout() {
+		this.type = Constants.BlockLayoutType;
 	}
 
 	public BlockLayout(String forClass, String title) {

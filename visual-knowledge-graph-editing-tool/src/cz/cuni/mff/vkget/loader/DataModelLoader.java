@@ -7,13 +7,13 @@ import java.util.Map.Entry;
 import org.springframework.stereotype.Service;
 
 import cz.cuni.mff.vkget.connect.CityCountryConnector;
-import cz.cuni.mff.vkget.data.DataModel;
-import cz.cuni.mff.vkget.data.Graph;
-import cz.cuni.mff.vkget.data.RdfObject;
-import cz.cuni.mff.vkget.data.RdfObjectProperty;
-import cz.cuni.mff.vkget.data.RdfProperty;
-import cz.cuni.mff.vkget.data.RdfTriple;
-import cz.cuni.mff.vkget.layout.GveTable;
+import cz.cuni.mff.vkget.data.layout.GveTable;
+import cz.cuni.mff.vkget.data.model.DataModel;
+import cz.cuni.mff.vkget.data.model.Graph;
+import cz.cuni.mff.vkget.data.model.RdfObject;
+import cz.cuni.mff.vkget.data.model.RdfObjectProperty;
+import cz.cuni.mff.vkget.data.model.RdfProperty;
+import cz.cuni.mff.vkget.data.model.RdfTriple;
 
 @Service
 public class DataModelLoader {

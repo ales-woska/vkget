@@ -1,13 +1,19 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.vkget.sparql.Constants;
+
 public class LineLayout extends AbstractLayout {
 	private String fromType;
 	private String toType;
 	private List<Point> points;
+	
+	public LineLayout() {
+		this.type = Constants.LineLayoutType;
+	}
 
 	public String getFromType() {
 		return fromType;

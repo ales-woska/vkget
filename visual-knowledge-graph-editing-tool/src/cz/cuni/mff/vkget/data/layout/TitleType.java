@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 public enum TitleType {
 	URL("url"), LABEL("label"), CONSTANT("constant"), PROPERTY("property");

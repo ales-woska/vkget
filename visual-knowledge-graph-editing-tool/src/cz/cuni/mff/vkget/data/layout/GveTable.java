@@ -1,8 +1,8 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 import java.util.List;
 
-import cz.cuni.mff.vkget.data.RdfObject;
+import cz.cuni.mff.vkget.data.model.RdfObject;
 
 /**
  * GveTable is table which contains subjects as lines. It's columns are

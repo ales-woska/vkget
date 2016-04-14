@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 import java.util.List;
 

@@ -1,12 +1,18 @@
-package cz.cuni.mff.vkget.layout;
+package cz.cuni.mff.vkget.data.layout;
 
 import java.util.List;
 
-public class ScreenLayout {
+import cz.cuni.mff.vkget.data.RdfEntity;
+import cz.cuni.mff.vkget.sparql.Constants;
+
+public class ScreenLayout extends RdfEntity {
 	private String name;
-	private String uri;
 	private List<BlockLayout> blockLayouts;
 	private List<LineLayout> lineLayouts;
+	
+	public ScreenLayout() {
+		this.type = Constants.ScreenLayoutType;
+	}
 
 	public String getName() {
 		return name;
@@ -16,10 +22,12 @@ public class ScreenLayout {
 		this.name = name;
 	}
 
+	@Override
 	public String getUri() {
 		return uri;
 	}
 
+	@Override
 	public void setUri(String uri) {
 		this.uri = uri;
 	}

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 
-import cz.cuni.mff.vkget.data.Graph;
-import cz.cuni.mff.vkget.data.RdfTriple;
+import cz.cuni.mff.vkget.data.model.Graph;
+import cz.cuni.mff.vkget.data.model.RdfTriple;
 
 public class CityCountryConnector {
 	private static final String query = 

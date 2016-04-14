@@ -5,8 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import cz.cuni.mff.vkget.data.DataModel;
-import cz.cuni.mff.vkget.layout.ScreenLayout;
+import cz.cuni.mff.vkget.data.layout.ScreenLayout;
+import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.loader.DataModelLoader;
 import cz.cuni.mff.vkget.persistence.ScreenLayoutDao;
 import cz.cuni.mff.vkget.render.HtmlRenderer;

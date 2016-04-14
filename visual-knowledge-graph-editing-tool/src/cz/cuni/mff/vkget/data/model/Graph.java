@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.data;
+package cz.cuni.mff.vkget.data.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;

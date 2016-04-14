@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.data;
+package cz.cuni.mff.vkget.data.model;
 
 /**
  * Concrete cell in GveTable. propertyUrl is same as columnsURIs in GveTable.

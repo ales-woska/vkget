@@ -4,13 +4,13 @@ import java.awt.Point;
 
 import org.springframework.stereotype.Service;
 
-import cz.cuni.mff.vkget.data.DataModel;
-import cz.cuni.mff.vkget.data.RdfObject;
-import cz.cuni.mff.vkget.layout.BlockLayout;
-import cz.cuni.mff.vkget.layout.GveTable;
-import cz.cuni.mff.vkget.layout.LineLayout;
-import cz.cuni.mff.vkget.layout.LineType;
-import cz.cuni.mff.vkget.layout.ScreenLayout;
+import cz.cuni.mff.vkget.data.layout.BlockLayout;
+import cz.cuni.mff.vkget.data.layout.GveTable;
+import cz.cuni.mff.vkget.data.layout.LineLayout;
+import cz.cuni.mff.vkget.data.layout.LineType;
+import cz.cuni.mff.vkget.data.layout.ScreenLayout;
+import cz.cuni.mff.vkget.data.model.DataModel;
+import cz.cuni.mff.vkget.data.model.RdfObject;
 
 @Service
 public class HtmlRenderer {

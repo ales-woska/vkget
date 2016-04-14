@@ -7,11 +7,11 @@ import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
-import cz.cuni.mff.vkget.layout.LineLayout;
+import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 @Repository
-public class LineLayoutDao {
+public class LineLayoutDao implements SparqlDao<LineLayout> {
 	private final String FONT_COLOR = Constants.VKGET_Prefix + ":" + "fontColor";
 	private final String FONT_SIZE = Constants.VKGET_Prefix + ":" + "fontSize";
 	private final String FROM_TYPE = Constants.VKGET_Prefix + ":" + "fromType";
@@ -25,6 +25,7 @@ public class LineLayoutDao {
 
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
+	@Override
 	public LineLayout load(String uri) {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
@@ -62,7 +63,8 @@ public class LineLayoutDao {
 	}
 	
 	
-    public void insert(LineLayout layout) {
+    @Override
+	public void insert(LineLayout layout) {
 		
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
 		insertQuery.append("INSERT DATA { ");

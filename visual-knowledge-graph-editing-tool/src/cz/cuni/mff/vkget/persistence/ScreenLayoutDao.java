@@ -5,20 +5,22 @@ import java.util.List;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
-import cz.cuni.mff.vkget.layout.BlockLayout;
-import cz.cuni.mff.vkget.layout.LineLayout;
-import cz.cuni.mff.vkget.layout.ScreenLayout;
+import cz.cuni.mff.vkget.data.layout.BlockLayout;
+import cz.cuni.mff.vkget.data.layout.LineLayout;
+import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
   * Created by Ales Woska on 31.1.2016.
   */
 @Repository
-public class ScreenLayoutDao {
+public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
 	private static final String loadScreenLayoutQuery = 
@@ -34,7 +36,8 @@ public class ScreenLayoutDao {
 	@Autowired
     private LineLayoutDao lineDao;
 
-    public void insert(ScreenLayout layout) {
+    @Override
+	public void insert(ScreenLayout layout) {
 
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
 		insertQuery.append("INSERT DATA { <").append(layout.getUri()).append("> ");
@@ -81,10 +84,40 @@ public class ScreenLayoutDao {
 			layout.setLineLayouts(this.loadLineLayouts(layout.getUri()));
 		}
 		return layouts;
-    	
     }
+
+	@Override
+	public ScreenLayout load(String uri) {
+		String loadBlockQuery = 
+				Constants.PREFIX_PART
+				+ "SELECT DISTINCT * WHERE { "
+				+ " <" + uri + "> ?property ?value . "
+				+ "}";
+		ResultSet results = sparql.query(loadBlockQuery);
+		ScreenLayout layout = new ScreenLayout();
+		layout.setUri(uri);
+		while (results.hasNext()) {
+			QuerySolution solution = results.next();
+			
+			Resource resource = solution.get("property").asResource();
+			String property = Constants.VKGET_Prefix + ":" + resource.getLocalName();
+			
+			RDFNode node = solution.get("value");
+			String value = (node.isLiteral()) ? node.asLiteral().getString() : node.asResource().getURI();
+			if (value == "null") {
+				continue;
+			}
+
+			switch (property) {
+				case Constants.RDFS_TITLE: layout.setName(value); break;
+			}
+		}
+		layout.setBlockLayouts(this.loadBlockLayouts(layout.getUri()));
+		layout.setLineLayouts(this.loadLineLayouts(layout.getUri()));
+		return layout;
+	}
     
-    public List<BlockLayout> loadBlockLayouts(String uri) {
+    private List<BlockLayout> loadBlockLayouts(String uri) {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -101,7 +134,7 @@ public class ScreenLayoutDao {
 		return layouts;
     }
     
-    public List<LineLayout> loadLineLayouts(String uri) {
+    private List<LineLayout> loadLineLayouts(String uri) {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -117,6 +150,5 @@ public class ScreenLayoutDao {
 		}
 		return layouts;
     }
-    
     
 }

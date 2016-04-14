@@ -1,8 +1,8 @@
-package cz.cuni.mff.vkget.data;
+package cz.cuni.mff.vkget.data.model;
 
 import java.util.List;
 
-import cz.cuni.mff.vkget.layout.GveTable;
+import cz.cuni.mff.vkget.data.layout.GveTable;
 
 /**
   * Class contains all GveTables (whole data)
