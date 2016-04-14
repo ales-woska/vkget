@@ -2,40 +2,35 @@ package cz.cuni.mff.vkget.persistence;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.springframework.stereotype.Repository;
 
+import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.layout.BlockLayout;
-import cz.cuni.mff.vkget.rdf.SparqlConnector;
+import cz.cuni.mff.vkget.sparql.Constants;
 
+@Repository
 public class BlockLayoutDao {
-	private final String GRAPH = "http://mff.cuni.cz/vkgetGraph";
-	private final String NAMESPACE = "http://mff.cuni.cz/vkget#";
-	private final String PREFIX = "vkget";
-	private final String TYPE = PREFIX + ":blockLayout";
-	private final String RDF_TYPE = "rdf:type";
-	
-	private final String FONT_COLOR = PREFIX + ":" + "fontColor";
-	private final String FONT_SIZE = PREFIX + ":" + "fontSize";
-	private final String LINE_COLOR = PREFIX + ":" + "lineColor";
-	private final String LINE_TYPE = PREFIX + ":" + "lineType";
-	private final String LINE_THICKNESS = PREFIX + ":" + "lineThickness";
-	private final String TITLE = PREFIX + ":" + "title";
-	private final String TITLE_TYPES = PREFIX + ":" + "titleTypes";
-	
-	private final String FOR_TYPE = PREFIX + ":" + "forType";
-	private final String BACKGROUND = PREFIX + ":" + "background";
-	private final String HEIGHT = PREFIX + ":" + "height";
-	private final String WIDTH = PREFIX + ":" + "width";
-	private final String LEFT = PREFIX + ":" + "left";
-	private final String TOP = PREFIX + ":" + "top";
+	private final String FONT_COLOR = Constants.VKGET_Prefix + ":" + "fontColor";
+	private final String FONT_SIZE = Constants.VKGET_Prefix + ":" + "fontSize";
+	private final String LINE_COLOR = Constants.VKGET_Prefix + ":" + "lineColor";
+	private final String LINE_TYPE = Constants.VKGET_Prefix + ":" + "lineType";
+	private final String LINE_THICKNESS = Constants.VKGET_Prefix + ":" + "lineThickness";
+	private final String TITLE = Constants.VKGET_Prefix + ":" + "title";
+	private final String TITLE_TYPES = Constants.VKGET_Prefix + ":" + "titleTypes";
+	private final String FOR_TYPE = Constants.VKGET_Prefix + ":" + "forType";
+	private final String BACKGROUND = Constants.VKGET_Prefix + ":" + "background";
+	private final String HEIGHT = Constants.VKGET_Prefix + ":" + "height";
+	private final String WIDTH = Constants.VKGET_Prefix + ":" + "width";
+	private final String LEFT = Constants.VKGET_Prefix + ":" + "left";
+	private final String TOP = Constants.VKGET_Prefix + ":" + "top";
 
-	private SparqlConnector sparql = new SparqlConnector("http://localhost:8890/sparql");
+	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
 	public BlockLayout load(String uri) {
 		String loadBlockQuery = 
-				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-				+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-				+ "PREFIX "+PREFIX+": <"+NAMESPACE+"> "
+				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
 				+ " <" + uri + "> ?property ?value . "
 				+ "}";
@@ -46,8 +41,10 @@ public class BlockLayoutDao {
 			QuerySolution solution = results.next();
 			
 			Resource resource = solution.get("property").asResource();
-			String property = PREFIX + ":" + resource.getLocalName();
-			String value = solution.get("value").asLiteral().getString();
+			String property = Constants.VKGET_Prefix + ":" + resource.getLocalName();
+			
+			RDFNode node = solution.get("value");
+			String value = (node.isLiteral()) ? node.asLiteral().getString() : node.asResource().getURI();
 			if (value == "null") {
 				continue;
 			}
@@ -56,7 +53,7 @@ public class BlockLayoutDao {
 				case FONT_COLOR: layout.setFontColor(value); break;
 				case FONT_SIZE: layout.setFontSize(Integer.valueOf(value)); break;
 				case LINE_COLOR: layout.setLineColor(value); break;
-				case LINE_TYPE: layout.setLineType(value); break;
+				case LINE_TYPE: layout.setLineTypeFromString(value); break;
 				case LINE_THICKNESS: layout.setLineThickness(Integer.valueOf(value)); break;
 				case TITLE: layout.setTitle(value); break;
 				case TITLE_TYPES: layout.setTitleTypesFromString(value); break;
@@ -74,18 +71,16 @@ public class BlockLayoutDao {
 	
     public void insert(BlockLayout layout) {
 		
-		StringBuilder insertQuery = new StringBuilder("PREFIX ").append(PREFIX).append(": <").append(NAMESPACE).append("> ");
-		insertQuery.append("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> ");
-		insertQuery.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ");
-		insertQuery.append("INSERT DATA { GRAPH <").append(GRAPH).append("> { ");
+		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
+		insertQuery.append("INSERT DATA { ");
 		insertQuery.append("<").append(layout.getUri()).append("> ");
 		
-		insertQuery.append(" ").append(RDF_TYPE).append(" \"").append(TYPE).append("\"; ");
+		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.BlockLayoutType).append("\"; ");
 		insertQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
 		insertQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
 		insertQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
 		insertQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
-		insertQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getLineType()).append("\"; ");
+		insertQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getLineTypeAsString()).append("\"; ");
 		insertQuery.append(" ").append(TITLE).append(" \"").append(layout.getTitle()).append("\"; ");
 		insertQuery.append(" ").append(TITLE_TYPES).append(" \"").append(layout.getTitleTypesAsString()).append("\"; ");
 		insertQuery.append(" ").append(FOR_TYPE).append(" \"").append(layout.getForType()).append("\"; ");
@@ -96,7 +91,7 @@ public class BlockLayoutDao {
 		insertQuery.append(" ").append(TOP).append(" \"").append(layout.getTop()).append("\". ");
 //		insertQuery.append(" ").append().append(" \"").append(layout.getProperties()).append("\"; ");
 		
-		insertQuery.append("} }");
+		insertQuery.append(" }");
 		
 		sparql.insertQuery(insertQuery.toString());
 		

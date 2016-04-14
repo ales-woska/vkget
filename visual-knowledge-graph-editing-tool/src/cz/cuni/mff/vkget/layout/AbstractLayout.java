@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractLayout {
-	private String uri;
-	private List<TitleType> titleTypes;
-	private String fontColor;
-	private int fontSize;
-	private String lineColor;
-	private String lineType;
-	private int lineThickness;
+	protected String title;
+	protected String uri;
+	protected List<TitleType> titleTypes;
+	protected String fontColor;
+	protected int fontSize;
+	protected String lineColor;
+	protected LineType lineType;
+	protected int lineThickness;
 
 	public List<TitleType> getTitleTypes() {
 		return titleTypes;
@@ -60,12 +61,20 @@ public abstract class AbstractLayout {
 		this.lineColor = lineColor;
 	}
 
-	public String getLineType() {
+	public LineType getLineType() {
 		return lineType;
 	}
 
-	public void setLineType(String lineType) {
+	public String getLineTypeAsString() {
+		return lineType.getText();
+	}
+
+	public void setLineType(LineType lineType) {
 		this.lineType = lineType;
+	}
+
+	public void setLineTypeFromString(String lineType) {
+		this.lineType = LineType.fromString(lineType);
 	}
 
 	public int getLineThickness() {
@@ -82,6 +91,14 @@ public abstract class AbstractLayout {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }

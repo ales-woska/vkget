@@ -10,7 +10,7 @@
 <body>
 	<jsp:include page="fragments/menu.jsp" />
 
-	<div>
+	<div style="position: relative;">
 		<canvas id="panelCanvas" height="700px" width="1500px"></canvas>
 		<c:out value="${tables}" escapeXml="false" />
 	</div>

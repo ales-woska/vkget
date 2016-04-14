@@ -2,13 +2,17 @@ package cz.cuni.mff.vkget.render;
 
 import java.awt.Point;
 
+import org.springframework.stereotype.Service;
+
 import cz.cuni.mff.vkget.data.DataModel;
 import cz.cuni.mff.vkget.data.RdfObject;
 import cz.cuni.mff.vkget.layout.BlockLayout;
 import cz.cuni.mff.vkget.layout.GveTable;
 import cz.cuni.mff.vkget.layout.LineLayout;
+import cz.cuni.mff.vkget.layout.LineType;
 import cz.cuni.mff.vkget.layout.ScreenLayout;
 
+@Service
 public class HtmlRenderer {
 	
 	public String render(DataModel dataModel, ScreenLayout screenLayout) {
@@ -72,6 +76,13 @@ public class HtmlRenderer {
 	
 	private void renderLine(StringBuilder sb, LineLayout layout) {
 		sb.append("ctx.beginPath();");
+		if (layout.getLineType() == LineType.DASHED) {
+			sb.append("ctx.setLineDash([5,5]);");
+		} else if (layout.getLineType() == LineType.DOTTED) {
+			sb.append("ctx.setLineDash([1,5]);");
+		}
+		sb.append("ctx.lineWidth = ").append(layout.getLineThickness()).append(";");
+		sb.append("ctx.strokeStyle = '").append(layout.getLineColor()).append("';");
 		if (layout.getPoints().size() > 1) {
 			Point first = layout.getPoints().get(0);
 			sb.append("ctx.moveTo(").append(first.x).append(", ").append(first.y).append(");");

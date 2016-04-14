@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.rdf;
+package cz.cuni.mff.vkget.data;
 
 import java.util.Map;
 

@@ -5,31 +5,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LineLayout extends AbstractLayout {
-	private String fromClass;
-	private String toClass;
-	private String title;
+	private String fromType;
+	private String toType;
 	private List<Point> points;
 
-	public String getFromClass() {
-		return fromClass;
+	public String getFromType() {
+		return fromType;
 	}
 
-	public void setFromClass(String fromClass) {
-		this.fromClass = fromClass;
+	public void setFromType(String fromType) {
+		this.fromType = fromType;
 	}
 
-	public String getToClass() {
-		return toClass;
+	public String getToType() {
+		return toType;
 	}
 
-	public void setToClass(String toClass) {
-		this.toClass = toClass;
+	public void setToType(String toType) {
+		this.toType = toType;
 	}
 
+	@Override
 	public String getTitle() {
 		return title;
 	}
 
+	@Override
 	public void setTitle(String title) {
 		this.title = title;
 	}

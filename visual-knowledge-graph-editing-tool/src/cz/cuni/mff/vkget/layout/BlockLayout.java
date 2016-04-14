@@ -4,7 +4,6 @@ import java.util.List;
 
 public class BlockLayout extends AbstractLayout {
 	private String forType;
-	private String title;
 	private String background;
 	private int height;
 	private int width;
@@ -35,14 +34,6 @@ public class BlockLayout extends AbstractLayout {
 
 	public void setForType(String forClass) {
 		this.forType = forClass;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	public String getBackground() {

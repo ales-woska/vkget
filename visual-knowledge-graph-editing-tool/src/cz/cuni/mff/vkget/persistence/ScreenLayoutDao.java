@@ -5,35 +5,54 @@ import java.util.List;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.layout.BlockLayout;
 import cz.cuni.mff.vkget.layout.LineLayout;
 import cz.cuni.mff.vkget.layout.ScreenLayout;
-import cz.cuni.mff.vkget.rdf.SparqlConnector;
+import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
   * Created by Ales Woska on 31.1.2016.
   */
+@Repository
 public class ScreenLayoutDao {
-	private static final String NAMESPACE = "http://mff.cuni.cz/vkget#";
-	private static final String PREFIX = "vkget";
-	private static final String TYPE = PREFIX + ":screenLayout";
-	private static final String RDF_TYPE = "rdf:type";
+	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
-	private SparqlConnector sparql = new SparqlConnector("http://localhost:8890/sparql");
 	private static final String loadScreenLayoutQuery = 
-			"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-			+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-			+ "PREFIX "+PREFIX+": <"+NAMESPACE+"> "
+			Constants.PREFIX_PART
 			+ "SELECT DISTINCT * WHERE { "
-			+ "  ?layout " + RDF_TYPE + " " + TYPE + " . "
-			+ "  ?layout rdfs:title ?name . "
+			+ "  ?layout " + Constants.RDF_TYPE + " " + Constants.ScreenLayoutType + " . "
+			+ "  ?layout " + Constants.RDFS_TITLE + " ?name . "
 			+ "}";
 	
-    private final BlockLayoutDao blockDao = new BlockLayoutDao();
-    private final LineLayoutDao lineDao = new LineLayoutDao();
+	@Autowired
+    private BlockLayoutDao blockDao;
+	
+	@Autowired
+    private LineLayoutDao lineDao;
 
     public void insert(ScreenLayout layout) {
+
+		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
+		insertQuery.append("INSERT DATA { <").append(layout.getUri()).append("> ");
+		
+		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append("; ");
+		insertQuery.append(" ").append(Constants.RDFS_TITLE).append(" \"").append(layout.getName()).append("\"; ");
+		
+		for (BlockLayout bl: layout.getBlockLayouts()) {
+			insertQuery.append(" ").append(Constants.BlockLayoutProperty).append(" <").append(bl.getUri()).append("> ; ");
+		}
+		for (LineLayout ll: layout.getLineLayouts()) {
+			insertQuery.append(" ").append(Constants.LineLayoutProperty).append(" <").append(ll.getUri()).append("> ; ");
+		}
+		
+		insertQuery.append(" }");
+    	
+    	sparql.insertQuery(insertQuery.toString());
+    	
         for (BlockLayout block: layout.getBlockLayouts()) {
             blockDao.insert(block);
         }
@@ -67,9 +86,9 @@ public class ScreenLayoutDao {
     
     public List<BlockLayout> loadBlockLayouts(String uri) {
     	String loadBlocksForScreen = 
-				"PREFIX vkget: <http://mff.cuni.cz/vkget#> "
+				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> vkget:blockLayout ?uri . "
+				+ " <" + uri + "> " + Constants.BlockLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
 		List<BlockLayout> layouts = new ArrayList<BlockLayout>();
@@ -84,9 +103,9 @@ public class ScreenLayoutDao {
     
     public List<LineLayout> loadLineLayouts(String uri) {
     	String loadBlocksForScreen = 
-				"PREFIX vkget: <http://mff.cuni.cz/vkget#> "
+				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> vkget:lineLayout ?uri . "
+				+ " <" + uri + "> " + Constants.LineLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
 		List<LineLayout> layouts = new ArrayList<LineLayout>();

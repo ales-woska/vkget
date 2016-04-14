@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.springframework.stereotype.Service;
+
+import cz.cuni.mff.vkget.connect.CityCountryConnector;
 import cz.cuni.mff.vkget.data.DataModel;
+import cz.cuni.mff.vkget.data.Graph;
 import cz.cuni.mff.vkget.data.RdfObject;
 import cz.cuni.mff.vkget.data.RdfObjectProperty;
 import cz.cuni.mff.vkget.data.RdfProperty;
+import cz.cuni.mff.vkget.data.RdfTriple;
 import cz.cuni.mff.vkget.layout.GveTable;
-import cz.cuni.mff.vkget.rdf.Graph;
-import cz.cuni.mff.vkget.rdf.RdfTriple;
 
+@Service
 public class DataModelLoader {
 
-	public DataModel loadDataModel(Graph graph) {
+	public DataModel loadDataModel() {
+		Graph graph = new CityCountryConnector().loadCitiesWithCountries();
 		DataModel dataModel = new DataModel();
 		
 		List<GveTable> tables = new ArrayList<GveTable>();

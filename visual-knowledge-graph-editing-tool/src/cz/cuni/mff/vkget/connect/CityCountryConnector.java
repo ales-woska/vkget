@@ -1,12 +1,14 @@
-package cz.cuni.mff.vkget.rdf;
+package cz.cuni.mff.vkget.connect;
 
 import java.util.HashMap;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 
+import cz.cuni.mff.vkget.data.Graph;
+import cz.cuni.mff.vkget.data.RdfTriple;
+
 public class CityCountryConnector {
-	private SparqlConnector sparql = new SparqlConnector("http://dbpedia.org/sparql");
 	private static final String query = 
 			"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
 			+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
@@ -28,7 +30,7 @@ public class CityCountryConnector {
 	public Graph loadCitiesWithCountries() {
 		Graph graph = new Graph();
 		
-		ResultSet results = sparql.query(query);
+		ResultSet results = SparqlConnector.getDbpediaConnector().query(query);
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
 
