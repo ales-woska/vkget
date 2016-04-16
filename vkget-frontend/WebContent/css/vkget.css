@@ -1,0 +1,59 @@
+table.vkget_table {
+    border-spacing: 10px;
+    border-collapse: collapse;
+    position: absolute;
+    table-layout: fixed;
+}
+
+table.vkget_table thead {
+	display: block;
+	font-size: 12px;	
+}
+
+table.vkget_table thead .caption {
+	font-size: 14px;
+}
+
+table.vkget_table th {
+	text-align: center;
+}
+
+table.vkget_table th.columnCaption:hover {
+	background-color: orange;
+	cursor: pointer;
+}
+
+table.vkget_table tbody {
+	display: block;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+table.vkget_table tbody tr:hover {
+	background-color: yellow;
+}
+
+table.vkget_table td {
+	padding: 5px;
+}
+
+#workspace {
+	position: relative;
+}
+
+div.vkget_line_title {
+	position: absolute;
+}
+
+#myholder {
+	border: 1px solid gray;
+	margin: 10px;
+	width: 1560px;
+	position: relative;
+}
+
+#myholder a {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}

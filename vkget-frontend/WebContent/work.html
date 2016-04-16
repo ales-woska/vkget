@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Visual Knowledge Graph Editing Tool">
+<meta name="author" content="ales.woska@gmail.com">
+
+<link href="favicon.png" rel="icon" type="image/png" />
+
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css" />
+<link rel="stylesheet" type="text/css" href="css/fix.css" />
+<link rel="stylesheet" type="text/css" href="css/vkget.css" />
+
+<script src="js/jquery-1.12.2.min.js"></script>
+<script src="js/angular.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<title>Visual Knowledge Graph Editing Tool Home</title>
+</head>
+
+<body ng-app="vkget">
+	<div>
+		<div ng-include="'menu.html'"></div>
+		<div id="workspace" ng-controller="dataController">
+			<canvas id="panelCanvas" height="700px" width="1500px"></canvas>
+
+			<table ng-repeat="table in dataModel.tables" class="vkget_table"
+				style="
+					background-color: {{layouts[table.typeUri].background}};
+					color: {{layouts[table.typeUri].fontColor}};
+					font-size: {{layouts[table.typeUri].fontSize}}px;
+					left: {{layouts[table.typeUri].left}}px;
+					top: {{layouts[table.typeUri].top}}px;
+					width: {{layouts[table.typeUri].width}}px;
+					border: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};">
+				
+				<thead>
+					<tr><th class="caption" colspan="{{table.columnsURIs.length}}">{{layouts[table.typeUri].title}}</th></tr>
+					<tr>
+						<th class="columnCaption" ng-repeat="property in table.columnsURIs" 
+							style="width: {{layouts[table.typeUri].width / table.columnsURIs.length}}px;"
+							ng:class="selectedCls(property)" ng:click="changeSorting($index)">
+							{{property}}</th>
+					</tr>
+				</thead>
+				
+				<tbody style="height: {{layouts[table.typeUri].height}}px;">
+					<tr ng-repeat="instance in table.instances | orderBy: mySorter : sort.reverse">
+						<td ng-repeat="property in instance.literalProperties" 
+							style="width: {{layouts[table.typeUri].width / instance.literalProperties.length}}px;">
+							{{property.value}}
+						</td>
+					</tr>
+				</tbody>
+								
+			</table>
+			
+			<div ng-repeat="layout in screenLayout.lineLayouts" class="vkget_line_title"
+				style="color: {{layout.fontColor}}; font-size: {{layout.fontSize}}px; left: {{layout.left}}px; top: {{layout.top}}px;">
+				{{layout.title}}
+			</div>
+			
+		</div>
+	</div>
+	
+	<script>
+		var app = angular.module('vkget', [])
+	
+		app.controller('dataController', function($scope, $http) {
+			$scope.sort = {
+		        column: 0,
+		        reverse: false
+		    };
+			
+			$scope.mySorter = function(item) {
+				var sortByColumn = $scope.sort.column;
+				return item.literalProperties[sortByColumn].value;
+			}
+
+		    $scope.selectedCls = function(column) {
+		        return column == $scope.sort.column && 'sort-' + $scope.sort.reverse;
+		    };
+		    
+		    $scope.changeSorting = function(column) {
+		        var sort = $scope.sort;
+		        if (sort.column == column) {
+		            sort.reverse = !sort.reverse;
+		        } else {
+		            sort.column = column;
+		            sort.reverse = false;
+		        }
+		    };
+			
+			$http.get("http://localhost:8090/data/aaa")
+		    .then(function(response) {
+				$scope.dataModel = response.data;
+		    });
+			
+			$http.get("http://localhost:8090/layout?uri=http://mff.cuni.cz/test.woska.layout")
+		    .then(function(response) {
+		        var layout = response.data;
+		        $scope.screenLayout = layout;
+		        var layouts = {}
+		        for (var key in layout.blockLayouts) {
+		        	var bl = layout.blockLayouts[key];
+		        	layouts[bl.forType] = bl;
+		        }
+		        $scope.layouts = layouts;
+				var c = document.getElementById('panelCanvas');
+				var ctx = c.getContext('2d');
+				for (var i in $scope.screenLayout.lineLayouts) {
+					layout = $scope.screenLayout.lineLayouts[i];
+					ctx.beginPath();
+					if (layout.lineType == 'dashed') {
+						ctx.setLineDash([5,5]);
+					} else if (layout.lineType == 'dotted') {
+						ctx.setLineDash([1,5]);
+					}
+					ctx.lineWidth = layout.lineThickness;
+					ctx.strokeStyle = layout.lineColor;
+					if (layout.points.length > 1) {
+						var first = layout.points[0];
+						ctx.moveTo(first.x, first.y);
+						for (var i = 1; i < layout.points.length; i++) {
+							var point = layout.points[i];
+							ctx.lineTo(point.x, point.y);
+						}
+					}
+					ctx.stroke();
+				}
+		    });
+		});
+	</script>
+	
+</body>
+</html>

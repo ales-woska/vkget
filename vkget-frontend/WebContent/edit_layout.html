@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Visual Knowledge Graph Editing Tool">
+<meta name="author" content="ales.woska@gmail.com">
+
+<link href="favicon.png" rel="icon" type="image/png" />
+
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css" />
+<link rel="stylesheet" type="text/css" href="css/fix.css" />
+<link rel="stylesheet" type="text/css" href="css/vkget.css" />
+<link rel="stylesheet" type="text/css" href="css/joint.min.css" />
+
+<script src="js/jquery-1.12.2.min.js"></script>
+<script src="js/angular.min.js"></script>
+<script src="js/angular-route.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script src="js/lodash.min.js"></script>
+<script src="js/backbone.min.js"></script>
+<script src="js/joint.min.js"></script>
+
+<title>Visual Knowledge Graph Editing Tool Home</title>
+</head>
+
+<body>
+	<div ng-app="vkget">
+		<div ng-include="'menu.html'"></div>
+
+		<div class="container" ng-controller="layoutController">
+		
+			<div ng-if="!uri" class="page-header">
+				<h1>Create new layout</h1>
+			</div>
+			<div ng-if="uri" class="page-header">
+				<h1>edit {{screenLayout.name}}</h1>
+			</div>
+			
+			<div>
+				<a href="layout" type="button" class="btn btn-default btn-success" aria-label="Left Align">
+					Save
+				</a>
+				<a href="layout" type="button" class="btn btn-default btn-warning" aria-label="Left Align">
+					Cancel
+				</a>
+			</div>
+		</div>
+		
+	
+		<div>
+			<div id="myholder">
+				<a href="#" type="button" class="btn btn-default btn-success" aria-label="Left Align" onclick="addTable();">
+					Add table
+				</a>
+			</div>
+		</div>
+	
+	
+		<div id="blockModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div ng-include="'block_form.html'"></div>
+				</div>
+			</div>
+		</div>
+	
+	
+		<div id="lineModal" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div ng-include="'line_form.html'"></div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	
+	<script>
+		var app = angular.module('vkget', []);
+		
+		app.config(function($locationProvider) {
+		    $locationProvider.html5Mode({
+		        enabled: true,
+		        requireBase: false
+		      });
+		  });
+
+		app.controller('layoutController', function($scope, $location, $http) {
+			var uri = $location.search()['uri'];
+			$http.get("http://localhost:8090/layout?uri=" + uri).then(
+					function(response) {
+						$scope.uri = uri;
+						$scope.screenLayout = response.data;
+						loadLayout($scope.screenLayout);
+					});
+		});
+
+		var graph = new joint.dia.Graph;
+
+		var paper = new joint.dia.Paper({
+			el : $('#myholder'),
+			model : graph,
+			width : 1558,
+			gridSize : 10
+		});
+
+		paper.on('cell:pointerdblclick', function(element) {
+			$('#blockModal').modal('toggle');
+		});
+
+		function addTable() {
+			var rect = new joint.shapes.basic.Rect({
+				position : {
+					x : 0,
+					y : 0
+				},
+				size : {
+					width : 100,
+					height : 100
+				},
+				attrs : {
+					rect : {
+						fill : 'silver'
+					},
+					text : {
+						text : 'new_table',
+						fill : 'black'
+					}
+				}
+			});
+			graph.addCell(rect);
+		}
+
+		function loadLayout(screenLayout) {
+			if (!screenLayout) {
+				return;
+			}
+			for (var i in screenLayout.blockLayouts) {
+				var bl = screenLayout.blockLayouts[i];
+				var rect = new joint.shapes.basic.Rect({
+					id : bl.forType,
+					position : {
+						x : bl.left,
+						y : bl.top
+					},
+					size : {
+						width : bl.width,
+						height : bl.height
+					},
+					attrs : {
+						rect : {
+							fill : bl.background
+						},
+						text : {
+							text : bl.forType,
+							fill : 'black'
+						}
+					}
+				});
+				graph.addCell(rect);
+			}
+
+			for (var i in screenLayout.lineLayouts) {
+				var ll = screenLayout.lineLayouts[i];
+				var link = new joint.dia.Link({
+					source : {
+						id : ll.fromType
+					},
+					target : {
+						id : ll.toType
+					}
+				});
+				link.on('change:vertices', function (element) {
+					$('#lineModal').modal('toggle');
+				});
+				graph.addCell(link);
+			}
+		}
+	</script>
+	
+</body>
+</html>
