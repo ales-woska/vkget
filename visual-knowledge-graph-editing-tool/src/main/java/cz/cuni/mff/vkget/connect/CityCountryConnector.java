@@ -33,7 +33,7 @@ public class CityCountryConnector {
 			+ "  ?country dbpedia-owl:populationTotal ?populationTotalCountry . "
 			+ "  ?country rdfs:label ?countryLabel . "
 			+ "  FILTER (lang(?cityLabel) = 'en' && lang(?countryLabel) = 'en' && ?populationTotalCity > 1000000) "
-			+ "}";
+			+ "} LIMIT 10 ";
 	
 
 	public Graph loadCitiesWithCountries() {

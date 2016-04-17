@@ -30,6 +30,10 @@
 <body>
 	<div ng-app="vkget">
 		<div ng-include="'menu.html'"></div>
+		<div class="alert alert-danger fade in hidden">
+		    <a href="#" class="close" data-dismiss="alert">&times;</a>
+		    <strong>Error!</strong> A problem has been occurred while submitting your data.
+		</div>
 
 		<div class="container" ng-controller="layoutController">
 		
@@ -41,10 +45,10 @@
 			</div>
 			
 			<div>
-				<a href="layout" type="button" class="btn btn-default btn-success" aria-label="Left Align">
+				<a type="button" class="btn btn-default btn-success" aria-label="Left Align" ng-click="saveLayout();">
 					Save
 				</a>
-				<a href="layout" type="button" class="btn btn-default btn-warning" aria-label="Left Align">
+				<a type="button" class="btn btn-default btn-warning" aria-label="Left Align" ng-click="cancel();">
 					Cancel
 				</a>
 			</div>
@@ -89,7 +93,7 @@
 		      });
 		  });
 
-		app.controller('layoutController', function($scope, $location, $http) {
+		app.controller('layoutController', function($scope, $location, $window, $http) {
 			var uri = $location.search()['uri'];
 			$http.get("http://localhost:8090/layout?uri=" + uri).then(
 					function(response) {
@@ -97,6 +101,20 @@
 						$scope.screenLayout = response.data;
 						loadLayout($scope.screenLayout);
 					});
+			
+			$scope.saveLayout = function() {
+				$http.post('http://localhost:8090/layout/save', $scope.screenLayout)
+	            .success(function (data, status, headers, config) {
+					$window.location.href = "/vkget-frontend/layout.html?saved=" + $scope.screenLayout.name;
+	            })
+	            .error(function (data, status, header, config) {
+	            	$('.alert').show();
+	            });
+			}
+			
+			$scope.cancel = function() {
+				$window.location.href = "/vkget-frontend/layout.html";
+			}
 		});
 
 		var graph = new joint.dia.Graph;

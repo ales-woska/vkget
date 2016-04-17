@@ -7,11 +7,11 @@ import cz.cuni.mff.vkget.data.RdfEntity;
 
 public abstract class AbstractLayout extends RdfEntity {
 	protected String title;
-	protected List<TitleType> titleTypes;
+	protected List<TitleType> titleTypes = new ArrayList<TitleType>();
 	protected String fontColor;
 	protected int fontSize;
 	protected String lineColor;
-	protected LineType lineType;
+	protected LineType lineType = LineType.SOLID;
 	protected int lineThickness;
 
 	public List<TitleType> getTitleTypes() {
@@ -31,6 +31,9 @@ public abstract class AbstractLayout extends RdfEntity {
 	}
 	
 	public void setTitleTypesFromString(String titleTypes) {
+		if (titleTypes == null) {
+			return;
+		}
 		String[] types = titleTypes.split(" ");
 		this.titleTypes = new ArrayList<TitleType>();
 		for (String type: types) {

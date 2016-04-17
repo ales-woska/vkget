@@ -10,9 +10,11 @@ public class Constants {
 	public static final String ScreenLayoutType = VKGET_Prefix + ":ScreenLayout";
 	public static final String BlockLayoutType = VKGET_Prefix + ":BlockLayout";
 	public static final String LineLayoutType = VKGET_Prefix + ":LineLayout";
+	public static final String RowLayoutType = VKGET_Prefix + ":RowLayout";
 	public static final String ScreenLayoutProperty = VKGET_Prefix + ":screenLayout";
 	public static final String BlockLayoutProperty = VKGET_Prefix + ":blockLayout";
 	public static final String LineLayoutProperty = VKGET_Prefix + ":lineLayout";
+	public static final String RowLayoutProperty = VKGET_Prefix + ":rowLayout";
 	public static final String RDF_TYPE = "rdf:type";
 	public static final String RDFS_TITLE = "rdfs:title";
 	

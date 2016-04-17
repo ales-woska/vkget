@@ -24,7 +24,7 @@ public class BlockLayout extends AbstractLayout {
 
 	public RowLayout getRowLayout(String name) {
 		for (RowLayout r : properties) {
-			if (r.getPropertyName().equals(name)) {
+			if (r.getProperty().equals(name)) {
 				return r;
 			}
 		}

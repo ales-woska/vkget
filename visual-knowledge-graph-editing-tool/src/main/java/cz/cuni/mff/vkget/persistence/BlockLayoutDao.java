@@ -1,13 +1,18 @@
 package cz.cuni.mff.vkget.persistence;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
+import cz.cuni.mff.vkget.data.layout.RowLayout;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 @Repository
@@ -27,6 +32,9 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 	private final String TOP = Constants.VKGET_Prefix + ":" + "top";
 
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
+	
+	@Autowired
+	private RowLayoutDao rowLayoutDao;
 	
 	@Override
 	public BlockLayout load(String uri) {
@@ -66,8 +74,26 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 				case TOP: layout.setTop(Integer.valueOf(value)); break;
 			}
 		}
+		layout.setProperties(this.loadRowLayouts(uri));
 		return layout;
 	}
+    
+    private List<RowLayout> loadRowLayouts(String uri) {
+    	String loadBlocksForScreen = 
+				Constants.PREFIX_PART
+				+ "SELECT DISTINCT * WHERE { "
+				+ " <" + uri + "> " + Constants.RowLayoutProperty + " ?uri . "
+				+ "}";
+		ResultSet results = sparql.query(loadBlocksForScreen);
+		List<RowLayout> layouts = new ArrayList<RowLayout>();
+		while (results.hasNext()) {
+			QuerySolution solution = results.next();
+			String rlUri = solution.get("uri").asResource().getURI();
+			RowLayout bl = rowLayoutDao.load(rlUri);
+			layouts.add(bl);
+		}
+		return layouts;
+    }
 	
 	
     @Override
@@ -91,12 +117,14 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 		insertQuery.append(" ").append(WIDTH).append(" \"").append(layout.getWidth()).append("\"; ");
 		insertQuery.append(" ").append(LEFT).append(" \"").append(layout.getLeft()).append("\"; ");
 		insertQuery.append(" ").append(TOP).append(" \"").append(layout.getTop()).append("\". ");
-//		insertQuery.append(" ").append().append(" \"").append(layout.getProperties()).append("\"; ");
 		
 		insertQuery.append(" }");
 		
 		sparql.insertQuery(insertQuery.toString());
-		
+				
+		for (RowLayout rowLayout: layout.getProperties()) {
+			rowLayoutDao.insert(rowLayout);
+		}
 		
     }
 }

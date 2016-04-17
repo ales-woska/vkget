@@ -1,6 +1,6 @@
 table.vkget_table {
-    border-spacing: 10px;
-    border-collapse: collapse;
+    border-spacing: 0px;
+    border-collapse: separate;
     position: absolute;
     table-layout: fixed;
 }
@@ -16,6 +16,10 @@ table.vkget_table thead .caption {
 
 table.vkget_table th {
 	text-align: center;
+}
+
+th.caption, th.columnCaption {
+	padding: 5px;
 }
 
 table.vkget_table th.columnCaption:hover {

@@ -16,15 +16,19 @@
 
 <script src="js/jquery-1.12.2.min.js"></script>
 <script src="js/angular.min.js"></script>
+<script src="js/angular-route.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 
 <title>Visual Knowledge Graph Editing Tool Home</title>
 </head>
 
 <body>
-	<div ng-app="vkget">
+	<div ng-app="vkget" ng-controller="layoutController">
 		<div ng-include="'menu.html'"></div>
-		
+		<div class="alert alert-info fade in {{show}}">
+		    <a href="#" class="close" data-dismiss="alert">&times;</a>
+		    <strong>Success!</strong> {{savedName}} saved.
+		</div>
 
 		<div class="container">
 		
@@ -33,7 +37,7 @@
 			</div>
 			
 			<div class="row">
-				<div class="list-group" ng-controller="layoutController">
+				<div class="list-group">
 					<a ng-repeat="layout in layouts" href="edit_layout.html?uri={{layout.uri}}" class="list-group-item">{{layout.name}}</a>
 				</div>
 				
@@ -47,8 +51,23 @@
 	
 	<script>
 		var app = angular.module('vkget', [])
+		
+		app.config(function($locationProvider) {
+		    $locationProvider.html5Mode({
+		        enabled: true,
+		        requireBase: false
+		      });
+		  });
 	
-		app.controller('layoutController', function($scope, $http) {
+		app.controller('layoutController', function($scope, $http, $location) {
+			var saved = $location.search()['saved'];
+			if (saved) {
+				$scope.savedName = saved;
+				$scope.show = '';
+			} else {
+				$scope.show = 'hidden';
+			}
+			
 			$http.get("http://localhost:8090/layouts")
 		    .then(function(response) {
 		        $scope.layouts = response.data;

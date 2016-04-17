@@ -1,36 +1,18 @@
 package cz.cuni.mff.vkget.data.layout;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-public class RowLayout implements Serializable {
-    private String propertyName;
-    private List<TitleType> titleTypes;
-    private String titleResource;
-    private List<AggregateFunction> aggregateFunctions;
+public class RowLayout extends AbstractLayout {
+    private String property;
+    private List<AggregateFunction> aggregateFunctions = new ArrayList<AggregateFunction>();
     
-    public String getPropertyName() {
-		return propertyName;
+    public String getProperty() {
+		return property;
 	}
 
-	public void setPropertyName(String propertyName) {
-		this.propertyName = propertyName;
-	}
-
-	public List<TitleType> getTitleTypes() {
-		return titleTypes;
-	}
-
-	public void setTitleTypes(List<TitleType> titleTypes) {
-		this.titleTypes = titleTypes;
-	}
-
-	public String getTitleResource() {
-		return titleResource;
-	}
-
-	public void setTitleResource(String titleResource) {
-		this.titleResource = titleResource;
+	public void setProperty(String property) {
+		this.property = property;
 	}
 
 	public List<AggregateFunction> getAggregateFunctions() {
@@ -41,75 +23,23 @@ public class RowLayout implements Serializable {
 		this.aggregateFunctions = aggregateFunctions;
 	}
 
-	public String getTitle() {
-        String returnTitle = "";
-        for (TitleType titleType: titleTypes) {
-            if (returnTitle.isEmpty()) {
-            	switch (titleType) {
-                    case URL: return propertyName;
-                    case PROPERTY: return propertyName;
-                    case CONSTANT: return titleResource;
-                    default: return "";
-                }
-            } else {
-            	break;
-            }
-        }
-        return returnTitle;
-    }
+	public String getAggregateFunctionsAsString() {
+		StringBuilder sb = new  StringBuilder();
+		for (AggregateFunction type: this.aggregateFunctions) {
+			sb.append(" ").append(type.getText());
+		}
+		return sb.toString().trim();
+	}
+	
+	public void setAggregateFunctionsFromString(String aggregateFunctions) {
+		if (aggregateFunctions == null) {
+			return;
+		}
+		String[] types = aggregateFunctions.split(" ");
+		this.aggregateFunctions = new ArrayList<AggregateFunction>();
+		for (String type: types) {
+			this.aggregateFunctions.add(AggregateFunction.fromString(type));
+		}
+	}
 
-    public String getValue(List<String> properties) {
-        if (properties.size() == 1) {
-            properties.get(0);
-        } else {
-            for (AggregateFunction aggregateFunction: aggregateFunctions) {
-                switch (aggregateFunction) {
-                    case MAX: return max(properties);
-                    case MIN: return min(properties);
-                    case AVG: return avg(properties);
-                    case NOTHING: return flatten(properties);
-                    default: return null;
-                }
-            }
-        }
-        return "";
-    }
-
-    private String max(List<String> strings) {
-        long max = 0;
-        for (String s: strings) {
-            long n = Long.valueOf(s);
-            if (n > max) {
-            	max = n;
-            }
-        }
-        return String.valueOf(max);
-    }
-
-    private String min(List<String> strings) {
-        long min = Long.MAX_VALUE;
-        for (String s: strings) {
-            long n = Long.valueOf(s);
-            if (n < min) {
-            	min = n;
-            }
-        }
-        return String.valueOf(min);
-    }
-
-    private String avg(List<String> strings) {
-        long sum = 0;
-        for (String s: strings) {
-            sum += Long.parseLong(s);       
-        }
-        return String.valueOf(sum / strings.size());
-    }
-
-    private String flatten(List<String> strings) {
-        String value = "";
-        for (String s: strings) {
-        	value += " " + s;
-        }
-        return value;
-    }
 }

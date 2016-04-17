@@ -37,18 +37,28 @@
 					width: {{layouts[table.typeUri].width}}px;
 					border: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};">
 				
-				<thead>
-					<tr><th class="caption" colspan="{{table.columnsURIs.length}}">{{layouts[table.typeUri].title}}</th></tr>
+				<thead style="border-bottom: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};">
+					<tr>
+						<th style="border-bottom: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};"
+							class="caption" colspan="{{table.columnsURIs.length}}">
+							{{layouts[table.typeUri].title}}</th>
+					</tr>
 					<tr>
 						<th class="columnCaption" ng-repeat="property in table.columnsURIs" 
 							style="width: {{layouts[table.typeUri].width / table.columnsURIs.length}}px;"
-							ng:class="selectedCls(property)" ng:click="changeSorting($index)">
-							{{property}}</th>
+							ng-click="order(this, $index);">
+							{{getTitleForProperty(layouts[table.typeUri], property);}}
+						</th>
+					</tr>
+					<tr>
+						<th ng-repeat="property in table.columnsURIs" style="width: {{layouts[table.typeUri].width / table.columnsURIs.length}}px;">
+							<input type="text" style="width: 100px;" ng-model="search[$index]" ng-change="filter(this, $index);" />
+						</th>
 					</tr>
 				</thead>
 				
 				<tbody style="height: {{layouts[table.typeUri].height}}px;">
-					<tr ng-repeat="instance in table.instances | orderBy: mySorter : sort.reverse">
+					<tr ng-repeat="instance in table.instances | filter:filterText">
 						<td ng-repeat="property in instance.literalProperties" 
 							style="width: {{layouts[table.typeUri].width / instance.literalProperties.length}}px;">
 							{{property.value}}
@@ -69,34 +79,68 @@
 	<script>
 		var app = angular.module('vkget', [])
 	
-		app.controller('dataController', function($scope, $http) {
+		app.controller('dataController', function($scope, $http, $filter) {
 			$scope.sort = {
 		        column: 0,
-		        reverse: false
+		        reverse: true
+		    };
+			
+			$scope.filter = {
+		        column: 0,
+		        text: ""
+		    };
+			
+			$scope.getTitleForProperty = function(layout, property) {
+				if (layout === undefined) {
+					return "";
+				}
+	        	for (var j in layout.properties) {
+	        		var rl = layout.properties[j];
+	        		if (rl.property == property) {
+	        			return rl.title;
+	        		}
+	        	}
+			};
+		    
+			$scope.order = function(scope, index) {
+				$scope.sort.column = index;
+				$scope.sort.reverse = !$scope.sort.reverse; 
+				var reverse = $scope.sort.reverse;
+		        scope.table.instances = $filter('orderBy')(scope.table.instances, $scope.mySorter, reverse);
+		    };
+		    
+			$scope.filter = function(scope, index) {
+				$scope.filter.column = index;
+				$scope.filter.text = scope.search[index];
+		        scope.table.instances = $filter('filter')(scope.table.instances, $scope.myFilter);
 		    };
 			
 			$scope.mySorter = function(item) {
 				var sortByColumn = $scope.sort.column;
 				return item.literalProperties[sortByColumn].value;
 			}
-
-		    $scope.selectedCls = function(column) {
-		        return column == $scope.sort.column && 'sort-' + $scope.sort.reverse;
-		    };
-		    
-		    $scope.changeSorting = function(column) {
-		        var sort = $scope.sort;
-		        if (sort.column == column) {
-		            sort.reverse = !sort.reverse;
-		        } else {
-		            sort.column = column;
-		            sort.reverse = false;
-		        }
-		    };
+			
+			$scope.myFilter = function(item) {
+				if ($scope.filter.text == "") {
+					return true;
+				} else {
+					var col = $scope.filter.column;
+					var text = $scope.filter.text;
+					var value = item.literalProperties[col].value.toString();
+					return value.toLowerCase().indexOf(text.toLowerCase()) >= 0;
+				}
+			};
 			
 			$http.get("http://localhost:8090/data/aaa")
 		    .then(function(response) {
-				$scope.dataModel = response.data;
+		    	var dataModel = response.data;
+				for (var i = 0; i < dataModel.tables.length; i++) {
+					var table = dataModel.tables[i];
+					var scope = [];
+					scope['table'] = table;
+					$scope.order(scope, 0);
+				}
+				$scope.dataModel = dataModel;
 		    });
 			
 			$http.get("http://localhost:8090/layout?uri=http://mff.cuni.cz/test.woska.layout")
