@@ -28,14 +28,14 @@
 </head>
 
 <body>
-	<div ng-app="vkget">
+	<div ng-app="vkget" ng-controller="layoutController">
 		<div ng-include="'menu.html'"></div>
 		<div class="alert alert-danger fade in hidden">
 		    <a href="#" class="close" data-dismiss="alert">&times;</a>
 		    <strong>Error!</strong> A problem has been occurred while submitting your data.
 		</div>
 
-		<div class="container" ng-controller="layoutController">
+		<div class="container">
 		
 			<div ng-if="!uri" class="page-header">
 				<h1>Create new layout</h1>
@@ -57,7 +57,8 @@
 	
 		<div>
 			<div id="myholder">
-				<a href="#" type="button" class="btn btn-default btn-success" aria-label="Left Align" onclick="addTable();">
+				<joint-diagram graph="graph" width="1558" height="600" grid-size="10" />
+				<a href="#" type="button" class="btn btn-default btn-success" aria-label="Left Align" ng-click="addTable();">
 					Add table
 				</a>
 			</div>
@@ -92,14 +93,59 @@
 		        requireBase: false
 		      });
 		  });
+		
+		app.directive('jointDiagram', function () {
+	        var directive = {
+	            link: link,
+	            restrict: 'E',
+	            scope: {
+	                height: '=',
+	                width: '=',
+	                gridSize: '=',
+	                graph: '=',
+	            }
+	        };
+
+	        return directive;
+
+	        function link(scope, element, attrs) {
+	            var diagram = newDiagram(scope.height, scope.width, scope.gridSize, scope.graph, element[0]);
+
+	            diagram.on('cell:pointerdblclick', function(element) {
+	    			$('#blockModal').modal('toggle');
+	    		});
+
+	            diagram.on('blank:pointerclick', function (evt, x, y) {
+	            });
+
+	            diagram.on('link:options', function (evt, cellView, x, y) {
+	            });
+	        }
+
+	        function newDiagram(height, width, gridSize, graph, targetElement) {
+	            var paper = new joint.dia.Paper({
+	                el: targetElement,
+	                width: width,
+	                height: height,
+	                gridSize: gridSize,
+	                model: graph,
+	            });
+	            return paper;
+	        }
+
+	    });
 
 		app.controller('layoutController', function($scope, $location, $window, $http) {
+			$scope.graph = new joint.dia.Graph;
+			
 			var uri = $location.search()['uri'];
 			$http.get("http://localhost:8090/layout?uri=" + uri).then(
 					function(response) {
 						$scope.uri = uri;
-						$scope.screenLayout = response.data;
-						loadLayout($scope.screenLayout);
+						var screenLayout = response.data;
+						$scope.screenLayout = screenLayout;
+						$scope.currBlock = screenLayout.blockLayouts[0];
+						loadLayout(screenLayout);
 					});
 			
 			$scope.saveLayout = function() {
@@ -115,89 +161,76 @@
 			$scope.cancel = function() {
 				$window.location.href = "/vkget-frontend/layout.html";
 			}
-		});
-
-		var graph = new joint.dia.Graph;
-
-		var paper = new joint.dia.Paper({
-			el : $('#myholder'),
-			model : graph,
-			width : 1558,
-			gridSize : 10
-		});
-
-		paper.on('cell:pointerdblclick', function(element) {
-			$('#blockModal').modal('toggle');
-		});
-
-		function addTable() {
-			var rect = new joint.shapes.basic.Rect({
-				position : {
-					x : 0,
-					y : 0
-				},
-				size : {
-					width : 100,
-					height : 100
-				},
-				attrs : {
-					rect : {
-						fill : 'silver'
-					},
-					text : {
-						text : 'new_table',
-						fill : 'black'
-					}
-				}
-			});
-			graph.addCell(rect);
-		}
-
-		function loadLayout(screenLayout) {
-			if (!screenLayout) {
-				return;
-			}
-			for (var i in screenLayout.blockLayouts) {
-				var bl = screenLayout.blockLayouts[i];
+			
+			$scope.addTable = function() {
 				var rect = new joint.shapes.basic.Rect({
-					id : bl.forType,
 					position : {
-						x : bl.left,
-						y : bl.top
+						x : 0,
+						y : 0
 					},
 					size : {
-						width : bl.width,
-						height : bl.height
+						width : 100,
+						height : 100
 					},
 					attrs : {
 						rect : {
-							fill : bl.background
+							fill : 'silver'
 						},
 						text : {
-							text : bl.forType,
+							text : 'new_table',
 							fill : 'black'
 						}
 					}
 				});
-				graph.addCell(rect);
+				$scope.graph.addCell(rect);
 			}
 
-			for (var i in screenLayout.lineLayouts) {
-				var ll = screenLayout.lineLayouts[i];
-				var link = new joint.dia.Link({
-					source : {
-						id : ll.fromType
-					},
-					target : {
-						id : ll.toType
-					}
-				});
-				link.on('change:vertices', function (element) {
-					$('#lineModal').modal('toggle');
-				});
-				graph.addCell(link);
+			function loadLayout(screenLayout) {
+				if (!screenLayout) {
+					return;
+				}
+				for (var i in screenLayout.blockLayouts) {
+					var bl = screenLayout.blockLayouts[i];
+					var rect = new joint.shapes.basic.Rect({
+						id : bl.forType,
+						position : {
+							x : bl.left,
+							y : bl.top
+						},
+						size : {
+							width : bl.width,
+							height : bl.height
+						},
+						attrs : {
+							rect : {
+								fill : bl.background
+							},
+							text : {
+								text : bl.forType,
+								fill : 'black'
+							}
+						}
+					});
+					$scope.graph.addCell(rect);
+				}
+
+				for (var i in screenLayout.lineLayouts) {
+					var ll = screenLayout.lineLayouts[i];
+					var link = new joint.dia.Link({
+						source : {
+							id : ll.fromType
+						},
+						target : {
+							id : ll.toType
+						}
+					});
+					link.on('change:vertices', function (element) {
+						$('#lineModal').modal('toggle');
+					});
+					$scope.graph.addCell(link);
+				}
 			}
-		}
+		});
 	</script>
 	
 </body>
