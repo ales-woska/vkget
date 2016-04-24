@@ -7,72 +7,163 @@ app.config(function($locationProvider) {
       });
   });
 
-app.directive('blockForm', function ($scope) {
-    var directive = {};
-    directive.restrict = 'E';
-    directive.templateUrl = 'blockForm.html';
-    directive.scope = {
-    	index: '=id',
-        currBlock: '=block'
-    };
-    return directive;
+app.filter('colons', function () {
+	return function (input) {
+		return input.replace(/:/g, '');
+	};
 });
 
-app.directive('jointDiagram', function () {
-    var directive = {
-        link: link,
-        restrict: 'E',
-        scope: {
-            height: '=',
-            width: '=',
-            gridSize: '=',
-            graph: '=',
-        }
+app.filter('subtract', function ($filter) {
+	return function (input, criteria) {
+		if (!criteria) {
+			return input;
+		}
+		var output = input.filter(function(x) { return criteria.indexOf(x) < 0; });
+		return output;
+	};
+});
+
+app.directive('blockForm', function () {
+    var directive = {};
+    directive.restrict = 'E';
+    directive.transclude = true;
+    directive.templateUrl = 'blockForm.html';
+    directive.scope = {
+        currBlock: '=block',
+        addTitleType: "&addTitleType",
+        removeTitleType: "&removeTitleType",
+        addProperty: "&addProperty",
+        removeProperty: "&removeProperty"
     };
+	return directive;
+});
 
-    return directive;
-
-    function link(scope, element, attrs) {
-        var diagram = newDiagram(scope.height, scope.width, scope.gridSize, scope.graph, element[0]);
-
-        diagram.on('cell:pointerdblclick', function(element) {
-        	var i = element.id.split("_")[1];
-        	var blockFormId = "#blockForm" + (i - 1);
-			$(blockFormId).modal('toggle');
-		});
-
-        diagram.on('blank:pointerclick', function (evt, x, y) {
-        });
-
-        diagram.on('link:options', function (evt, cellView, x, y) {
-        });
-    }
-
-    function newDiagram(height, width, gridSize, graph, targetElement) {
-        var paper = new joint.dia.Paper({
-            el: targetElement,
-            width: width,
-            height: height,
-            gridSize: gridSize,
-            model: graph,
-        });
-        return paper;
-    }
-
+app.directive('lineForm', function () {
+    var directive = {};
+    directive.restrict = 'E';
+    directive.transclude = true;
+    directive.templateUrl = 'lineForm.html';
+    directive.scope = {
+		screenLayout: '=screenLayout',
+        lineLayout: '=lineLayout',
+        addLine: "&addLine",
+    };
+	return directive;
 });
 
 app.controller('layoutController', function($scope, $location, $window, $http) {
-	$scope.graph = new joint.dia.Graph;
-	
 	var uri = $location.search()['uri'];
 	$http.get("http://localhost:8090/layout?uri=" + uri).then(
 			function(response) {
 				$scope.uri = uri;
 				var screenLayout = response.data;
+				for (var i in screenLayout.blockLayouts) {
+					screenLayout.blockLayouts[i].list = ['a', 'b', 'c'];
+				}
 				$scope.screenLayout = screenLayout;
-				$scope.currBlock = screenLayout.blockLayouts[0];
-				$scope.loadLayout();
 			});
+	
+	$scope.mouseDown = false;
+	$scope.mouseDownBL = null;
+	$scope.top = 0;
+	$scope.left = 0;
+	$scope.offsetTop = 0;
+	$scope.offsetLeft = 0;
+	$scope.parentWidth = 0;
+	$scope.parentHeight = 0;
+	
+	$scope.addLine = function() {
+		var newLine = $scope.lineLayout;
+		var newObject = jQuery.extend(true, {}, newLine);
+		$scope.lineLayout = {};
+		$scope.screenLayout.lineLayouts.push(newObject);
+	};
+	
+	$scope.openLineForm = function() {
+		$('#lineModal').modal('toggle');
+	};
+
+	$scope.addProperty = function(blockLayout) {
+		var property = blockLayout.toAddProperty;
+		if (property == null) {
+			return;
+		}
+		var rowLayout = {
+			property: property.property,
+			title: property.title,
+			titleTypes: [property.titleType],
+			aggregateFunctions: [property.aggregateFunction]
+		};
+		blockLayout.properties.push(rowLayout);
+	};
+	
+	$scope.removeProperty = function(blockLayout, property) {
+		var index = blockLayout.properties.indexOf(property);
+		blockLayout.properties.splice(index, 1);
+	};
+
+	$scope.addTitleType = function(blockLayout) {
+		var titleType = blockLayout.toAddTitle;
+		if (titleType == null) {
+			return;
+		}
+		if (!blockLayout.titleTypes) {
+			blockLayout.titleTypes = [];
+		}
+		blockLayout.titleTypes.push(titleType);
+	};
+	
+	$scope.removeTitleType = function(blockLayout, titleType) {
+		var index = blockLayout.titleTypes.indexOf(titleType);
+		blockLayout.titleTypes.splice(index, 1);
+	};
+
+	$scope.openModal = function(blockLayout) {
+		var id = "#blockForm" + blockLayout.forType.replace(":", "");
+		$(id).modal('toggle');
+	};
+	
+	$scope.onMouseDown = function(event, blockLayout) {
+		if ($scope.mouseDown == false) {
+			$scope.mouseDown = true;
+			$scope.left = event.screenX - blockLayout.left - event.offsetX;
+			$scope.top = event.screenY - blockLayout.top - event.offsetY;
+			$scope.offsetLeft = event.offsetX;
+			$scope.offsetTop = event.offsetY;
+			$scope.mouseDownEl = event.toElement;
+			$scope.mouseDownBL = blockLayout;
+			$scope.parentWidth = event.toElement.parentElement.offsetWidth;
+			$scope.parentHeight = event.toElement.parentElement.offsetHeight;
+		}
+	};
+	
+	$scope.onMouseMove = function(event) {
+		if (event && $scope.mouseDown == true) {
+			var left = $scope.left;
+			var top = $scope.top;
+			var newLeft = (event.screenX - $scope.offsetLeft) - left;
+			var newTop = (event.screenY - $scope.offsetTop) - top;
+			if (newLeft < 0) {
+				$scope.mouseDownBL.left = 0;
+			} else if ((newLeft + $scope.mouseDownBL.width) > $scope.parentWidth) {
+				$scope.mouseDownBL.left = $scope.parentWidth - $scope.mouseDownBL.width;
+			} else {
+				$scope.mouseDownBL.left = newLeft;
+			}
+			if (newTop < 0) {
+				$scope.mouseDownBL.top = 0;
+			} else if ((newTop + $scope.mouseDownBL.height) > $scope.parentHeight) {
+				$scope.mouseDownBL.top = $scope.parentHeight - $scope.mouseDownBL.height;
+			} else {
+				$scope.mouseDownBL.top = newTop;
+			}
+		}
+	};
+	
+	$scope.onMouseUp = function(event) {
+		$scope.mouseDown = false;
+		$scope.mouseDownBL = null;
+	};
 	
 	$scope.saveLayout = function() {
 		$http.post('http://localhost:8090/layout/save', $scope.screenLayout)
@@ -89,72 +180,32 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.addTable = function() {
-		var rect = new joint.shapes.basic.Rect({
-			position : {
-				x : 0,
-				y : 0
-			},
-			size : {
-				width : 100,
-				height : 100
-			},
-			attrs : {
-				rect : {
-					fill : 'silver'
-				},
-				text : {
-					text : 'new_table',
-					fill : 'black'
-				}
-			}
-		});
-		$scope.graph.addCell(rect);
+		var blockLayout = newBlockLayout();
+		$scope.screenLayout.blockLayouts.push(blockLayout);
 	};
-
-	$scope.loadLayout = function() {
-		$scope.graph.clear();
-		if (!$scope.screenLayout) {
-			return;
-		}
-		for (var i in $scope.screenLayout.blockLayouts) {
-			var bl = $scope.screenLayout.blockLayouts[i];
-			var rect = new joint.shapes.basic.Rect({
-				id : bl.forType,
-				position : {
-					x : bl.left,
-					y : bl.top
-				},
-				size : {
-					width : bl.width,
-					height : bl.height
-				},
-				attrs : {
-					rect : {
-						fill : bl.background
-					},
-					text : {
-						text : bl.forType,
-						fill : 'black'
-					}
-				}
-			});
-			$scope.graph.addCell(rect);
-		}
-
-		for (var i in $scope.screenLayout.lineLayouts) {
-			var ll = $scope.screenLayout.lineLayouts[i];
-			var link = new joint.dia.Link({
-				source : {
-					id : ll.fromType
-				},
-				target : {
-					id : ll.toType
-				}
-			});
-			link.on('change:vertices', function (element) {
-				$('#lineModal').modal('toggle');
-			});
-			$scope.graph.addCell(link);
-		}
+	
+	$scope.removeTable = function(blockLayout) {
+		var index = $scope.screenLayout.blockLayouts.indexOf(blockLayout);
+		$scope.screenLayout.blockLayouts.splice(index, 1);
+	};
+	
+	function newBlockLayout() {
+		var blockLayout = {};
+		blockLayout.forType = 'for_type';
+		blockLayout.background = '#aaaaaa',
+		blockLayout.height = 100;
+		blockLayout.width = 100;
+		blockLayout.left = 0;
+		blockLayout.top = 0;
+		blockLayout.properties = [];
+		blockLayout.title = '';
+		blockLayout.titleTypesFromString = 'CONSTANT';
+		blockLayout.fontColor = 'black';
+		blockLayout.fontSize = 10;
+		blockLayout.lineColor = 'black';
+		blockLayout.lineType = 'SOLID';
+		blockLayout.lineThickness = 1;
+		blockLayout.uri = 'asfasfasfasf';
+		return blockLayout;
 	}
 });

@@ -9,6 +9,7 @@ import cz.cuni.mff.vkget.sparql.Constants;
 public class LineLayout extends AbstractLayout {
 	private String fromType;
 	private String toType;
+	private String property;
 	private List<Point> points;
 	
 	public LineLayout() {
@@ -55,6 +56,14 @@ public class LineLayout extends AbstractLayout {
 
 	public void setPoints(List<Point> points) {
 		this.points = points;
+	}
+
+	public String getProperty() {
+		return property;
+	}
+
+	public void setProperty(String property) {
+		this.property = property;
 	}
 
 	public void setPointsFromString(String pointsString) {

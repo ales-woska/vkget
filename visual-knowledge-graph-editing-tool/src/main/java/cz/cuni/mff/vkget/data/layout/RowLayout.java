@@ -3,9 +3,15 @@ package cz.cuni.mff.vkget.data.layout;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.vkget.sparql.Constants;
+
 public class RowLayout extends AbstractLayout {
     private String property;
     private List<AggregateFunction> aggregateFunctions = new ArrayList<AggregateFunction>();
+    
+    public RowLayout() {
+    	this.type = Constants.RowLayoutType;
+    }
     
     public String getProperty() {
 		return property;

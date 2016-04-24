@@ -53,11 +53,61 @@ div.vkget_line_title {
 	border: 1px solid gray;
 	margin: 10px;
 	width: 1560px;
+	height: 600px;
 	position: relative;
 }
 
-#myholder a {
+#addTableButton {
 	position: absolute;
 	top: 10px;
 	right: 10px;
+}
+
+#addLineButton {
+	position: absolute;
+	top: 50px;
+	right: 10px;
+}
+
+.vkget-block {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.vkget-block:hover {
+	cursor: pointer;
+}
+
+.vkget-block a {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	color: black;
+}
+
+.vkget-block a:hover {
+	color: red;
+}
+
+.modal a {
+	color: black;
+	padding: 5px;
+}
+
+.modal a:hover {
+	cursor: pointer;
+}
+
+.modal a.removeTitleType {
+	position: absolute;
+	right: 5px;
+	padding: 0px;
 }

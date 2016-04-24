@@ -1,45 +1,87 @@
-<div id="blockForm{{index}}" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+<div id="blockForm{{currBlock.forType | colons}}" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog">
+
+
+
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
+					<span>&times;</span>
 				</button>
 				<h4 class="modal-title" id="exampleModalLabel">Block layout</h4>
 			</div>
 			<div class="modal-body">
 				<form class="form-horizontal">
-
 					<div class="form-group">
 						<label for="forType" class="col-sm-2 control-label">For rdf:type</label>
-						<div class="col-sm-10">
+						<div class="col-sm-6">
 							<input type="text" class="form-control" id="forType" placeholder="Class" ng-model="currBlock.forType">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="title" class="col-sm-2 control-label">Title</label>
-						<div class="col-sm-10">
+						<label for="title" class="col-sm-2 control-label">Title source</label>
+						<div class="col-sm-4">
 							<input type="text" class="form-control" id="title" placeholder="Title" ng-model="currBlock.title">
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="lineType" class="col-sm-2 control-label">Line type</label>
-						<div class="col-sm-10">
-							<select class="form-control" id="lineType" ng-model="currBlock.lineType">
-								<option value="SOLID">Solid</option>
-								<option value="DOTTED">Dotted</option>
-								<option value="DASHED">Dashed</option>
+						<label for="titleTypes" class="col-sm-2 control-label">Title type</label>
+						<div class="col-sm-4">
+						    <ul class="list-group">
+						        <li class="list-group-item" ng-repeat="titleType in currBlock.titleTypes">
+						            {{titleType}}
+									<a class="removeTitleType" type="button" ng-click="removeTitleType({blockLayout: currBlock, titleType: titleType})">
+										<span class="glyphicon glyphicon-remove"></span>
+									</a>
+						        </li>
+						    </ul>
+							Add title type: <select id="titleTypesList" ng-model="currBlock.toAddTitle" ng-change="addTitleType({blockLayout: currBlock})"
+								ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY'] | subtract:currBlock.titleTypes">
 							</select>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="titleTypes" class="col-sm-2 control-label">Title types</label>
+						<label for="titleTypes" class="col-sm-2 control-label">Title type</label>
 						<div class="col-sm-10">
-							<select class="form-control" id="titleTypes" ng-model="currBlock.titleTypes">
-								<option value="URL">URL</option>
-								<option value="LABEL">RDFS Label</option>
-								<option value="CONSTANT">Constant</option>
-								<option value="PROPERTY">Other property</option>
+							<table>
+								<thead>
+									<tr><th>Property</th><th>Title types</th><th>Title source</th><th>Aggr functions</th><th></th></tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="rowLayout in currBlock.properties">
+										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="rowLayout.property" /></td>
+										<td><select class="form-control" ng-model="rowLayout.titleTypes[0]" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"</select></td>
+										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="rowLayout.title" /></td>
+										<td><select class="form-control" ng-model="rowLayout.aggregateFunctions[0]" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"</select></td>
+										<td><a type="button" ng-click="removeProperty({blockLayout: currBlock, property: rowLayout})"><span class="glyphicon glyphicon-remove"></span></a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="titleTypes" class="col-sm-2 control-label"></label>
+						<div class="col-sm-10">
+							<table>
+								<tbody>
+									<tr>
+										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="currBlock.toAddProperty.property" /></td>
+										<td><select class="form-control" ng-model="currBlock.toAddProperty.titleType" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"</select></td>
+										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="currBlock.toAddProperty.title" /></td>
+										<td><select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"</select></td>
+										<td><a type="button" ng-click="addProperty({blockLayout: currBlock})"><span class="glyphicon glyphicon-plus"></span></a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="lineType" class="col-sm-2 control-label">Line type</label>
+						<div class="col-sm-4">
+							<select class="form-control" id="lineType" ng-model="currBlock.lineType">
+								<option value="SOLID">Solid</option>
+								<option value="DOTTED">Dotted</option>
+								<option value="DASHED">Dashed</option>
 							</select>
 						</div>
 					</div>
@@ -63,38 +105,38 @@
 					</div>
 					<div class="form-group">
 						<label for="fontSize" class="col-sm-2 control-label">Font size</label>
-						<div class="col-sm-10">
+						<div class="col-sm-2">
 							<input type="number" class="form-control" id="fontSize" placeholder="10" ng-model="currBlock.fontSize" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="lineThickness" class="col-sm-2 control-label">Line Thickness</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" id="lineThickness" placeholder="1" ng-model="currBlock.lineThickness" />
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="lineThickness" placeholder="1" ng-model="currBlock.lineThickness" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="height" class="col-sm-2 control-label">Height</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" id="height" placeholder="100" ng-model="currBlock.height" />
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="height" placeholder="100" ng-model="currBlock.height" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="width" class="col-sm-2 control-label">Width</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" id="width" placeholder="100" ng-model="currBlock.width" />
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="width" placeholder="100" ng-model="currBlock.width" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="left" class="col-sm-2 control-label">Left</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" id="left" placeholder="0" ng-model="currBlock.left" />
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="left" placeholder="0" ng-model="currBlock.left" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="top" class="col-sm-2 control-label">Top</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" id="top" placeholder="0" ng-model="currBlock.top" />
+						<div class="col-sm-2">
+							<input type="number" class="form-control" id="top" placeholder="0" ng-model="currBlock.top" />
 						</div>
 					</div>
 				</form>
@@ -104,4 +146,6 @@
 			</div>
 		</div>
 	</div>
+	
+	
 </div>

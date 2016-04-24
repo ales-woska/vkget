@@ -15,6 +15,7 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 	private final String FONT_COLOR = Constants.VKGET_Prefix + ":" + "fontColor";
 	private final String FONT_SIZE = Constants.VKGET_Prefix + ":" + "fontSize";
 	private final String FROM_TYPE = Constants.VKGET_Prefix + ":" + "fromType";
+	private final String PROPERTY = Constants.VKGET_Prefix + ":" + "property";
 	private final String TO_TYPE = Constants.VKGET_Prefix + ":" + "toType";
 	private final String LINE_COLOR = Constants.VKGET_Prefix + ":" + "lineColor";
 	private final String LINE_TYPE = Constants.VKGET_Prefix + ":" + "lineType";
@@ -50,6 +51,7 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 				case FONT_COLOR: layout.setFontColor(value); break;
 				case FONT_SIZE: layout.setFontSize(Integer.valueOf(value)); break;
 				case FROM_TYPE: layout.setFromType(value); break;
+				case PROPERTY: layout.setProperty(value); break;
 				case TO_TYPE: layout.setToType(value); break;
 				case LINE_COLOR: layout.setLineColor(value); break;
 				case LINE_TYPE: layout.setLineTypeFromString(value); break;
@@ -73,6 +75,7 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.LineLayoutType).append("; ");
 		insertQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
 		insertQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
+		insertQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
 		insertQuery.append(" ").append(FROM_TYPE).append(" \"").append(layout.getFromType()).append("\"; ");
 		insertQuery.append(" ").append(TO_TYPE).append(" \"").append(layout.getToType()).append("\"; ");
 		insertQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");

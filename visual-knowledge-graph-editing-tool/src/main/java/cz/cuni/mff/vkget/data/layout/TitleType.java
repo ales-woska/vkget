@@ -1,7 +1,7 @@
 package cz.cuni.mff.vkget.data.layout;
 
 public enum TitleType {
-	URL("url"), LABEL("label"), CONSTANT("constant"), PROPERTY("property");
+	URI("uri"), LABEL("label"), CONSTANT("constant"), PROPERTY("property");
 
 	private String text;
 
