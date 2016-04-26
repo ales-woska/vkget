@@ -23,6 +23,17 @@ app.filter('subtract', function ($filter) {
 	};
 });
 
+app.directive('linesSvg', function () {
+    var directive = {};
+    directive.restrict = 'E';
+    directive.templateUrl = 'linesSvg.html';
+    directive.scope = {
+        screenLayout: '=screenLayout',
+        getLines: '&getLines'
+    };
+	return directive;
+});
+
 app.directive('blockForm', function () {
     var directive = {};
     directive.restrict = 'E';
@@ -57,11 +68,42 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			function(response) {
 				$scope.uri = uri;
 				var screenLayout = response.data;
-				for (var i in screenLayout.blockLayouts) {
-					screenLayout.blockLayouts[i].list = ['a', 'b', 'c'];
+				for (var i in screenLayout.lineLayouts) {
+					initLines(screenLayout.lineLayouts[i]);
+					polyLine(screenLayout.lineLayouts[i]);
 				}
 				$scope.screenLayout = screenLayout;
 			});
+	
+	function polyLine(lineLayout) {
+		if (!lineLayout) {
+			return;
+		}
+		var polyline = "";
+		for (var i = 0; i < lineLayout.points.length; i += 1) {
+			var point = lineLayout.points[i];
+			var space = "";
+			if (polyline != "") {
+				space = " ";
+			}
+			polyline += space + point.x + "," + point.y;
+		}
+		lineLayout.polyline = polyline;
+	}
+	
+	function initLines(lineLayout) {
+		if (!lineLayout) {
+			return;
+		}
+		var lines = [];
+		for (var i = 0; i < lineLayout.points.length - 1; i += 1) {
+			var point1 = lineLayout.points[i];
+			var point2 = lineLayout.points[i + 1];
+			var newLine = [point1.x, point1.y, point2.x, point2.y];
+			lines.push(newLine);
+		}
+		lineLayout.lines = lines;
+	}
 	
 	$scope.mouseDown = false;
 	$scope.mouseDownBL = null;
@@ -71,7 +113,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.offsetLeft = 0;
 	$scope.parentWidth = 0;
 	$scope.parentHeight = 0;
-	
+		
 	$scope.addLine = function() {
 		var newLine = $scope.lineLayout;
 		var newObject = jQuery.extend(true, {}, newLine);
