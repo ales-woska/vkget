@@ -1,3 +1,7 @@
+function escapeUri(uri) {
+	return uri.replace(/#|:|\.|\//gi, "");
+}
+
 var app = angular.module('vkget', []);
 
 app.config(function($locationProvider) {
@@ -9,7 +13,10 @@ app.config(function($locationProvider) {
 
 app.filter('colons', function () {
 	return function (input) {
-		return input.replace(/:/g, '');
+		if (!input) {
+			return "";
+		}
+		return escapeUri(input);
 	};
 });
 
@@ -29,7 +36,8 @@ app.directive('linesSvg', function () {
     directive.templateUrl = 'linesSvg.html';
     directive.scope = {
         screenLayout: '=screenLayout',
-        getLines: '&getLines'
+        getLines: '&getLines',
+        openModal: '&openModal'
     };
 	return directive;
 });
@@ -63,17 +71,21 @@ app.directive('lineForm', function () {
 });
 
 app.controller('layoutController', function($scope, $location, $window, $http) {
+	$scope.screenLayout = newScreenLayout();
+	
 	var uri = $location.search()['uri'];
-	$http.get("http://localhost:8090/layout?uri=" + uri).then(
-			function(response) {
-				$scope.uri = uri;
-				var screenLayout = response.data;
-				for (var i in screenLayout.lineLayouts) {
-					initLines(screenLayout.lineLayouts[i]);
-					polyLine(screenLayout.lineLayouts[i]);
-				}
-				$scope.screenLayout = screenLayout;
-			});
+	if (uri) {
+		$http.get("http://localhost:8090/layout?uri=" + uri).then(
+				function(response) {
+					$scope.uri = uri;
+					var screenLayout = response.data;
+					for (var i in screenLayout.lineLayouts) {
+						initLines(screenLayout.lineLayouts[i]);
+						polyLine(screenLayout.lineLayouts[i]);
+					}
+					$scope.screenLayout = screenLayout;
+				});
+	}
 	
 	function polyLine(lineLayout) {
 		if (!lineLayout) {
@@ -115,14 +127,25 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.parentHeight = 0;
 		
 	$scope.addLine = function() {
-		var newLine = $scope.lineLayout;
-		var newObject = jQuery.extend(true, {}, newLine);
-		$scope.lineLayout = {};
-		$scope.screenLayout.lineLayouts.push(newObject);
+		var newLine = newLineLayout($scope.screenLayout);
+		$scope.screenLayout.lineLayouts.push(newLine);
+		$scope.openLineModal(newLine);
 	};
 	
-	$scope.openLineForm = function() {
-		$('#lineModal').modal('toggle');
+	$scope.saveLine = function(lineLayout) {
+		var index = $scope.screenLayout.lineLayouts.indexOf(lineLayout);
+		for (var i in $scope.screenLayout.lineLayouts) {
+			var curr = $scope.screenLayout.lineLayouts[i];
+			if (i != index && curr.fromType == lineLayout.fromType && curr.fromType == lineLayout.fromType) {
+				$scope.screenLayout.lineLayouts.splice(index, 1);
+				alert('Connection between types already exists, canceling.');
+			}
+		}
+	};
+	
+	$scope.openLineModal = function(lineLayout) {
+		var id = "#lineForm" + escapeUri(lineLayout.uri);
+		$(id).modal('toggle');
 	};
 
 	$scope.addProperty = function(blockLayout) {
@@ -161,7 +184,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 
 	$scope.openModal = function(blockLayout) {
-		var id = "#blockForm" + blockLayout.forType.replace(":", "");
+		var id = "#blockForm" + escapeUri(blockLayout.forType);
 		$(id).modal('toggle');
 	};
 	
@@ -222,7 +245,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.addTable = function() {
-		var blockLayout = newBlockLayout();
+		var blockLayout = newBlockLayout($scope.screenLayout);
 		$scope.screenLayout.blockLayouts.push(blockLayout);
 	};
 	
@@ -231,9 +254,46 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		$scope.screenLayout.blockLayouts.splice(index, 1);
 	};
 	
-	function newBlockLayout() {
+	function newScreenLayout() {
+		var screenLayout = {};
+		screenLayout.uri = '';
+		screenLayout.name = '';
+		screenLayout.blockLayouts = [];
+		screenLayout.lineLayouts = [];
+		return screenLayout;
+	}
+	
+	function newBlockLayout(screenLayout) {
 		var blockLayout = {};
-		blockLayout.forType = 'for_type';
+		
+		var uriPostfix = 0;
+		for (var i in screenLayout.blockLayouts) {
+			var existing = screenLayout.blockLayouts[i];
+			var uri = existing.uri;
+			var uriIndex = uri.indexOf('#new_block');
+			if (uriIndex != -1) {
+				uriPostfix = uri.substring(uriIndex + 10);
+				if (uriPostfix != '') {
+					uriPostfix++;
+				}
+			}
+		}
+		
+		var forTypePostfix = 0;
+		for (var i in screenLayout.blockLayouts) {
+			var existing = screenLayout.blockLayouts[i];
+			var forType = existing.forType;
+			var uriIndex = forType.indexOf('for_type');
+			if (uriIndex != -1) {
+				forTypePostfix = forType.substring(uriIndex + 8);
+				if (forTypePostfix != '') {
+					forTypePostfix++;
+				}
+			}
+		}
+		
+		blockLayout.uri = '#new_block' + uriPostfix;
+		blockLayout.forType = 'for_type' + forTypePostfix;
 		blockLayout.background = '#aaaaaa',
 		blockLayout.height = 100;
 		blockLayout.width = 100;
@@ -241,13 +301,42 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		blockLayout.top = 0;
 		blockLayout.properties = [];
 		blockLayout.title = '';
-		blockLayout.titleTypesFromString = 'CONSTANT';
+		blockLayout.titleTypes = ['CONSTANT'];
 		blockLayout.fontColor = 'black';
 		blockLayout.fontSize = 10;
 		blockLayout.lineColor = 'black';
 		blockLayout.lineType = 'SOLID';
 		blockLayout.lineThickness = 1;
-		blockLayout.uri = 'asfasfasfasf';
 		return blockLayout;
+	}
+	
+	function newLineLayout(screenLayout) {
+		var lineLayout = {};
+		
+		var uriPostfix = 0;
+		for (var i in screenLayout.blockLayouts) {
+			var blockLayout = screenLayout.blockLayouts[i];
+			var uri = blockLayout.uri;
+			var uriIndex = uri.indexOf('#new_line');
+			if (uriIndex != -1) {
+				uri.substring(uriIndex + 9);
+				if (uriPostfix != '') {
+					uriPostfix++;
+				}
+			}
+		}
+		
+		lineLayout.uri = '#new_line' + uriPostfix;
+		lineLayout.fromType = '';
+		lineLayout.toType = '';
+		lineLayout.title = '';
+		lineLayout.titleTypes = ['CONSTANT'];
+		lineLayout.fontColor = 'black';
+		lineLayout.fontSize = 10;
+		lineLayout.lineColor = 'black';
+		lineLayout.lineType = 'SOLID';
+		lineLayout.lineThickness = 1;
+		lineLayout.points = [];
+		return lineLayout;
 	}
 });

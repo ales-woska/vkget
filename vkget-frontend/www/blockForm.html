@@ -13,6 +13,12 @@
 			<div class="modal-body">
 				<form class="form-horizontal">
 					<div class="form-group">
+						<label for="forType" class="col-sm-2 control-label">URI</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" id="uri" placeholder="Class" ng-model="currBlock.uri">
+						</div>
+					</div>
+					<div class="form-group">
 						<label for="forType" class="col-sm-2 control-label">For rdf:type</label>
 						<div class="col-sm-6">
 							<input type="text" class="form-control" id="forType" placeholder="Class" ng-model="currBlock.forType">
@@ -50,9 +56,9 @@
 								<tbody>
 									<tr ng-repeat="rowLayout in currBlock.properties">
 										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="rowLayout.property" /></td>
-										<td><select class="form-control" ng-model="rowLayout.titleTypes[0]" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"</select></td>
+										<td><select class="form-control" ng-model="rowLayout.titleTypes[0]" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"></select></td>
 										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="rowLayout.title" /></td>
-										<td><select class="form-control" ng-model="rowLayout.aggregateFunctions[0]" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"</select></td>
+										<td><select class="form-control" ng-model="rowLayout.aggregateFunctions[0]" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"></select></td>
 										<td><a type="button" ng-click="removeProperty({blockLayout: currBlock, property: rowLayout})"><span class="glyphicon glyphicon-remove"></span></a></td>
 									</tr>
 								</tbody>
@@ -66,9 +72,9 @@
 								<tbody>
 									<tr>
 										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="currBlock.toAddProperty.property" /></td>
-										<td><select class="form-control" ng-model="currBlock.toAddProperty.titleType" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"</select></td>
+										<td><select class="form-control" ng-model="currBlock.toAddProperty.titleType" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"></select></td>
 										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="currBlock.toAddProperty.title" /></td>
-										<td><select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"</select></td>
+										<td><select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"></select></td>
 										<td><a type="button" ng-click="addProperty({blockLayout: currBlock})"><span class="glyphicon glyphicon-plus"></span></a></td>
 									</tr>
 								</tbody>
