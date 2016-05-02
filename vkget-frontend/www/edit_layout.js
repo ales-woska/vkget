@@ -2,6 +2,22 @@ function escapeUri(uri) {
 	return uri.replace(/#|:|\.|\//gi, "");
 }
 
+function polyline(lineLayout) {
+	if (!lineLayout) {
+		return;
+	}
+	var polyline = "";
+	for (var i = 0; i < lineLayout.points.length; i += 1) {
+		var point = lineLayout.points[i];
+		var space = "";
+		if (polyline != "") {
+			space = " ";
+		}
+		polyline += space + point.x + "," + point.y;
+	}
+	lineLayout.polyline = polyline;
+};
+
 var app = angular.module('vkget', []);
 
 app.config(function($locationProvider) {
@@ -81,26 +97,10 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 					var screenLayout = response.data;
 					for (var i in screenLayout.lineLayouts) {
 						initLines(screenLayout.lineLayouts[i]);
-						polyLine(screenLayout.lineLayouts[i]);
+						polyline(screenLayout.lineLayouts[i]);
 					}
 					$scope.screenLayout = screenLayout;
 				});
-	}
-	
-	function polyLine(lineLayout) {
-		if (!lineLayout) {
-			return;
-		}
-		var polyline = "";
-		for (var i = 0; i < lineLayout.points.length; i += 1) {
-			var point = lineLayout.points[i];
-			var space = "";
-			if (polyline != "") {
-				space = " ";
-			}
-			polyline += space + point.x + "," + point.y;
-		}
-		lineLayout.polyline = polyline;
 	}
 	
 	function initLines(lineLayout) {
@@ -119,6 +119,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	
 	$scope.mouseDown = false;
 	$scope.mouseDownBL = null;
+	$scope.mouseDownLL = null;
 	$scope.top = 0;
 	$scope.left = 0;
 	$scope.offsetTop = 0;
@@ -129,7 +130,9 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.addLine = function() {
 		var newLine = newLineLayout($scope.screenLayout);
 		$scope.screenLayout.lineLayouts.push(newLine);
-		$scope.openLineModal(newLine);
+		setTimeout(function(){
+			$scope.openLineModal(newLine);
+		}, 100);
 	};
 	
 	$scope.saveLine = function(lineLayout) {
@@ -140,6 +143,41 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 				$scope.screenLayout.lineLayouts.splice(index, 1);
 				alert('Connection between types already exists, canceling.');
 			}
+		}
+		
+		if (lineLayout) {
+			if (!lineLayout.points) {
+				lineLayout.points = [];
+			}
+			var b1 = null;
+			var b2 = null;
+			for (var j in $scope.screenLayout.blockLayouts) {
+				var b = $scope.screenLayout.blockLayouts[j];
+				if (b.forType == lineLayout.fromType) {
+					b1 = b;
+				} else if (b.forType == lineLayout.toType) {
+					b2 = b;
+				}
+			}
+			if (!b1 || !b2) {
+				$scope.screenLayout.lineLayouts.splice(index, 1);
+				alert('One of the sources doesn\'t exists, canceling.');
+			}
+			var x = b1.left + (b1.width/2); 
+			var y = b1.top + (b1.height/2);
+			var point = {
+				x: x,
+				y: y
+			};
+			lineLayout.points.push(point);
+			x = b2.left + (b2.width/2); 
+			y = b2.top + (b2.height/2);
+			point = {
+				x: x,
+				y: y
+			};
+			lineLayout.points.push(point);
+			polyline(lineLayout);
 		}
 	};
 	
@@ -196,7 +234,13 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			$scope.offsetLeft = event.offsetX;
 			$scope.offsetTop = event.offsetY;
 			$scope.mouseDownEl = event.toElement;
-			$scope.mouseDownBL = blockLayout;
+			$scope.mouseDownBL = blockLayout;			
+			for (var i in $scope.screenLayout.lineLayouts) {
+				var lineLayout = $scope.screenLayout.lineLayouts[i];
+				if (lineLayout.fromType == blockLayout.forType || lineLayout.toType == blockLayout.forType) {
+					$scope.mouseDownLL = lineLayout;
+				}
+			}
 			$scope.parentWidth = event.toElement.parentElement.offsetWidth;
 			$scope.parentHeight = event.toElement.parentElement.offsetHeight;
 		}
@@ -208,6 +252,20 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			var top = $scope.top;
 			var newLeft = (event.screenX - $scope.offsetLeft) - left;
 			var newTop = (event.screenY - $scope.offsetTop) - top;
+
+			var point = null;
+			var diffPointX  = null;
+			var diffPointY = null;
+			if ($scope.mouseDownLL) {
+				if ($scope.mouseDownLL.fromType == $scope.mouseDownBL.forType) {
+					point = $scope.mouseDownLL.points[0];
+				} else if ($scope.mouseDownLL.toType == $scope.mouseDownBL.forType) {
+					point = $scope.mouseDownLL.points[$scope.mouseDownLL.points.length - 1];
+				}
+				diffPointX = point.x - $scope.mouseDownBL.left;
+				diffPointY = point.y - $scope.mouseDownBL.top;
+			}
+			
 			if (newLeft < 0) {
 				$scope.mouseDownBL.left = 0;
 			} else if ((newLeft + $scope.mouseDownBL.width) > $scope.parentWidth) {
@@ -222,12 +280,19 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			} else {
 				$scope.mouseDownBL.top = newTop;
 			}
+			
+			if ($scope.mouseDownLL) {
+				point.x = $scope.mouseDownBL.left + diffPointX;
+				point.y = $scope.mouseDownBL.top + diffPointY;
+				polyline($scope.mouseDownLL);
+			}
 		}
 	};
 	
 	$scope.onMouseUp = function(event) {
 		$scope.mouseDown = false;
 		$scope.mouseDownBL = null;
+		$scope.mouseDownLL = null;
 	};
 	
 	$scope.saveLayout = function() {
@@ -250,6 +315,13 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.removeTable = function(blockLayout) {
+		for (var i in $scope.screenLayout.lineLayouts) {
+			var ll = $scope.screenLayout.lineLayouts[i];
+			if (ll.fromType == blockLayout.forType || ll.toType == blockLayout.forType) {
+				$scope.screenLayout.lineLayouts.splice(i, 1);
+			}
+		}
+		
 		var index = $scope.screenLayout.blockLayouts.indexOf(blockLayout);
 		$scope.screenLayout.blockLayouts.splice(index, 1);
 	};
