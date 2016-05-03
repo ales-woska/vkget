@@ -4,5 +4,5 @@ import cz.cuni.mff.vkget.data.model.DataModel;
 
 public interface DataService {
 	
-	 DataModel loadDataModel();
+	 DataModel loadDataModel(String endpoint, String type, String layoutUri);
 }

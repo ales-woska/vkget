@@ -10,12 +10,15 @@ import cz.cuni.mff.vkget.data.model.Graph;
 import cz.cuni.mff.vkget.data.model.RdfTriple;
 
 @Service
-public class CityCountryConnector {
+public class CityCountryConnector implements DataConnector {
 	
 	private SparqlConnector connector;
 	
-	public CityCountryConnector() {
-		connector = SparqlConnector.getDbpediaConnector();
+	public CityCountryConnector() {}
+	
+	public CityCountryConnector(String endpoint) {
+		connector = new SparqlConnector();
+		connector.setEndpoint(endpoint);
 	}
 	
 	private static final String query = 
@@ -36,7 +39,8 @@ public class CityCountryConnector {
 			+ "} LIMIT 10 ";
 	
 
-	public Graph loadCitiesWithCountries() {
+	@Override
+	public Graph loadGraph() {
 		Graph graph = new Graph();
 		
 		ResultSet results = this.connector.query(query);

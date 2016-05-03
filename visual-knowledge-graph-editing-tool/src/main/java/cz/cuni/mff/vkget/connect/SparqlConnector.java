@@ -11,22 +11,25 @@ import org.apache.jena.update.UpdateRequest;
 
 public class SparqlConnector {
 
-	private static SparqlConnector dbpediaInstance = new SparqlConnector("http://dbpedia.org/sparql");
 	private static SparqlConnector fusekiInstance = new SparqlConnector("http://localhost:3030/vkget");
 	
 //	private static final String user = "dba";
 //	private static final String password = "dba";
 	private String endpoint;
 	
-	private SparqlConnector() {
+	public String getEndpoint() {
+		return endpoint;
+	}
+
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+	}
+
+	public SparqlConnector() {
 	}
 
 	private SparqlConnector(String endpoint) {
 		this.endpoint = endpoint;
-	}
-	
-	public static SparqlConnector getDbpediaConnector() {
-		return dbpediaInstance;
 	}
 	
 	public static SparqlConnector getLocalFusekiConnector() {

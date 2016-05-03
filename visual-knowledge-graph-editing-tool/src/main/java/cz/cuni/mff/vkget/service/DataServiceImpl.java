@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import org.springframework.stereotype.Service;
 
 import cz.cuni.mff.vkget.connect.CityCountryConnector;
+import cz.cuni.mff.vkget.connect.DataConnector;
 import cz.cuni.mff.vkget.data.layout.GveTable;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.Graph;
@@ -19,8 +20,11 @@ import cz.cuni.mff.vkget.data.model.RdfTriple;
 public class DataServiceImpl implements DataService {
 
 	@Override
-	public DataModel loadDataModel() {
-		Graph graph = new CityCountryConnector().loadCitiesWithCountries();
+	public DataModel loadDataModel(String endpoint, String endpointType, String layoutUri) {
+		// TODO endpoint type
+		// TODO layout uri
+		DataConnector connector = new CityCountryConnector(endpoint);
+		Graph graph = connector.loadGraph();
 		DataModel dataModel = new DataModel();
 		
 		List<GveTable> tables = new ArrayList<GveTable>();
