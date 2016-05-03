@@ -126,6 +126,18 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.offsetLeft = 0;
 	$scope.parentWidth = 0;
 	$scope.parentHeight = 0;
+	
+	$scope.addNamespace = function() {
+		var key = $scope.newKey;
+		var value = $scope.newValue;
+		$scope.screenLayout.namespaces[key] = value;
+		$scope.newKey = '';
+		$scope.newValue = '';
+	};
+	
+	$scope.removeNamespace = function(key) {
+		delete $scope.screenLayout.namespaces[key];
+	};
 		
 	$scope.addLine = function() {
 		var newLine = newLineLayout($scope.screenLayout);

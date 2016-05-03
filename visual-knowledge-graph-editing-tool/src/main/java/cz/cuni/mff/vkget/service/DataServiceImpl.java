@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cz.cuni.mff.vkget.connect.CityCountryConnector;
+import cz.cuni.mff.vkget.connect.CommonDataConnector;
 import cz.cuni.mff.vkget.connect.DataConnector;
+import cz.cuni.mff.vkget.connect.EndpointType;
 import cz.cuni.mff.vkget.data.layout.GveTable;
+import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.Graph;
 import cz.cuni.mff.vkget.data.model.RdfObject;
@@ -18,13 +21,22 @@ import cz.cuni.mff.vkget.data.model.RdfTriple;
 
 @Service
 public class DataServiceImpl implements DataService {
+	
+	@Autowired
+	private LayoutService layoutService;
 
 	@Override
-	public DataModel loadDataModel(String endpoint, String endpointType, String layoutUri) {
-		// TODO endpoint type
-		// TODO layout uri
-		DataConnector connector = new CityCountryConnector(endpoint);
-		Graph graph = connector.loadGraph();
+	public DataModel loadDataModel(String endpoint, EndpointType endpointType, String layoutUri) {
+		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
+		
+		DataConnector connector = null;
+		switch (endpointType) {
+			case virtuoso: connector = new CommonDataConnector(endpoint); break;
+			case jena: connector = new CommonDataConnector(endpoint); break;
+			default: connector = new CommonDataConnector(endpoint); break;
+		}
+		
+		Graph graph = connector.loadGraph(screenLayout);
 		DataModel dataModel = new DataModel();
 		
 		List<GveTable> tables = new ArrayList<GveTable>();

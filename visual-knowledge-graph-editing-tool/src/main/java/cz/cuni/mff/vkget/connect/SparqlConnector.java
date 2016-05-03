@@ -28,7 +28,7 @@ public class SparqlConnector {
 	public SparqlConnector() {
 	}
 
-	private SparqlConnector(String endpoint) {
+	public SparqlConnector(String endpoint) {
 		this.endpoint = endpoint;
 	}
 	

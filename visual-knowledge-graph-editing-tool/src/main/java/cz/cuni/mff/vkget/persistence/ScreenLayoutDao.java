@@ -22,6 +22,8 @@ import cz.cuni.mff.vkget.sparql.Constants;
   */
 @Repository
 public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
+	private static final String NAMESPACES = Constants.VKGET_Prefix + ":" + "namespaces";
+	
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
 	private static final String loadScreenLayoutQuery = 
@@ -45,6 +47,7 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 		
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append("; ");
 		insertQuery.append(" ").append(Constants.RDFS_TITLE).append(" \"").append(layout.getName()).append("\"; ");
+		insertQuery.append(" ").append(NAMESPACES).append(" \"").append(layout.getNamespacesAsString()).append("\"; ");
 		
 		for (BlockLayout bl: layout.getBlockLayouts()) {
 			insertQuery.append(" ").append(Constants.BlockLayoutProperty).append(" <").append(bl.getUri()).append("> ; ");
@@ -116,6 +119,7 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 
 			switch (property) {
 				case Constants.RDFS_TITLE: layout.setName(value); break;
+				case NAMESPACES: layout.setNamespacesFromString(value); break;
 			}
 		}
 		layout.setBlockLayouts(this.loadBlockLayouts(layout.getUri()));
