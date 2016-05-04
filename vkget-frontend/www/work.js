@@ -4,6 +4,14 @@ app.controller('dataController', function($scope, $http, $filter) {
 	$scope.endpoint = 'http://dbpedia.org/sparql';
 	$scope.endpointType = 'other';
 	
+	$scope.selectInstance = function(table, instance) {
+		if (table.selectedInstance == instance) {
+			delete table.selectedInstance;
+		} else {
+			table.selectedInstance = instance;
+		}
+	};
+	
 	$scope.filters = {};
 	
 	$scope.filterInstances = function(instance) {

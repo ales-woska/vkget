@@ -141,3 +141,13 @@ polyline:hover {
     from { transform: scale(1) rotate(0deg);}
     to { transform: scale(1) rotate(360deg);}
 }
+
+tr.selectedInstance {
+	background-color: pink;
+	border: 1px solid red;
+	font-weight: bold;
+}
+
+table.vkget_table tbody tr.selectedInstance:hover {
+	background-color: red;
+}

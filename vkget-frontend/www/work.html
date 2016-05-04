@@ -63,7 +63,9 @@
 			</thead>
 			
 			<tbody style="height: {{layouts[table.typeUri].height}}px;">
-				<tr ng-repeat="instance in table.instances | filter : filterInstances">
+				<tr ng-repeat="instance in table.instances | filter : filterInstances" 
+					ng-click="selectInstance(table, instance);" 
+					ng-class="instance == table.selectedInstance ? 'selectedInstance' : ''">
 					<td ng-repeat="property in instance.literalProperties" 
 						style="width: {{layouts[table.typeUri].width / instance.literalProperties.length}}px;">
 						{{property.value}}
