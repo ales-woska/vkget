@@ -25,7 +25,11 @@
 <body ng-app="vkget" ng-controller="dataController">
 	<div ng-include="'menu.html'"></div>
 	
-	<div id="workspace">
+	<div id="loading" style="display: none">
+		<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</button>
+	</div>
+	
+	<div id="workspace" style="display: none">
 		<canvas id="panelCanvas" height="700px" width="1500px"></canvas>
 
 		<table ng-repeat="table in dataModel.tables" class="vkget_table"

@@ -58,6 +58,10 @@ public class CommonDataConnector implements DataConnector {
 					} else if (rdfNode.isLiteral()) {
 						value = rdfNode.asLiteral().getValue();
 					}
+					
+					if (value instanceof Number) {
+						value = (Number) value;
+					}
 
 					rdfTriple.getProperties().put(rowLayout.getProperty(), value);
 				}
