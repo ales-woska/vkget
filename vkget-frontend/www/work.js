@@ -2,15 +2,32 @@ var app = angular.module('vkget', []);
 
 app.controller('dataController', function($scope, $http, $filter) {
 	$scope.endpoint = 'http://dbpedia.org/sparql';
+	$scope.endpointType = 'other';
+	
+	$scope.filters = {};
+	
+	$scope.filterInstances = function(instance) {
+		var tableFilters = $scope.filters[instance.type];
+		if (!tableFilters) {
+			return true;
+		}
+		for (var i in instance.literalProperties) {
+			var property = instance.literalProperties[i];
+			var propertyFilter = tableFilters[property.propertyURI];
+			if (!propertyFilter) {
+				continue;
+			}
+			var value = property.value.toString();
+			if (value.toLowerCase().indexOf(propertyFilter.toLowerCase()) == -1) {
+				return false;
+			}
+		}
+		return true;
+	};
 	
 	$scope.sort = {
         column: 0,
         reverse: true
-    };
-	
-	$scope.filter = {
-        column: 0,
-        text: ""
     };
 	
 	$scope.getTitleForProperty = function(layout, property) {
@@ -35,32 +52,6 @@ app.controller('dataController', function($scope, $http, $filter) {
 	$scope.mySorter = function(item) {
 		var sortByColumn = $scope.sort.column;
 		return item.literalProperties[sortByColumn].value;
-	};
-    
-	$scope.filter = function(scope, index) {
-		$scope.filter.column = index;
-		$scope.filter.text = scope.search[index];
-		
-		var instances = scope.table.instances;
-		for (var i in $scope.dataModel.tables) {
-			var table = $scope.dataModel.tables[i];
-			if (scope.table == table) {
-				instances = table.instances;
-			}
-		}
-		
-        scope.table.instances = $filter('filter')(instances, $scope.myFilter);
-    };
-	
-	$scope.myFilter = function(item) {
-		if ($scope.filter.text == "") {
-			return true;
-		} else {
-			var col = $scope.filter.column;
-			var text = $scope.filter.text;
-			var value = item.literalProperties[col].value.toString();
-			return value.toLowerCase().indexOf(text.toLowerCase()) >= 0;
-		}
 	};
 	
 	$http.get("http://localhost:8090/layouts")

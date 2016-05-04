@@ -23,7 +23,7 @@ th.caption, th.columnCaption {
 }
 
 table.vkget_table th.columnCaption:hover {
-	background-color: orange;
+	background-color: yellow;
 	cursor: pointer;
 }
 
@@ -35,6 +35,7 @@ table.vkget_table tbody {
 
 table.vkget_table tbody tr:hover {
 	background-color: yellow;
+	cursor: pointer;
 }
 
 table.vkget_table td {

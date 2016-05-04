@@ -57,6 +57,7 @@ public class DataServiceImpl implements DataService {
 		for (RdfTriple triple: graph.getRdfTriplesByType(type)) {
 			RdfObject rdfObject = new RdfObject();
 			rdfObject.setObjectURI(triple.getUri());
+			rdfObject.setType(type);
 			rdfObject.setLiteralProperties(new ArrayList<RdfProperty>());
 			rdfObject.setObjectProperties(new ArrayList<RdfObjectProperty>());
 			for (Entry<String, Object> e: triple.getProperties().entrySet()) {

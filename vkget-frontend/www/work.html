@@ -46,7 +46,7 @@
 				<tr>
 					<th style="border-bottom: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};"
 						class="caption" colspan="{{table.columnsURIs.length}}">
-						{{layouts[table.typeUri].title}}</th>
+						{{layouts[table.typeUri].title}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})</th>
 				</tr>
 				<tr>
 					<th class="columnCaption" ng-repeat="property in table.columnsURIs" 
@@ -57,13 +57,13 @@
 				</tr>
 				<tr>
 					<th ng-repeat="property in table.columnsURIs" style="width: {{layouts[table.typeUri].width / table.columnsURIs.length}}px;">
-						<input type="text" style="width: 100px;" ng-model="search[$index]" ng-change="filter(this, $index);" />
+						<input type="text" style="width: 100px;" ng-model="filters[table.typeUri][property]" />
 					</th>
 				</tr>
 			</thead>
 			
 			<tbody style="height: {{layouts[table.typeUri].height}}px;">
-				<tr ng-repeat="instance in table.instances | filter:filterText">
+				<tr ng-repeat="instance in table.instances | filter : filterInstances">
 					<td ng-repeat="property in instance.literalProperties" 
 						style="width: {{layouts[table.typeUri].width / instance.literalProperties.length}}px;">
 						{{property.value}}
@@ -105,7 +105,7 @@
 								<select class="form-control" required ng-model="endpointType">
 									<option value="virtuoso">Virtuoso</option>
 									<option value="jena">Jena</option>
-									<option value="other" selected>Other</option>
+									<option value="other">Other</option>
 								</select>
 							</div>
 						</div>

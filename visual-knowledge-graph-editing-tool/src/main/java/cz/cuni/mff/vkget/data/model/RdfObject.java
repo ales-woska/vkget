@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class RdfObject implements Serializable {
 	private String objectURI;
+	private String type;
 	private List<RdfObjectProperty> objectProperties;
 	private List<RdfProperty> literalProperties;
 
@@ -38,6 +39,14 @@ public class RdfObject implements Serializable {
 		this.literalProperties = literalProperties;
 	}
 	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	public Object getValueForProperty(String property) {
 		for (RdfProperty rp: literalProperties) {
 			if (rp.getPropertyURI().equals(property)) {
