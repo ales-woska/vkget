@@ -11,6 +11,7 @@ import cz.cuni.mff.vkget.connect.CommonDataConnector;
 import cz.cuni.mff.vkget.connect.DataConnector;
 import cz.cuni.mff.vkget.connect.EndpointType;
 import cz.cuni.mff.vkget.data.layout.GveTable;
+import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.Graph;
@@ -48,30 +49,74 @@ public class DataServiceImpl implements DataService {
 			tables.add(table);
 		}
 		dataModel.setTables(tables);
+		
+		for (LineLayout lineLayout: screenLayout.getLineLayouts()) {
+			fillRdfObjectProperties(dataModel, graph, lineLayout);
+		}
+		
 		return dataModel;
 	}
 	
+	private void fillRdfObjectProperties(DataModel dataModel, Graph graph, LineLayout lineLayout) {
+		GveTable sourceTable = dataModel.getTableByType(lineLayout.getFromType());
+		GveTable targetTable = dataModel.getTableByType(lineLayout.getToType());
+				
+		if (sourceTable == null || targetTable == null) {
+			return;
+		}
+		
+		for (RdfTriple triple: graph.getRdfTriplesByType(sourceTable.getTypeUri())) {
+			RdfObject rdfObject = sourceTable.getInstanceByUri(triple.getUri());
+			if (rdfObject == null) {
+				continue;
+			}
+			
+			rdfObject.setObjectProperties(new ArrayList<RdfObjectProperty>());
+			for (Entry<String, Object> e: triple.getProperties().entrySet()) {
+				String property = e.getKey();
+				Object value = e.getValue();
+
+				if (value instanceof RdfTriple) {
+					RdfObjectProperty rdfProperty = new RdfObjectProperty();
+					rdfProperty.setSubjectUri(rdfObject.getObjectURI());
+					rdfProperty.setProperty(property);
+					rdfProperty.setObjectUri(((RdfTriple) value).getUri());
+					rdfObject.getObjectProperties().add(rdfProperty);
+				}
+				
+			}
+		}
+		
+	}
+	
 	private List<RdfObject> getRdfObjects(Graph graph, String type) {
-		List<RdfObject> rdfObjcets = new ArrayList<RdfObject>();
+		List<RdfObject> rdfObjects = new ArrayList<RdfObject>();
 		
 		for (RdfTriple triple: graph.getRdfTriplesByType(type)) {
 			RdfObject rdfObject = new RdfObject();
 			rdfObject.setObjectURI(triple.getUri());
 			rdfObject.setType(type);
+			
 			rdfObject.setLiteralProperties(new ArrayList<RdfProperty>());
-			rdfObject.setObjectProperties(new ArrayList<RdfObjectProperty>());
 			for (Entry<String, Object> e: triple.getProperties().entrySet()) {
 				String property = e.getKey();
 				Object value = e.getValue();
+
+				if (value instanceof RdfTriple) {
+					continue;
+					
+				}
+				
 				RdfProperty rdfProperty = new RdfProperty();
 				rdfProperty.setPropertyURI(property);
 				rdfProperty.setValue(value);
 				rdfObject.getLiteralProperties().add(rdfProperty);
 			}
-			// TODO object properties
-			rdfObjcets.add(rdfObject);
+
+			rdfObjects.add(rdfObject);
 		}
-		return rdfObjcets;
+		
+		return rdfObjects;
 	}
 	
 }

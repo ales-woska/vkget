@@ -45,5 +45,14 @@ public class GveTable implements Serializable {
 	public void setColumnsURIs(List<String> columnsURIs) {
 		this.columnsURIs = columnsURIs;
 	}
+	
+	public RdfObject getInstanceByUri(String uri) {
+		for (RdfObject rdfObject: instances) {
+			if (rdfObject.getObjectURI().equals(uri)) {
+				return rdfObject;
+			}
+		}
+		return null;
+	}
 
 }

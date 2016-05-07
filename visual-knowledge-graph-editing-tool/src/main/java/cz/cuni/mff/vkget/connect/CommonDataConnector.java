@@ -35,11 +35,17 @@ public class CommonDataConnector implements DataConnector {
 		ResultSet results = this.connector.query(query);
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
-			
+
+			Map<String, String> varMap = new LinkedHashMap<String, String>();
 			int i = 0;
 			for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
 				String var = "x" + i;
 				i++;
+				varMap.put(blockLayout.getForType(), var);
+			}
+			
+			for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
+				String var = varMap.get(blockLayout.getForType());
 
 				RdfTriple rdfTriple = new RdfTriple();
 				rdfTriple.setUri(solution.get(var).asResource().getURI());
@@ -64,6 +70,22 @@ public class CommonDataConnector implements DataConnector {
 					}
 
 					rdfTriple.getProperties().put(rowLayout.getProperty(), value);
+				}
+				
+				for (LineLayout lineLayout: screenLayout.getLineLayouts()) {
+					if (lineLayout.getFromType().equals(blockLayout.getForType())) {
+						String property = varMap.get(lineLayout.getToType());
+						
+						RDFNode rdfNode = solution.get(property);
+						String uri = rdfNode.asResource().getURI();
+						RdfTriple value = new RdfTriple();
+						value.setUri(uri);
+
+						rdfTriple.getProperties().put(lineLayout.getProperty(), value);
+						
+					} else {
+						continue;
+					}
 				}
 				
 				graph.addTripleIfNotExists(rdfTriple);

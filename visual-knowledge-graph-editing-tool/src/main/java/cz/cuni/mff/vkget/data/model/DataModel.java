@@ -20,5 +20,14 @@ public class DataModel implements Serializable {
 	public void setTables(List<GveTable> tables) {
 		this.tables = tables;
 	}
+	
+	public GveTable getTableByType(String type) {
+		for (GveTable table: tables) {
+			if (table.getTypeUri().equals(type)) {
+				return table;
+			}
+		}
+		return null;
+	}
     
 }

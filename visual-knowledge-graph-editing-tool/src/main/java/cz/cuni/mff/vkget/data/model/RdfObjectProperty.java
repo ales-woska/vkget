@@ -5,40 +5,36 @@ import java.io.Serializable;
 /**
  * Property which value is RdfSubject
  * 
- * @param propertyUri
- *            URI of this property
- * @param subject
- *            RDF subject (source)
- * @param property
- *            RDF object (destination)
+ * @author Ales Woska
+ *
  */
 public class RdfObjectProperty implements Serializable {
-	private String propertyUri;
-	private RdfObject subject;
-	private RdfObject property;
+	private String property;
+	private String subjectUri;
+	private String objectUri;
 
-	public String getPropertyUri() {
-		return propertyUri;
-	}
-
-	public void setPropertyUri(String propertyUri) {
-		this.propertyUri = propertyUri;
-	}
-
-	public RdfObject getSubject() {
-		return subject;
-	}
-
-	public void setSubject(RdfObject subject) {
-		this.subject = subject;
-	}
-
-	public RdfObject getProperty() {
+	public String getProperty() {
 		return property;
 	}
 
-	public void setProperty(RdfObject property) {
+	public void setProperty(String property) {
 		this.property = property;
+	}
+
+	public String getSubjectUri() {
+		return subjectUri;
+	}
+
+	public void setSubjectUri(String subjectUri) {
+		this.subjectUri = subjectUri;
+	}
+
+	public String getObjectUri() {
+		return objectUri;
+	}
+
+	public void setObjectUri(String objectUri) {
+		this.objectUri = objectUri;
 	}
 
 }

@@ -48,7 +48,12 @@ public class Graph implements Serializable {
 		Set<String> properties = new HashSet<String>();
 		for (RdfTriple triple: triples) {
 			if (triple.getType().equals(type)) {
-				properties.addAll(triple.getProperties().keySet());
+				for (String key: triple.getProperties().keySet()) {
+					if (triple.getProperties().get(key) instanceof RdfTriple) {
+						continue;
+					}
+					properties.add(key);
+				}
 			}
 		}
 		return new ArrayList<String>(properties);

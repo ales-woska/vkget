@@ -15,11 +15,33 @@ app.controller('dataController', function($scope, $http, $filter) {
 	$scope.filters = {};
 	
 	$scope.filterInstances = function(instance) {
+		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
+			for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
+				var lineLayout = $scope.screenLayout.lineLayouts[i];
+				if (lineLayout.toType != instance.type) {
+					continue;
+				} else {
+					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType);
+					if (sourceTable && sourceTable.selectedInstance) {
+						for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
+							var objectProperty = sourceTable.selectedInstance.objectProperties[j];
+							if (objectProperty.property == lineLayout.property) {
+								if (objectProperty.objectUri != instance.objectURI) {
+									return false;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
 		var tableFilters = $scope.filters[instance.type];
 		if (!tableFilters) {
 			return true;
 		}
-		for (var i in instance.literalProperties) {
+		
+		for (var i = 0; i < instance.literalProperties.length; i++) {
 			var property = instance.literalProperties[i];
 			var propertyFilter = tableFilters[property.propertyURI];
 			if (!propertyFilter) {
@@ -33,6 +55,15 @@ app.controller('dataController', function($scope, $http, $filter) {
 		return true;
 	};
 	
+	function getTableByType(dataModel, type) {
+		for (var i = 0; i < dataModel.tables.length; i++) {
+			if (dataModel.tables[i].typeUri == type) {
+				return dataModel.tables[i];
+			}
+		}
+		return null;
+	}
+	
 	$scope.sort = {
         column: 0,
         reverse: true
@@ -42,7 +73,7 @@ app.controller('dataController', function($scope, $http, $filter) {
 		if (layout === undefined) {
 			return "";
 		}
-    	for (var j in layout.properties) {
+    	for (var j = 0; j < layout.properties.length; j++) {
     		var rl = layout.properties[j];
     		if (rl.property == property) {
     			return rl.title;
@@ -65,6 +96,8 @@ app.controller('dataController', function($scope, $http, $filter) {
 	$http.get("http://localhost:8090/layouts")
     .then(function(response) {
         $scope.layouts = response.data;
+		$('#layoutLoading').hide();
+		$('#layoutSelect').show();
     });
 	
 	$scope.run = function() {
@@ -92,14 +125,14 @@ app.controller('dataController', function($scope, $http, $filter) {
 		        var layout = response.data;
 		        $scope.screenLayout = layout;
 		        var layouts = {};
-		        for (var key in layout.blockLayouts) {
+		        for (var key = 0; key < layout.blockLayouts.length; key++) {
 		        	var bl = layout.blockLayouts[key];
 		        	layouts[bl.forType] = bl;
 		        }
 		        $scope.layouts = layouts;
 				var c = document.getElementById('panelCanvas');
 				var ctx = c.getContext('2d');
-				for (var i in $scope.screenLayout.lineLayouts) {
+				for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 					layout = $scope.screenLayout.lineLayouts[i];
 					ctx.beginPath();
 					if (layout.lineType == 'dashed') {
@@ -112,8 +145,8 @@ app.controller('dataController', function($scope, $http, $filter) {
 					if (layout.points.length > 1) {
 						var first = layout.points[0];
 						ctx.moveTo(first.x, first.y);
-						for (var i = 1; i < layout.points.length; i++) {
-							var point = layout.points[i];
+						for (var j = 1; j < layout.points.length; j++) {
+							var point = layout.points[j];
 							ctx.lineTo(point.x, point.y);
 						}
 					}

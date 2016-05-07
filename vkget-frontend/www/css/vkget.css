@@ -130,6 +130,7 @@ polyline:hover {
 #loading {
 	text-align: center;
 	margin-top: 350px;
+	display: none;
 }
 
 @-webkit-keyframes spin2 {
