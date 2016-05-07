@@ -36,7 +36,6 @@
 		<a id="addLineButton" type="button" class="btn btn-default btn-danger" ng-hide="changes.length == 0" ng-click="discardChanges();">
 			Discard changes
 		</a>
-		<canvas id="panelCanvas" height="700px" width="1500px"></canvas>
 
 		<table ng-repeat="table in dataModel.tables" class="vkget_table"
 			style="
@@ -80,6 +79,19 @@
 			</tbody>
 							
 		</table>
+		
+		<svg>
+			<g ng-repeat="lineLayout in screenLayout.lineLayouts">
+				<polyline
+					ng-click=""
+					fill="none"
+					stroke="{{lineLayout.lineColor}}"
+					stroke-width="{{lineLayout.lineThickness}}"
+					stroke-linecap="round"
+					ng-attr-stroke-dasharray="{{lineLayout.lineType == 'DASHED' ? '5,5' : (lineLayout.lineType == 'DOTTED' ? '1,5' : '')}}"
+					ng-attr-points="{{lineLayout.polyline}}" />
+			</g>
+		</svg>
 		
 		<div ng-repeat="layout in screenLayout.lineLayouts" class="vkget_line_title"
 			style="color: {{layout.fontColor}}; font-size: {{layout.fontSize}}px; left: {{layout.left}}px; top: {{layout.top}}px;">

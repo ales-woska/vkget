@@ -195,29 +195,10 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 		        	var bl = layout.blockLayouts[key];
 		        	layouts[bl.forType] = bl;
 		        }
-		        $scope.layouts = layouts;
-				var c = document.getElementById('panelCanvas');
-				var ctx = c.getContext('2d');
-				for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
-					layout = $scope.screenLayout.lineLayouts[i];
-					ctx.beginPath();
-					if (layout.lineType == 'dashed') {
-						ctx.setLineDash([5,5]);
-					} else if (layout.lineType == 'dotted') {
-						ctx.setLineDash([1,5]);
-					}
-					ctx.lineWidth = layout.lineThickness;
-					ctx.strokeStyle = layout.lineColor;
-					if (layout.points.length > 1) {
-						var first = layout.points[0];
-						ctx.moveTo(first.x, first.y);
-						for (var j = 1; j < layout.points.length; j++) {
-							var point = layout.points[j];
-							ctx.lineTo(point.x, point.y);
-						}
-					}
-					ctx.stroke();
+				for (var i = 0; i < layout.lineLayouts.length; i++) {
+					polyline(layout.lineLayouts[i]);
 				}
+		        $scope.layouts = layouts;
 				
 				$('#loading').hide();
 				$('#workspace').show();
@@ -226,6 +207,22 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 	    });
 	};
 });
+
+function polyline(lineLayout) {
+	if (!lineLayout) {
+		return;
+	}
+	var polyline = "";
+	for (var i = 0; i < lineLayout.points.length; i += 1) {
+		var point = lineLayout.points[i];
+		var space = "";
+		if (polyline != "") {
+			space = " ";
+		}
+		polyline += space + point.x + "," + point.y;
+	}
+	lineLayout.polyline = polyline;
+};
 
 $(function() {
 
