@@ -72,6 +72,7 @@
 					ng-click="selectInstance(table, instance);" 
 					ng-class="instance == table.selectedInstance ? 'selectedInstance' : ''">
 					<td ng-repeat="property in instance.literalProperties" 
+						ng-right-click="contextMenu(table, instance, property)"
 						style="width: {{layouts[table.typeUri].width / instance.literalProperties.length}}px;">
 						{{property.value}}
 					</td>
@@ -165,7 +166,7 @@
 						<textarea id="updateScriptTextarea" style="display: none;" ng-model="updateScript"></textarea>
 					</div>
 					<div class="modal-footer">
-						<a type="button" class="btn btn-default" ng-click="download();" />Save ...</a>
+						<a type="button" class="btn btn-default" ng-click="download();" />Save...</a>
 						<input type="submit" class="btn btn-default btn-danger" value="Commit changes" ng-click="commitChange();" />
 						<input type="submit" class="btn btn-default" value="Close" ng-click="closeChangeModal();" />
 					</div>
@@ -175,18 +176,164 @@
 		</div>
 	</div>
 
+	<div id="editCellModal" class="modal bs-example-modal-lg" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+			
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+					<h4 class="modal-title">Edit cell value</h4>
+				</div>
+				
+				<form class="form-horizontal">
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="forType" class="col-sm-4 control-label">Old value</label>
+							<div class="col-sm-6">
+								<input type="text" class="form-control" ng-model="oldCellValue" disabled="disabled" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="forType" class="col-sm-4 control-label">New value</label>
+							<div class="col-sm-6">
+								<input type="text" class="form-control" ng-model="editCellValue" />
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<input type="button" class="btn btn-default" value="Cancel" ng-click="closeEditCellModal();" />
+						<input type="submit" class="btn btn-default" value="Save" ng-click="editCell();" />
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="addRowModal" class="modal bs-example-modal-lg" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+					<h4 class="modal-title">Add a new row</h4>
+				</div>
+				<form class="form-horizontal" ng-submit="addRow();">
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="uri" class="col-sm-4 control-label">URI</label>
+							<div class="col-sm-6">
+								<input type="text" class="form-control" placeholder="URI" name="uri" required ng-model="addRowObject['uri']" />
+							</div>
+						</div>
+						<div class="form-group" ng-repeat="literalProperty in selectedTd.instance.literalProperties">
+							<label class="col-sm-4 control-label">{{literalProperty.propertyURI}}</label>
+							<div class="col-sm-6">
+								<input type="text" class="form-control" ng-model="addRowObject[literalProperty.propertyURI]" />
+							</div>
+						</div>
+						<div class="modal-footer">
+							<input type="button" class="btn btn-default" value="Cancel" ng-click="closeAddRowModal();" />
+							<input type="submit" class="btn btn-default" value="Save" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="removeLinkedPropertyModal" class="modal bs-example-modal-lg" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+					<h4 class="modal-title">Remove linked property</h4>
+				</div>
+				<form class="form-horizontal" ng-submit="removeLinkedProperty();">
+					<div class="modal-body">
+						<div class="form-group" ng-if="selectedTd.instance.objectProperties">
+							<div class="col-sm-10">
+							<table>
+								<thead>
+									<tr><th>&nbsp;</th><th>Property</th><th>Value</th><th>URI</th></tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="objectProperty in selectedTd.instance.objectProperties">
+										<td><input type="checkbox" ng-model="removeLinkedPropertyObject[objectProperty.property][objectProperty.objectUri]" /></td>
+									    <td style="padding: 10px;">{{getObjectPropertyTitle(objectProperty.property);}}</td>
+									    <td style="padding: 10px;">{{getObjectPropertyValue(objectProperty.objectUri);}}</td>
+									    <td style="padding: 10px;">{{objectProperty.objectUri}}</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+						</div>
+						<div class="form-group" ng-if="!selectedTd.instance.objectProperties">
+							<div class="col-sm-6">No linked properties.</div>
+						</div>
+						<div class="modal-footer">
+							<input type="button" class="btn btn-default" value="Cancel" ng-click="closeRemoveLinkedPropertyModal();" />
+							<input ng-if="selectedTd.instance.objectProperties" type="submit" class="btn btn-default" value="Remove selected" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="addLinkedPropertyModal" class="modal bs-example-modal-lg" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">
+						<span>&times;</span>
+					</button>
+					<h4 class="modal-title">Add linked property</h4>
+				</div>
+				<form class="form-horizontal" ng-submit="addLinkedProperty();">
+					<div class="modal-body">
+						<div class="form-group">
+							<label class="col-sm-4 control-label">Property</label>
+							<div class="col-sm-6">
+								<select required class="form-control" ng-model="addLinkedPropertyObject['property']"
+									ng-options="lineLayout.property as getObjectPropertyTitle(lineLayout.property) for lineLayout in screenLayout.lineLayouts | filter: {fromType: selectedTd.table.typeUri}">
+								</select>
+							</div>
+						</div>
+						<div class="form-group" ng-if="addLinkedPropertyObject['property']">
+							<label class="col-sm-4 control-label">Value</label>
+							<div class="col-sm-6">
+								<select required class="form-control" ng-model="addLinkedPropertyObject['value']" 
+									ng-options="instance.objectURI as getObjectPropertyValue(instance.objectURI) for instance in getLinkedPropertyInstances(selectedTd.table.typeUri, addLinkedPropertyObject['property'])">
+								</select>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<input type="button" class="btn btn-default" value="Cancel" ng-click="closeAddLinkedPropertyModal();" />
+							<input ng-if="addLinkedPropertyObject['property'] && addLinkedPropertyObject['value']" type="submit" class="btn btn-default" value="Save" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 	<div id="contextMenu" class="dropdown clearfix">
 		<ul class="dropdown-menu" role="menu">
-			<li><a tabindex="-1" href="#">Edit cell</a></li>
-			<li><a tabindex="-1" href="#">Remove cell</a></li>
+			<li><a tabindex="-1" href="#" ng-click="openEditCellModal();">Edit cell</a></li>
+			<li><a tabindex="-1" href="#" ng-click="removeCell();">Clear cell</a></li>
 			<li class="divider"></li>
-			<li><a tabindex="-1" href="#">Add row</a></li>
-			<li><a tabindex="-1" href="#">Remove row</a></li>
+			<li><a tabindex="-1" href="#" ng-click="openAddRowModal();">Add row</a></li>
+			<li><a tabindex="-1" href="#" ng-click="removeRow();">Remove row</a></li>
 			<li class="divider"></li>
-			<li><a tabindex="-1" href="#">Add linked property</a></li>
-			<li><a tabindex="-1" href="#">Remove linked property</a></li>
+			<li><a tabindex="-1" href="#" ng-click="openAddLinkedPropertyModal();">Add linked property</a></li>
+			<li><a tabindex="-1" href="#" ng-click="openRemoveLinkedPropertyModal();">Remove linked property</a></li>
 			<li class="divider"></li>
-			<li><a id="closeContextMenu" tabindex="-1" href="#">Close</a></li>
+			<li><a id="closeContextMenu" tabindex="-1" href="#" ng-click="hideContextMenu();">Close</a></li>
 		</ul>
 	</div>
 	
