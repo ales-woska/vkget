@@ -31,7 +31,7 @@
 	
 	<div id="workspace" style="display: none">
 		<a id="addTableButton" type="button" class="btn btn-default" ng-hide="changes.length == 0" ng-click="confirmChanges();">
-			Show update script
+			Manage changes
 		</a>
 		<a id="addLineButton" type="button" class="btn btn-default btn-danger" ng-hide="changes.length == 0" ng-click="discardChanges();">
 			Discard changes
@@ -149,10 +149,12 @@
 				
 				<form class="form-horizontal">
 					<div class="modal-body">
-						<textarea ng-model="changes"></textarea>
+						<span id="updateScriptLoading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...</span>
+						<textarea id="updateScriptTextarea" style="display: none;" ng-model="updateScript"></textarea>
 					</div>
 					<div class="modal-footer">
 						<a type="button" class="btn btn-default" ng-click="download();" />Save ...</a>
+						<input type="submit" class="btn btn-default btn-danger" value="Commit changes" ng-click="commitChange();" />
 						<input type="submit" class="btn btn-default" value="Close" ng-click="closeChangeModal();" />
 					</div>
 					

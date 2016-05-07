@@ -1,18 +1,59 @@
 var app = angular.module('vkget', []);
 
+app.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.defaults.useXDomain = true;
+    delete $httpProvider.defaults.headers.common['X-Requested-With'];
+}
+]);
+
 app.controller('dataController', function($scope, $http, $filter, $window) {
 	$scope.endpoint = 'http://dbpedia.org/sparql';
 	$scope.endpointType = 'other';
-	$scope.changes = ['aaaaa'];
+	$scope.changes = [{
+		'objectUri': 'aaa',
+		'property': 'bbb',
+		'oldValue': 'ccc',
+		'newValue': 'ddd'},{
+		'objectUri': '111',
+		'property': '222',
+		'oldValue': '333',
+		'newValue': '444'
+		}];
+	$scope.updateScript = '';
 	
 	$scope.discardChanges = function() {
-		$scope.dataModel = $scope.originalDataModel;
-		$scope.changes = [];
-		alert('All changes have been canceled.');
+		if (confirm("Are you sure to discard all changes?")) {
+			$scope.dataModel = $scope.originalDataModel;
+			$scope.changes = [];
+		}
 	};
 	
 	$scope.confirmChanges = function() {
+		var changes = $scope.changes;
+		var dataModel = $scope.dataModel;
+		
+		$http({
+            url : 'http://localhost:8090/changes',
+            method : "POST",
+            data : changes
+        }).then(function(response) {
+            $scope.updateScript = response.data;
+            $('#updateScriptLoading').hide();
+            $('#updateScriptTextarea').show();
+            
+        }, function(response) {
+            alert('ERROR');
+        });
+		
 		$('#changesModal').modal('show');
+	};
+	
+	$scope.commitChange = function() {
+		if (confirm("Are you sure to commit all changes?")) {
+			$scope.originalDataModel = $scope.dataModel;
+			$scope.changes = [];
+			$('#changesModal').modal('hide');
+		}
 	};
 	
 	$scope.closeChangeModal = function() {
@@ -142,7 +183,7 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 				$scope.order(scope, 0);
 			}
 			$scope.dataModel = dataModel;
-			$scope.originalDataModel = dataModel;
+			$scope.originalDataModel = jQuery.extend({}, dataModel);
 
 			
 			$http.get("http://localhost:8090/layout?uri=" + layoutUri)

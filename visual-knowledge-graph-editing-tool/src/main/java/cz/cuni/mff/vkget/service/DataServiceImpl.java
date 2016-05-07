@@ -15,6 +15,7 @@ import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.Graph;
+import cz.cuni.mff.vkget.data.model.RdfChange;
 import cz.cuni.mff.vkget.data.model.RdfObject;
 import cz.cuni.mff.vkget.data.model.RdfObjectProperty;
 import cz.cuni.mff.vkget.data.model.RdfProperty;
@@ -25,6 +26,11 @@ public class DataServiceImpl implements DataService {
 	
 	@Autowired
 	private LayoutService layoutService;
+	
+	@Override
+	public String generateUpdateScript(List<RdfChange> changes) {
+		return "AAAAAAAAAAAAAAAAAAAAAAAAAAAa"; // TODO
+	}
 
 	@Override
 	public DataModel loadDataModel(String endpoint, EndpointType endpointType, String layoutUri) {
