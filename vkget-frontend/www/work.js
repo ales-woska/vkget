@@ -1,8 +1,31 @@
 var app = angular.module('vkget', []);
 
-app.controller('dataController', function($scope, $http, $filter) {
+app.controller('dataController', function($scope, $http, $filter, $window) {
 	$scope.endpoint = 'http://dbpedia.org/sparql';
 	$scope.endpointType = 'other';
+	$scope.changes = ['aaaaa'];
+	
+	$scope.discardChanges = function() {
+		$scope.dataModel = $scope.originalDataModel;
+		$scope.changes = [];
+		alert('All changes have been canceled.');
+	};
+	
+	$scope.confirmChanges = function() {
+		$('#changesModal').modal('show');
+	};
+	
+	$scope.closeChangeModal = function() {
+		$('#changesModal').modal('hide');
+	};
+	
+	$scope.download = function() {
+		var blob = new Blob([$scope.changes], { type: "application/json;charset=utf-8;" });			
+		var downloadLink = angular.element('<a></a>');
+                    downloadLink.attr('href', window.URL.createObjectURL(blob));
+                    downloadLink.attr('download', 'updateScript.rdf');
+		downloadLink[0].click();
+	};
 	
 	$scope.selectInstance = function(table, instance) {
 		if (table.selectedInstance == instance) {
@@ -98,6 +121,7 @@ app.controller('dataController', function($scope, $http, $filter) {
         $scope.layouts = response.data;
 		$('#layoutLoading').hide();
 		$('#layoutSelect').show();
+		$scope.layout = $scope.layouts[0].uri;
     });
 	
 	$scope.run = function() {
@@ -118,6 +142,7 @@ app.controller('dataController', function($scope, $http, $filter) {
 				$scope.order(scope, 0);
 			}
 			$scope.dataModel = dataModel;
+			$scope.originalDataModel = dataModel;
 
 			
 			$http.get("http://localhost:8090/layout?uri=" + layoutUri)
@@ -159,4 +184,47 @@ app.controller('dataController', function($scope, $http, $filter) {
 			
 	    });
 	};
+});
+
+$(function() {
+
+	var $contextMenu = $("#contextMenu");
+	var $td = null;
+	
+	$("body").on("contextmenu", "table td", function(e) {
+		if ($td) {
+			$td.css({
+				'background-color': ""
+			});
+		}
+		$td = $(e.target);
+		$td.css({
+			'background-color': "red"
+		});
+		$contextMenu.css({
+			display : "block",
+			left : e.pageX,
+			top : e.pageY
+		});
+		return false;
+	});
+
+	$contextMenu.on("click", "a", function(e) {
+		hide();
+	});
+	
+	$contextMenu.on("click", "#closeContextMenu", function(e) {
+		hide();
+	});
+	
+	function hide() {
+		if ($td) {
+			$td.css({
+				'background-color': ""
+			});
+		}
+		$contextMenu.hide();
+		
+	}
+
 });

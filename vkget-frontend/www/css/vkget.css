@@ -38,6 +38,10 @@ table.vkget_table tbody tr:hover {
 	cursor: pointer;
 }
 
+table.vkget_table tbody td:hover {
+	background-color: #F5DA81;
+}
+
 table.vkget_table td {
 	padding: 5px;
 }
@@ -151,4 +155,22 @@ tr.selectedInstance {
 
 table.vkget_table tbody tr.selectedInstance:hover {
 	background-color: red;
+}
+
+#contextMenu {
+	position: absolute;
+	display: none;
+}
+
+#contextMenu ul {
+	display: block;
+	position: static;
+	margin-bottom: 5px;
+}
+
+#changesModal textarea {
+	width: 100%;
+	min-height: 200px;
+	max-height: 500px;
+	overflow: auto;
 }
