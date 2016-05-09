@@ -20,6 +20,7 @@ import cz.cuni.mff.vkget.data.model.RdfTriple;
 public class CommonDataConnector implements DataConnector {
 	
 	private SparqlConnector connector;
+	private static final int LIMIT = 20;
 	
 	public CommonDataConnector() {}
 	
@@ -115,7 +116,7 @@ public class CommonDataConnector implements DataConnector {
 			for (RowLayout rowLayout: blockLayout.getProperties()) {
 				String property = var + "y" + j;
 				j++;
-				sb.append(" ?").append(var).append(" ").append(rowLayout.getProperty()).append(" ?").append(property).append(" . ");
+				sb.append(" OPTIONAL { ?").append(var).append(" ").append(rowLayout.getProperty()).append(" ?").append(property).append(" . } ");
 			}
 		}
 		for (LineLayout lineLayout: screenLayout.getLineLayouts()) {
@@ -124,7 +125,7 @@ public class CommonDataConnector implements DataConnector {
 			sb.append(" ?").append(varFrom).append(" ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . ");
 		}
 		
-		sb.append("} ");
+		sb.append("} LIMIT ").append(LIMIT);
 		return sb.toString();
 	}
 	

@@ -1,12 +1,10 @@
-package cz.cuni.mff.vkget.data.layout;
+package cz.cuni.mff.vkget.data.model;
 
 import java.io.Serializable;
 import java.util.List;
 
-import cz.cuni.mff.vkget.data.model.RdfObject;
-
 /**
- * GveTable is table which contains subjects as lines. It's columns are
+ * RdfTable is table which contains subjects as lines. It's columns are
  * RdfProperties from within subjects.
  *
  * @param classURI
@@ -17,9 +15,9 @@ import cz.cuni.mff.vkget.data.model.RdfObject;
  * @param columnsURIs
  *            : list of columns identified by their URIs
  */
-public class GveTable implements Serializable {
+public class RdfTable implements Serializable {
 	private String typeUri;
-	private List<RdfObject> instances;
+	private List<RdfInstance> instances;
 	private List<String> columnsURIs;
 
 	public String getTypeUri() {
@@ -30,11 +28,11 @@ public class GveTable implements Serializable {
 		this.typeUri = classUri;
 	}
 
-	public List<RdfObject> getInstances() {
+	public List<RdfInstance> getInstances() {
 		return instances;
 	}
 
-	public void setInstances(List<RdfObject> instances) {
+	public void setInstances(List<RdfInstance> instances) {
 		this.instances = instances;
 	}
 
@@ -46,8 +44,8 @@ public class GveTable implements Serializable {
 		this.columnsURIs = columnsURIs;
 	}
 	
-	public RdfObject getInstanceByUri(String uri) {
-		for (RdfObject rdfObject: instances) {
+	public RdfInstance getInstanceByUri(String uri) {
+		for (RdfInstance rdfObject: instances) {
 			if (rdfObject.getObjectURI().equals(uri)) {
 				return rdfObject;
 			}

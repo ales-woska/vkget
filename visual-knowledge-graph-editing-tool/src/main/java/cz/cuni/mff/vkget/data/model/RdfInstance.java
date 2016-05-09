@@ -9,7 +9,7 @@ import java.util.List;
  * @param objectURI
  *            URI of the instance
  */
-public class RdfObject implements Serializable {
+public class RdfInstance implements Serializable {
 	private String objectURI;
 	private String type;
 	private List<RdfObjectProperty> objectProperties;

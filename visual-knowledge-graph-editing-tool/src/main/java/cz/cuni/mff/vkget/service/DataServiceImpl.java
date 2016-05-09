@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 import cz.cuni.mff.vkget.connect.CommonDataConnector;
 import cz.cuni.mff.vkget.connect.DataConnector;
 import cz.cuni.mff.vkget.connect.EndpointType;
-import cz.cuni.mff.vkget.data.layout.GveTable;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.Graph;
+import cz.cuni.mff.vkget.data.model.RdfTable;
 import cz.cuni.mff.vkget.data.model.RdfChange;
-import cz.cuni.mff.vkget.data.model.RdfObject;
+import cz.cuni.mff.vkget.data.model.RdfInstance;
 import cz.cuni.mff.vkget.data.model.RdfObjectProperty;
 import cz.cuni.mff.vkget.data.model.RdfProperty;
 import cz.cuni.mff.vkget.data.model.RdfTriple;
@@ -99,9 +99,9 @@ public class DataServiceImpl implements DataService {
 		Graph graph = connector.loadGraph(screenLayout);
 		DataModel dataModel = new DataModel();
 		
-		List<GveTable> tables = new ArrayList<GveTable>();
+		List<RdfTable> tables = new ArrayList<RdfTable>();
 		for (String type: graph.getTypes()) {
-			GveTable table = new GveTable(); 
+			RdfTable table = new RdfTable(); 
 			table.setTypeUri(type);
 			table.setColumnsURIs(graph.getAllClassProperties(type));
 			table.setInstances(getRdfObjects(graph, type));
@@ -117,15 +117,15 @@ public class DataServiceImpl implements DataService {
 	}
 	
 	private void fillRdfObjectProperties(DataModel dataModel, Graph graph, LineLayout lineLayout) {
-		GveTable sourceTable = dataModel.getTableByType(lineLayout.getFromType());
-		GveTable targetTable = dataModel.getTableByType(lineLayout.getToType());
+		RdfTable sourceTable = dataModel.getTableByType(lineLayout.getFromType());
+		RdfTable targetTable = dataModel.getTableByType(lineLayout.getToType());
 				
 		if (sourceTable == null || targetTable == null) {
 			return;
 		}
 		
 		for (RdfTriple triple: graph.getRdfTriplesByType(sourceTable.getTypeUri())) {
-			RdfObject rdfObject = sourceTable.getInstanceByUri(triple.getUri());
+			RdfInstance rdfObject = sourceTable.getInstanceByUri(triple.getUri());
 			if (rdfObject == null) {
 				continue;
 			}
@@ -148,11 +148,11 @@ public class DataServiceImpl implements DataService {
 		
 	}
 	
-	private List<RdfObject> getRdfObjects(Graph graph, String type) {
-		List<RdfObject> rdfObjects = new ArrayList<RdfObject>();
+	private List<RdfInstance> getRdfObjects(Graph graph, String type) {
+		List<RdfInstance> rdfObjects = new ArrayList<RdfInstance>();
 		
 		for (RdfTriple triple: graph.getRdfTriplesByType(type)) {
-			RdfObject rdfObject = new RdfObject();
+			RdfInstance rdfObject = new RdfInstance();
 			rdfObject.setObjectURI(triple.getUri());
 			rdfObject.setType(type);
 			

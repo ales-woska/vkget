@@ -3,26 +3,24 @@ package cz.cuni.mff.vkget.data.model;
 import java.io.Serializable;
 import java.util.List;
 
-import cz.cuni.mff.vkget.data.layout.GveTable;
-
 /**
   * Class contains all GveTables (whole data)
  *
   * @param tables list of all gve tables
   */
 public class DataModel implements Serializable {
-    private List<GveTable> tables;
+    private List<RdfTable> tables;
 
-	public List<GveTable> getTables() {
+	public List<RdfTable> getTables() {
 		return tables;
 	}
 
-	public void setTables(List<GveTable> tables) {
+	public void setTables(List<RdfTable> tables) {
 		this.tables = tables;
 	}
 	
-	public GveTable getTableByType(String type) {
-		for (GveTable table: tables) {
+	public RdfTable getTableByType(String type) {
+		for (RdfTable table: tables) {
 			if (table.getTypeUri().equals(type)) {
 				return table;
 			}
