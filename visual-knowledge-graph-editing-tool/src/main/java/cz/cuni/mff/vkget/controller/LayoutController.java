@@ -27,7 +27,8 @@ public class LayoutController {
 
 	@RequestMapping("/layout")
 	public ScreenLayout getLayout(@RequestParam("uri") String uri) {
-		return service.getLayout(uri);
+		ScreenLayout layout = service.getLayout(uri);
+		return layout;
 	}
 
 	@RequestMapping(value = "/layout/save", method = RequestMethod.POST)

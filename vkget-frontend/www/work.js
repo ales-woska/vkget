@@ -340,6 +340,9 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 			if (!propertyFilter) {
 				continue;
 			}
+			if (!property.value) {
+				return false;
+			}
 			var value = property.value.toString();
 			if (value.toLowerCase().indexOf(propertyFilter.toLowerCase()) == -1) {
 				return false;

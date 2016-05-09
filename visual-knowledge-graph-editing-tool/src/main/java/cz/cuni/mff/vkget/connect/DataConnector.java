@@ -1,9 +1,9 @@
 package cz.cuni.mff.vkget.connect;
 
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
-import cz.cuni.mff.vkget.data.model.Graph;
+import cz.cuni.mff.vkget.data.model.DataModel;
 
 public interface DataConnector {
 	
-	Graph loadGraph(ScreenLayout screenLayout);
+	DataModel loadDataModel(ScreenLayout screenLayout);
 }
