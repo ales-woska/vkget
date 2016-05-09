@@ -18,6 +18,11 @@ import cz.cuni.mff.vkget.data.model.RdfChange;
 import cz.cuni.mff.vkget.data.model.RdfInstance;
 import cz.cuni.mff.vkget.service.DataService;
 
+/**
+ * Implementation of @see DataController
+ * @author Ales Woska
+ *
+ */
 @CrossOrigin(origins = "*")
 @RestController
 public class DataControllerImpl implements DataController {
@@ -25,6 +30,9 @@ public class DataControllerImpl implements DataController {
 	@Autowired
 	private DataService dataService;
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	@RequestMapping("/data")
 	public DataModel loadData(@RequestParam("endpoint") String endpoint, @RequestParam("type") EndpointType type, @RequestParam("layoutUri") String layoutUri) {
@@ -32,6 +40,9 @@ public class DataControllerImpl implements DataController {
 		return dataModel;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	@ResponseBody
 	@RequestMapping(value = "/data/table", method = RequestMethod.POST)
@@ -40,6 +51,9 @@ public class DataControllerImpl implements DataController {
 		return instances;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	@ResponseBody
 	@RequestMapping(value = "/changes", method = RequestMethod.POST, produces = "text/plain; charset=utf-8")

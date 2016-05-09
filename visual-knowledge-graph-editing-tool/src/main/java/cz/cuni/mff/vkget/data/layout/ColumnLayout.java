@@ -5,12 +5,24 @@ import java.util.List;
 
 import cz.cuni.mff.vkget.sparql.Constants;
 
-public class RowLayout extends AbstractLayout {
+/**
+ * Definition of table column.
+ * @author Ales Woska
+ *
+ */
+public class ColumnLayout extends AbstractLayout {
+	/**
+	 * Which property is shown in column
+	 */
     private String property;
+    
+    /**
+     * What aggregate function to use in case of multiple values.
+     */
     private List<AggregateFunction> aggregateFunctions = new ArrayList<AggregateFunction>();
     
-    public RowLayout() {
-    	this.type = Constants.RowLayoutType;
+    public ColumnLayout() {
+    	this.type = Constants.ColumnLayoutType;
     }
     
     public String getProperty() {

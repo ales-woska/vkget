@@ -12,9 +12,14 @@ import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
-import cz.cuni.mff.vkget.data.layout.RowLayout;
+import cz.cuni.mff.vkget.data.layout.ColumnLayout;
 import cz.cuni.mff.vkget.sparql.Constants;
 
+/**
+ * BlockLayout DAO
+ * @author Ales Woska
+ *
+ */
 @Repository
 public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 	private final String FONT_COLOR = Constants.VKGET_Prefix + ":" + "fontColor";
@@ -34,8 +39,11 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
 	@Autowired
-	private RowLayoutDao rowLayoutDao;
+	private ColumnLayoutDao columnLayoutDao;
 	
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public BlockLayout load(String uri) {
 		String loadBlockQuery = 
@@ -74,28 +82,30 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 				case TOP: layout.setTop(Integer.valueOf(value)); break;
 			}
 		}
-		layout.setProperties(this.loadRowLayouts(uri));
+		layout.setProperties(this.loadColumnLayouts(uri));
 		return layout;
 	}
     
-    private List<RowLayout> loadRowLayouts(String uri) {
+    private List<ColumnLayout> loadColumnLayouts(String uri) {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> " + Constants.RowLayoutProperty + " ?uri . "
+				+ " <" + uri + "> " + Constants.ColumnLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
-		List<RowLayout> layouts = new ArrayList<RowLayout>();
+		List<ColumnLayout> layouts = new ArrayList<ColumnLayout>();
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
 			String rlUri = solution.get("uri").asResource().getURI();
-			RowLayout bl = rowLayoutDao.load(rlUri);
+			ColumnLayout bl = columnLayoutDao.load(rlUri);
 			layouts.add(bl);
 		}
 		return layouts;
     }
 	
-	
+	/**
+	 * @inheritDoc
+	 */
     @Override
 	public void insert(BlockLayout layout) {
 		
@@ -122,8 +132,8 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 		
 		sparql.insertQuery(insertQuery.toString());
 				
-		for (RowLayout rowLayout: layout.getProperties()) {
-			rowLayoutDao.insert(rowLayout);
+		for (ColumnLayout columnLayout: layout.getProperties()) {
+			columnLayoutDao.insert(columnLayout);
 		}
 		
     }

@@ -1,5 +1,10 @@
 package cz.cuni.mff.vkget.data.layout;
 
+/**
+ * types of aggregate functions that can be used.
+ * @author Ales Woska
+ *
+ */
 public enum AggregateFunction {
 	NOTHING("nothing"), MIN("min"), MAX("max"), AVG("avg");
 

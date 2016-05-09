@@ -8,11 +8,37 @@ import cz.cuni.mff.vkget.data.model.RdfChange;
 import cz.cuni.mff.vkget.data.model.RdfFilter;
 import cz.cuni.mff.vkget.data.model.RdfInstance;
 
+/**
+ * Service intergace for business data operations.
+ * @author Ales Woska
+ *
+ */
 public interface DataService {
 
+	/**
+	 * Loads whole data model.
+	 * @param endpoint
+	 * @param type
+	 * @param layoutUri
+	 * @return
+	 */
 	DataModel loadDataModel(String endpoint, EndpointType type, String layoutUri);
 
+	/**
+	 * Generates SPARQL update script from changes.
+	 * @param changes
+	 * @return
+	 */
 	String generateUpdateScript(List<RdfChange> changes);
 
+	/**
+	 * Load concrete table.
+	 * @param tableType
+	 * @param filter
+	 * @param endpoint
+	 * @param endpointType
+	 * @param layoutUri
+	 * @return
+	 */
 	List<RdfInstance> loadTableData(String tableType, RdfFilter filter, String endpoint, EndpointType endpointType, String layoutUri);
 }

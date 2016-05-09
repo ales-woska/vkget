@@ -6,6 +6,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+/**
+ * Spring settings and runner.
+ * @author Ales Woska
+ *
+ */
 @Configuration 
 @ComponentScan("cz.cuni.mff.vkget") 
 @EnableWebMvc   

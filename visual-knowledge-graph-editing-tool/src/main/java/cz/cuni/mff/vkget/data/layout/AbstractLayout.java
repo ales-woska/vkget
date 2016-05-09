@@ -5,9 +5,30 @@ import java.util.List;
 
 import cz.cuni.mff.vkget.data.RdfEntity;
 
+/**
+ * common properties for @see LineLayout and @see BlockLayout
+ * @author Ales Woska
+ *
+ */
 public abstract class AbstractLayout extends RdfEntity {
+	
+	/**
+	 * source of title
+	 * constant - show as is
+	 * label - isn't used
+	 * uri - isn't used
+	 * property - identifier of property to show
+	 */
 	protected String title;
+	
+	/**
+	 * Order of properties how the title should be loaded
+	 */
 	protected List<TitleType> titleTypes = new ArrayList<TitleType>();
+	
+	/**
+	 * other visual properties
+	 */
 	protected String fontColor;
 	protected int fontSize;
 	protected String lineColor;

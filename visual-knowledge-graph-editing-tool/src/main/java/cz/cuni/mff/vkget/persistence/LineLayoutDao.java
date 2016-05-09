@@ -10,6 +10,11 @@ import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.sparql.Constants;
 
+/**
+ * LineLayout DAO
+ * @author Ales Woska
+ *
+ */
 @Repository
 public class LineLayoutDao implements SparqlDao<LineLayout> {
 	private final String FONT_COLOR = Constants.VKGET_Prefix + ":" + "fontColor";
@@ -26,6 +31,9 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public LineLayout load(String uri) {
 		String loadBlockQuery = 
@@ -64,7 +72,9 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 		return layout;
 	}
 	
-	
+	/**
+	 * @inheritDoc
+	 */
     @Override
 	public void insert(LineLayout layout) {
 		

@@ -4,20 +4,25 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * RdfTable is table which contains subjects as lines. It's columns are
- * RdfProperties from within subjects.
+ * RdfTable hold collection of instances with same type.
+ * @author Ales Woska
  *
- * @param classURI
- *            : Uri of rdf class of this table (each table has exactly one rdf
- *            cass)
- * @param instances
- *            : class instances
- * @param columnsURIs
- *            : list of columns identified by their URIs
  */
 public class RdfTable implements Serializable {
+	
+	/**
+	 * rdf:type for the table
+	 */
 	private String typeUri;
+	
+	/**
+	 * table instances - rows
+	 */
 	private List<RdfInstance> instances;
+	
+	/**
+	 * URIs of table columns
+	 */
 	private List<String> columnsURIs;
 
 	public String getTypeUri() {
@@ -42,15 +47,6 @@ public class RdfTable implements Serializable {
 
 	public void setColumnsURIs(List<String> columnsURIs) {
 		this.columnsURIs = columnsURIs;
-	}
-	
-	public RdfInstance getInstanceByUri(String uri) {
-		for (RdfInstance rdfObject: instances) {
-			if (rdfObject.getObjectURI().equals(uri)) {
-				return rdfObject;
-			}
-		}
-		return null;
 	}
 
 }

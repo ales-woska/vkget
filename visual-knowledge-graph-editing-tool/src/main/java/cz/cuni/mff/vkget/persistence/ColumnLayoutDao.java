@@ -7,11 +7,16 @@ import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
-import cz.cuni.mff.vkget.data.layout.RowLayout;
+import cz.cuni.mff.vkget.data.layout.ColumnLayout;
 import cz.cuni.mff.vkget.sparql.Constants;
 
+/**
+ * ColumnLayout DAO
+ * @author Ales Woska
+ *
+ */
 @Repository
-public class RowLayoutDao implements SparqlDao<RowLayout> {
+public class ColumnLayoutDao implements SparqlDao<ColumnLayout> {
 	private final String TITLE = Constants.VKGET_Prefix + ":" + "title";
 	private final String TITLE_TYPES = Constants.VKGET_Prefix + ":" + "titleTypes";
 	private final String PROPERTY = Constants.VKGET_Prefix + ":" + "property";
@@ -19,15 +24,18 @@ public class RowLayoutDao implements SparqlDao<RowLayout> {
 
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
 	
+	/**
+	 * @inheritDoc
+	 */
 	@Override
-	public RowLayout load(String uri) {
+	public ColumnLayout load(String uri) {
 		String loadRowQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
 				+ " <" + uri + "> ?property ?value . "
 				+ "}";
 		ResultSet results = sparql.query(loadRowQuery);
-		RowLayout layout = new RowLayout();
+		ColumnLayout layout = new ColumnLayout();
 		layout.setUri(uri);
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
@@ -51,15 +59,17 @@ public class RowLayoutDao implements SparqlDao<RowLayout> {
 		return layout;
 	}
 	
-	
+	/**
+	 * @inheritDoc
+	 */
     @Override
-	public void insert(RowLayout layout) {
+	public void insert(ColumnLayout layout) {
 		
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
 		insertQuery.append("INSERT DATA { ");
 		insertQuery.append("<").append(layout.getUri()).append("> ");
 		
-		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.RowLayoutType).append("\"; ");
+		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.ColumnLayoutType).append("\"; ");
 		insertQuery.append(" ").append(TITLE).append(" \"").append(layout.getTitle()).append("\"; ");
 		insertQuery.append(" ").append(TITLE_TYPES).append(" \"").append(layout.getTitleTypesAsString()).append("\"; ");
 		insertQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");

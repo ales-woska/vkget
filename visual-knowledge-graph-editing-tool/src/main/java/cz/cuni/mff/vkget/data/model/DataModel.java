@@ -4,11 +4,15 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
-  * Class contains all GveTables (whole data)
+ * Objects holding all @see RdfTable objects.
+ * @author Ales Woska
  *
-  * @param tables list of all gve tables
-  */
+ */
 public class DataModel implements Serializable {
+	
+	/**
+	 * Collection of @see @inheritDoc
+	 */
     private List<RdfTable> tables;
 
 	public List<RdfTable> getTables() {
@@ -17,15 +21,6 @@ public class DataModel implements Serializable {
 
 	public void setTables(List<RdfTable> tables) {
 		this.tables = tables;
-	}
-	
-	public RdfTable getTableByType(String type) {
-		for (RdfTable table: tables) {
-			if (table.getTypeUri().equals(type)) {
-				return table;
-			}
-		}
-		return null;
 	}
     
 }

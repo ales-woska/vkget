@@ -3,15 +3,19 @@ package cz.cuni.mff.vkget.data.model;
 import java.io.Serializable;
 
 /**
- * Concrete cell in GveTable. propertyUrl is same as columnsURIs in GveTable.
- * 
- * @param propertyURI
- *            URI of this property
- * @param value
- *            concrete property value - content of table cell
+ * Literal value of instance (@see RdfInstance).
+ * @author Ales Woska
+ *
  */
 public class RdfProperty implements Serializable {
+	/**
+	 * identifier of the property. e.g. rdfs:label or dbpedia-owl:length
+	 */
 	private String propertyURI;
+	
+	/**
+	 * value ~ table cell
+	 */
 	private Object value;
 
 	public String getPropertyURI() {

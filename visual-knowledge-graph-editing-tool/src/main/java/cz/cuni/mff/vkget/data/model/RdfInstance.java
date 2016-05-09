@@ -4,15 +4,30 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Rdf class instance - line in GveTable, its literal properties makes columns.
- * 
- * @param objectURI
- *            URI of the instance
+ * Instance of RDF object ~ table row
+ * @author Ales Woska
+ *
  */
 public class RdfInstance implements Serializable {
+	
+	/**
+	 * Instance URI
+	 */
 	private String objectURI;
+	
+	/**
+	 * rdf:type, is same as RdfTable.typeURI
+	 */
 	private String type;
+	
+	/**
+	 * properties leading to other table
+	 */
 	private List<RdfObjectProperty> objectProperties;
+	
+	/**
+	 * instance properties ~ table cells
+	 */
 	private List<RdfProperty> literalProperties;
 
 	public String getObjectURI() {

@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.service.LayoutService;
 
+/**
+ * Implementation of @see LayoutController.
+ * @author Ales Woska
+ *
+ */
 @CrossOrigin(origins = "*")
 @RestController
 public class LayoutControllerImpl implements LayoutController {
@@ -20,12 +25,18 @@ public class LayoutControllerImpl implements LayoutController {
 	@Autowired
 	private LayoutService service;
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	@RequestMapping("/layouts")
 	public List<ScreenLayout> getLayouts() {
 		return service.getLayoutList();
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	@RequestMapping("/layout")
 	public ScreenLayout getLayout(@RequestParam("uri") String uri) {
@@ -33,6 +44,9 @@ public class LayoutControllerImpl implements LayoutController {
 		return layout;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	@RequestMapping(value = "/layout/save", method = RequestMethod.POST)
 	public void saveLayout(@RequestBody ScreenLayout layout) {

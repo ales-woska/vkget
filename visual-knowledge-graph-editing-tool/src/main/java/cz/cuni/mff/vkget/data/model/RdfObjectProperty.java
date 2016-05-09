@@ -3,15 +3,27 @@ package cz.cuni.mff.vkget.data.model;
 import java.io.Serializable;
 
 /**
- * Property which value is RdfSubject
+ * Property containing reference to other type's instance via its URI.
  * 
  * @author Ales Woska
  *
  */
 public class RdfObjectProperty implements Serializable {
-	private String property;
+	
+	/**
+	 * URI of source instance
+	 */
 	private String subjectUri;
+	
+	/**
+	 * URI of target instance
+	 */
 	private String objectUri;
+	
+	/**
+	 * identifier of property which connects them.
+	 */
+	private String property;
 
 	public String getProperty() {
 		return property;

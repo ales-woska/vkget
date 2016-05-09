@@ -7,10 +7,29 @@ import java.util.Map;
 import cz.cuni.mff.vkget.data.RdfEntity;
 import cz.cuni.mff.vkget.sparql.Constants;
 
+/**
+ * Whole layout definition.
+ * @author Ales Woska
+ */
 public class ScreenLayout extends RdfEntity {
+	/**
+	 * Layout name
+	 */
 	private String name;
+	
+	/**
+	 * Namespaces used in layout.
+	 */
 	private Map<String, String> namespaces;
+	
+	/**
+	 * Definitions of tables ~ @see RdfTable
+	 */
 	private List<BlockLayout> blockLayouts;
+	
+	/**
+	 * Definitions of properties connecting tables @see RdfObjectProperty
+	 */
 	private List<LineLayout> lineLayouts;
 	
 	public ScreenLayout() {

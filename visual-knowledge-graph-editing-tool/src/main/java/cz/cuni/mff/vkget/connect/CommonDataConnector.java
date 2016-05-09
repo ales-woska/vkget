@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
-import cz.cuni.mff.vkget.data.layout.RowLayout;
+import cz.cuni.mff.vkget.data.layout.ColumnLayout;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.layout.TitleType;
 import cz.cuni.mff.vkget.data.model.DataModel;
@@ -21,12 +21,22 @@ import cz.cuni.mff.vkget.data.model.RdfInstance;
 import cz.cuni.mff.vkget.data.model.RdfObjectProperty;
 import cz.cuni.mff.vkget.data.model.RdfProperty;
 import cz.cuni.mff.vkget.data.model.RdfTable;
+import cz.cuni.mff.vkget.sparql.Constants;
 
+/**
+ * Implementation of @see DataConnector for common types of endpoints.
+ * @author Ales Woska
+ *
+ */
 @Service
 public class CommonDataConnector implements DataConnector {
 	
-	private SparqlConnector connector;
-	private static final int LIMIT = 40;
+	protected SparqlConnector connector;
+	
+	/**
+	 * Default row limit.
+	 */
+	protected static final int LIMIT = 40;
 	
 	public CommonDataConnector() {}
 	
@@ -34,6 +44,9 @@ public class CommonDataConnector implements DataConnector {
 		connector = new SparqlConnector(endpoint);
 	}
 	
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public DataModel loadDataModel(ScreenLayout screenLayout) {
 		DataModel dataModel = new DataModel();
@@ -46,6 +59,9 @@ public class CommonDataConnector implements DataConnector {
 		return dataModel;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public RdfTable loadTableData(String tableType, RdfFilter filter, ScreenLayout screenLayout) {
 		for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
@@ -57,7 +73,14 @@ public class CommonDataConnector implements DataConnector {
 		return null;
 	}
 	
-	private RdfTable loadRdfTable(ScreenLayout screenLayout, RdfFilter filter, BlockLayout blockLayout) {
+	/**
+	 * Loads table data by given parameters.
+	 * @param screenLayout
+	 * @param filter
+	 * @param blockLayout
+	 * @return Null if doesn't satisfy filter parameters.
+	 */
+	protected RdfTable loadRdfTable(ScreenLayout screenLayout, RdfFilter filter, BlockLayout blockLayout) {
 		RdfTable rdfTable = new RdfTable();
 		String query = this.constructTableQuery(blockLayout, screenLayout.getNamespaces(), screenLayout.getLineLayouts(), filter);
 		ResultSet results = this.connector.query(query);
@@ -65,8 +88,8 @@ public class CommonDataConnector implements DataConnector {
 		rdfTable.setInstances(new ArrayList<RdfInstance>());
 		
 		rdfTable.setColumnsURIs(new ArrayList<String>());
-		for (RowLayout rowLayout: blockLayout.getProperties()) {
-			rdfTable.getColumnsURIs().add(rowLayout.getProperty());
+		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
+			rdfTable.getColumnsURIs().add(columnLayout.getProperty());
 		}
 		
 		while (results.hasNext()) {
@@ -85,9 +108,9 @@ public class CommonDataConnector implements DataConnector {
 				instance.getLiteralProperties().add(rdfProperty);
 			}
 			int j = 0;
-			for (RowLayout rowLayout: blockLayout.getProperties()) {
+			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 				String property = "";
-				if (rowLayout.getProperty().equals("rdfs:label")) {
+				if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
 					property = "typeLabel";
 				} else {
 					property = "y" + j;
@@ -108,7 +131,7 @@ public class CommonDataConnector implements DataConnector {
 				if (value instanceof Number) {
 					value = (Number) value;
 				}
-				String propertyUri = rowLayout.getProperty();
+				String propertyUri = columnLayout.getProperty();
 				
 				RdfProperty rdfProperty = new RdfProperty();
 				rdfProperty.setPropertyURI(propertyUri);
@@ -141,7 +164,15 @@ public class CommonDataConnector implements DataConnector {
 		return rdfTable;
 	}
 	
-	private String constructTableQuery(BlockLayout blockLayout, Map<String, String> namespaces, List<LineLayout> lineLayouts, RdfFilter filter) {
+	/**
+	 * Constructs query for loading table data.
+	 * @param blockLayout
+	 * @param namespaces
+	 * @param lineLayouts
+	 * @param filter
+	 * @return
+	 */
+	protected String constructTableQuery(BlockLayout blockLayout, Map<String, String> namespaces, List<LineLayout> lineLayouts, RdfFilter filter) {
 		StringBuilder sb = new StringBuilder();
 		for (String prefix: namespaces.keySet()) {
 			String namespace = namespaces.get(prefix);
@@ -150,7 +181,7 @@ public class CommonDataConnector implements DataConnector {
 		sb.append("SELECT DISTINCT * WHERE {{ ");
 		
 		sb.append(" ?uri rdf:type ").append(blockLayout.getForType()).append(" . ");
-		sb.append(" ?uri rdfs:label ?typeLabel . ");
+		sb.append(" ?uri ").append(Constants.RDFS_LABEL).append(" ?typeLabel . ");
 		if (blockLayout.getTitleTypes().get(0) == TitleType.PROPERTY) {
 			sb.append(" OPTIONAL { ?uri ").append(blockLayout.getTitle()).append(" ?labelProperty . } ");
 		}
@@ -158,15 +189,15 @@ public class CommonDataConnector implements DataConnector {
 		Map<String, String> propertyVarMap = new HashMap<String, String>();
 		
 		int j = 0;
-		for (RowLayout rowLayout: blockLayout.getProperties()) {
-			if (rowLayout.getProperty().equals("rdfs:label")) {
-				propertyVarMap.put("rdfs:label", "typeLabel");
+		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
+			if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
+				propertyVarMap.put(Constants.RDFS_LABEL, "typeLabel");
 				continue;
 			}
 			String property = "y" + j;
-			propertyVarMap.put(rowLayout.getProperty(), property);
+			propertyVarMap.put(columnLayout.getProperty(), property);
 			j++;
-			sb.append(" OPTIONAL { ?uri ").append(rowLayout.getProperty()).append(" ?").append(property).append(" . } ");
+			sb.append(" OPTIONAL { ?uri ").append(columnLayout.getProperty()).append(" ?").append(property).append(" . } ");
 		}
 		
 		for (LineLayout lineLayout: lineLayouts) {

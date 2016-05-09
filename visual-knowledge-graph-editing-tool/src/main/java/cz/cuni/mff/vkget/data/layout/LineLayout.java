@@ -6,10 +6,31 @@ import java.util.List;
 import cz.cuni.mff.vkget.data.Point;
 import cz.cuni.mff.vkget.sparql.Constants;
 
+/**
+ * Layout of property connecting tables
+ * @author Ales Woska
+ *
+ */
 public class LineLayout extends AbstractLayout {
+	
+	/**
+	 * URI of source instance.
+	 */
 	private String fromType;
+	
+	/**
+	 * URI of target instance
+	 */
 	private String toType;
+	
+	/**
+	 * property that connects instances
+	 */
 	private String property;
+	
+	/**
+	 * Line is shown as multilne - a list of points within the multiline.
+	 */
 	private List<Point> points;
 	
 	public LineLayout() {

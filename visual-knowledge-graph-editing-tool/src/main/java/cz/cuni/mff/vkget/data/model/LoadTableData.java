@@ -4,11 +4,35 @@ import java.io.Serializable;
 
 import cz.cuni.mff.vkget.connect.EndpointType;
 
+/**
+ * Container for web service.
+ * @author Ales Woska
+ *
+ */
 public class LoadTableData implements Serializable {
+	/**
+	 * rdf:type for which table to load
+	 */
 	private String tableType;
+	
+	/**
+	 * table filter
+	 */
 	private RdfFilter filter;
+	
+	/**
+	 * data source
+	 */
 	private String endpoint;
+	
+	/**
+	 * data source type
+	 */
 	private EndpointType type;
+	
+	/**
+	 * layout definition
+	 */
 	private String layoutUri;
 
 	public String getTableType() {

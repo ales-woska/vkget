@@ -2,6 +2,10 @@ package cz.cuni.mff.vkget.data;
 
 import java.io.Serializable;
 
+/**
+ * 2D point
+ * @author Ales Woska
+ */
 public class Point implements Serializable {
 	public int x;
 	public int y;

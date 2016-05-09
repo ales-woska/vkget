@@ -9,12 +9,21 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
+/**
+ * Connection to SPARQL endpoint on the lowest level.
+ * @author Ales Woska
+ *
+ */
 public class SparqlConnector {
 
 	private static SparqlConnector fusekiInstance = new SparqlConnector("http://localhost:3030/vkget");
 	
 //	private static final String user = "dba";
 //	private static final String password = "dba";
+	
+	/**
+	 * Endpoint address.
+	 */
 	private String endpoint;
 	
 	public String getEndpoint() {

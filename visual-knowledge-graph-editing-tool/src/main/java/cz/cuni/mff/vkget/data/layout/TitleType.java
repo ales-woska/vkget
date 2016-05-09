@@ -1,5 +1,10 @@
 package cz.cuni.mff.vkget.data.layout;
 
+/**
+ * Describes what to show as title.
+ * @author Ales Woska
+ *
+ */
 public enum TitleType {
 	URI("uri"), LABEL("label"), CONSTANT("constant"), PROPERTY("property");
 

@@ -4,14 +4,46 @@ import java.util.List;
 
 import cz.cuni.mff.vkget.sparql.Constants;
 
+/**
+ * Layout for table
+ * @author Ales Woska
+ *
+ */
 public class BlockLayout extends AbstractLayout {
+	/**
+	 * rdf:type of all instaces
+	 */
 	private String forType;
+	
+	/**
+	 * color of table background
+	 */
 	private String background;
+	
+	/**
+	 * height of the table
+	 */
 	private int height;
+	
+	/**
+	 * width of the table
+	 */
 	private int width;
+	
+	/**
+	 * X position
+	 */
 	private int left;
+	
+	/**
+	 * Y position
+	 */
 	private int top;
-	private List<RowLayout> properties;
+	
+	/**
+	 * 
+	 */
+	private List<ColumnLayout> properties;
 
 	public BlockLayout() {
 		this.type = Constants.BlockLayoutType;
@@ -22,8 +54,8 @@ public class BlockLayout extends AbstractLayout {
 		this.title = title;
 	}
 
-	public RowLayout getRowLayout(String name) {
-		for (RowLayout r : properties) {
+	public ColumnLayout getColumnLayout(String name) {
+		for (ColumnLayout r : properties) {
 			if (r.getProperty().equals(name)) {
 				return r;
 			}
@@ -55,11 +87,11 @@ public class BlockLayout extends AbstractLayout {
 		this.height = height;
 	}
 
-	public List<RowLayout> getProperties() {
+	public List<ColumnLayout> getProperties() {
 		return properties;
 	}
 
-	public void setProperties(List<RowLayout> properties) {
+	public void setProperties(List<ColumnLayout> properties) {
 		this.properties = properties;
 	}
 

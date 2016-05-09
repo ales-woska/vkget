@@ -18,8 +18,10 @@ import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
-  * Created by Ales Woska on 31.1.2016.
-  */
+ * ScreenLayout dao object
+ * @author Ales Woska
+ *
+ */
 @Repository
 public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 	private static final String NAMESPACES = Constants.VKGET_Prefix + ":" + "namespaces";
@@ -39,6 +41,9 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 	@Autowired
     private LineLayoutDao lineDao;
 
+	/**
+	 * @inheritDoc
+	 */
     @Override
 	public void insert(ScreenLayout layout) {
 
@@ -68,6 +73,10 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
         }
     }
     
+    /**
+     * Loads list of all screen layouts without subcollections
+     * @return
+     */
     public List<ScreenLayout> loadScreenLayouts() {
     	List<ScreenLayout> layouts = new ArrayList<ScreenLayout>();
     	ResultSet results = sparql.query(loadScreenLayoutQuery);
@@ -90,6 +99,9 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 		return layouts;
     }
 
+    /**
+     * @inheritDoc
+     */
 	@Override
 	public ScreenLayout load(String uri) {
 		String loadBlockQuery = 

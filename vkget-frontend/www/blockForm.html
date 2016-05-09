@@ -54,12 +54,12 @@
 									<tr><th>Property</th><th>Title types</th><th>Title source</th><th>Aggr functions</th><th></th></tr>
 								</thead>
 								<tbody>
-									<tr ng-repeat="rowLayout in currBlock.properties">
-										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="rowLayout.property" /></td>
-										<td><select class="form-control" ng-model="rowLayout.titleTypes[0]" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"></select></td>
-										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="rowLayout.title" /></td>
-										<td><select class="form-control" ng-model="rowLayout.aggregateFunctions[0]" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"></select></td>
-										<td><a type="button" ng-click="removeProperty({blockLayout: currBlock, property: rowLayout})"><span class="glyphicon glyphicon-remove"></span></a></td>
+									<tr ng-repeat="columnLayout in currBlock.properties">
+										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="columnLayout.property" /></td>
+										<td><select class="form-control" ng-model="columnLayout.titleTypes[0]" ng-options="titleType for titleType in ['URI', 'LABEL', 'CONSTANT', 'PROPERTY']"></select></td>
+										<td><input type="text" class="form-control" id="title" placeholder="Title" ng-model="columnLayout.title" /></td>
+										<td><select class="form-control" ng-model="columnLayout.aggregateFunctions[0]" ng-options="titleType for titleType in ['NOTHING', 'MIN', 'MAX', 'AVG']"></select></td>
+										<td><a type="button" ng-click="removeProperty({blockLayout: currBlock, property: columnLayout})"><span class="glyphicon glyphicon-remove"></span></a></td>
 									</tr>
 								</tbody>
 							</table>

@@ -1,5 +1,10 @@
 package cz.cuni.mff.vkget.data.layout;
 
+/**
+ * Visual line type.
+ * @author Ales Woska
+ *
+ */
 public enum LineType {
 	SOLID("solid"), DOTTED("dotted"), DASHED("dashed");
 

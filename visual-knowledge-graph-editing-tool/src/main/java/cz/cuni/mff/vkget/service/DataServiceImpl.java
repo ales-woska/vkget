@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import cz.cuni.mff.vkget.connect.CommonDataConnector;
 import cz.cuni.mff.vkget.connect.DataConnector;
 import cz.cuni.mff.vkget.connect.EndpointType;
+import cz.cuni.mff.vkget.connect.VirtuosoDataConnector;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.RdfChange;
@@ -16,12 +17,20 @@ import cz.cuni.mff.vkget.data.model.RdfFilter;
 import cz.cuni.mff.vkget.data.model.RdfInstance;
 import cz.cuni.mff.vkget.data.model.RdfTable;
 
+/**
+ * Implementation of @see DataService
+ * @author Ales Woska
+ *
+ */
 @Service
 public class DataServiceImpl implements DataService {
 	
 	@Autowired
 	private LayoutService layoutService;
 	
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public String generateUpdateScript(List<RdfChange> changes) {
 		StringBuilder updates = new StringBuilder("UPDATE {\n");
@@ -80,6 +89,9 @@ public class DataServiceImpl implements DataService {
 		return result.toString();
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public DataModel loadDataModel(String endpoint, EndpointType endpointType, String layoutUri) {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
@@ -90,6 +102,9 @@ public class DataServiceImpl implements DataService {
 		return dataModel;
 	}
 	
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public List<RdfInstance> loadTableData(String tableType, RdfFilter filter, String endpoint, EndpointType endpointType, String layoutUri) {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
@@ -105,7 +120,7 @@ public class DataServiceImpl implements DataService {
 	
 	private DataConnector getConnector(String endpoint, EndpointType type) {
 		switch (type) {
-			case virtuoso: return new CommonDataConnector(endpoint);
+			case virtuoso: return new VirtuosoDataConnector(endpoint);
 			case jena: return new CommonDataConnector(endpoint);
 			default: return new CommonDataConnector(endpoint);
 		}

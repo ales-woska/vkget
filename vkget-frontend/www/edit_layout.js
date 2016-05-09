@@ -203,13 +203,13 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		if (property == null) {
 			return;
 		}
-		var rowLayout = {
+		var columnLayout = {
 			property: property.property,
 			title: property.title,
 			titleTypes: [property.titleType],
 			aggregateFunctions: [property.aggregateFunction]
 		};
-		blockLayout.properties.push(rowLayout);
+		blockLayout.properties.push(columnLayout);
 	};
 	
 	$scope.removeProperty = function(blockLayout, property) {
