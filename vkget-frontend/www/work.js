@@ -298,6 +298,7 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 			delete table.selectedInstance;
 		} else {
 			table.selectedInstance = instance;
+			$scope.reloadTable(table, instance);
 		}
 	};
 	
@@ -396,6 +397,66 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 		$('#layoutSelect').show();
 		$scope.layout = $scope.layouts[0].uri;
     });
+	
+	$scope.reloadTable = function(sourceTable, instance) {
+		
+		var tableType = '';
+		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
+			var lineLayout = $scope.screenLayout.lineLayouts[i];
+			if (lineLayout.fromType == sourceTable.typeUri) {
+				tableType = lineLayout.toType;
+			}
+		}
+		
+		var filter = {
+			limit: 20,
+			uriFilters: [],
+			columnFilters: {}				
+		};
+		for (var i = 0; i < instance.objectProperties.length; i++) {
+			var objectProperty = instance.objectProperties[i];
+			filter.uriFilters.push(objectProperty.objectUri);
+		}
+		
+		var endpoint = $scope.endpoint;
+		var type = $scope.endpointType;
+		var layoutUri = $scope.screenLayout.uri;
+		
+		var request = {
+			tableType: tableType,
+			filter: filter,
+			endpoint: endpoint,
+			type: type,
+			layoutUri: layoutUri
+		};
+
+		$http.post('http://localhost:8090/data/table', request)
+        .success(function (data, status, headers, config) {
+        	var newInstances = data;
+			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
+				if ($scope.dataModel.tables[i].typeUri == tableType) {
+					for (var j = 0; j < newInstances.length; j++) {
+						if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
+							$scope.dataModel.tables[i].instances.push(newInstances[j]);
+						}
+					}
+				}
+			}
+        })
+        .error(function (data, status, header, config) {
+        	alert('ERROR');
+        });
+		
+	};
+	
+	function containsInstance(table, instance) {
+		for (var i = 0; i < table.instances.length; i++) {
+			if (table.instances[i].objectURI == instance.objectURI) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	$scope.run = function() {
 		$('#dataSourceModal').modal('hide');

@@ -11,6 +11,9 @@ import cz.cuni.mff.vkget.connect.EndpointType;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.RdfChange;
+import cz.cuni.mff.vkget.data.model.RdfFilter;
+import cz.cuni.mff.vkget.data.model.RdfInstance;
+import cz.cuni.mff.vkget.data.model.RdfTable;
 
 @Service
 public class DataServiceImpl implements DataService {
@@ -80,15 +83,27 @@ public class DataServiceImpl implements DataService {
 	public DataModel loadDataModel(String endpoint, EndpointType endpointType, String layoutUri) {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
 		
-		DataConnector connector = null;
-		switch (endpointType) {
-			case virtuoso: connector = new CommonDataConnector(endpoint); break;
-			case jena: connector = new CommonDataConnector(endpoint); break;
-			default: connector = new CommonDataConnector(endpoint); break;
-		}
+		DataConnector connector = getConnector(endpoint, endpointType);
 		
 		DataModel dataModel = connector.loadDataModel(screenLayout);
 		return dataModel;
+	}
+	
+	@Override
+	public List<RdfInstance> loadTableData(String tableType, RdfFilter filter, String endpoint, EndpointType endpointType, String layoutUri) {
+		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
+		DataConnector connector = getConnector(endpoint, endpointType);
+		RdfTable table = connector.loadTableData(tableType, filter, screenLayout);
+		List<RdfInstance> instances = table.getInstances();
+		return instances;
+	}
+	
+	private DataConnector getConnector(String endpoint, EndpointType type) {
+		switch (type) {
+			case virtuoso: return new CommonDataConnector(endpoint);
+			case jena: return new CommonDataConnector(endpoint);
+			default: return new CommonDataConnector(endpoint);
+		}
 	}
 	
 }
