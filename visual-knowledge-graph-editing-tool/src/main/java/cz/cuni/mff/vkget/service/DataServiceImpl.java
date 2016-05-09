@@ -1,5 +1,6 @@
 package cz.cuni.mff.vkget.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,8 +95,12 @@ public class DataServiceImpl implements DataService {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
 		DataConnector connector = getConnector(endpoint, endpointType);
 		RdfTable table = connector.loadTableData(tableType, filter, screenLayout);
-		List<RdfInstance> instances = table.getInstances();
-		return instances;
+		if (table == null) {
+			return new ArrayList<RdfInstance>();
+		} else {
+			List<RdfInstance> instances = table.getInstances();
+			return instances;
+		}
 	}
 	
 	private DataConnector getConnector(String endpoint, EndpointType type) {

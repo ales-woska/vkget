@@ -6,6 +6,13 @@ app.config(['$httpProvider', function($httpProvider) {
 }
 ]);
 
+app.config(function($locationProvider) {
+    $locationProvider.html5Mode({
+        enabled: true,
+        requireBase: false
+      });
+  });
+
 app.directive('ngRightClick', function($parse) {
     return function(scope, element, attrs) {
         var fn = $parse(attrs.ngRightClick);
@@ -18,7 +25,7 @@ app.directive('ngRightClick', function($parse) {
     };
 });
 
-app.controller('dataController', function($scope, $http, $filter, $window) {
+app.controller('dataController', function($scope, $http, $filter, $window, $location) {
 	$scope.endpoint = 'http://dbpedia.org/sparql';
 	$scope.endpointType = 'other';
 	$scope.changes = [];
@@ -27,6 +34,14 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 	$scope.addRowObject = {};
 	$scope.removeLinkedPropertyObject = {};
 	$scope.addLinkedPropertyObject = {};
+	
+	if ($location.search()['endpoint']) {
+		$scope.endpoint = $location.search()['endpoint'];
+	}
+	
+	if ($location.search()['type']) {
+		$scope.endpointType = $location.search()['type'];
+	}
 	
 	$scope.editCell = function() {
 		var instance = $scope.selectedTd.instance;
@@ -399,7 +414,6 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
     });
 	
 	$scope.reloadTable = function(sourceTable, instance) {
-		
 		var tableType = '';
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			var lineLayout = $scope.screenLayout.lineLayouts[i];
@@ -409,7 +423,7 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
 		}
 		
 		var filter = {
-			limit: 20,
+			limit: 40,
 			uriFilters: [],
 			columnFilters: {}				
 		};
@@ -446,6 +460,55 @@ app.controller('dataController', function($scope, $http, $filter, $window) {
         .error(function (data, status, header, config) {
         	alert('ERROR');
         });
+		
+	};
+	
+	$scope.filterChanged = function(sourceTable) {
+		var tableType = sourceTable.typeUri;
+		
+		var filter = {
+			limit: 40,
+			uriFilters: [],
+			columnFilters: {}				
+		};
+		
+		var tableFilters = $scope.filters[sourceTable.typeUri];
+		if (tableFilters) {
+			for (var i = 0; i < sourceTable.columnsURIs.length; i++) {
+				var property = sourceTable.columnsURIs[i];
+				var propertyFilter = tableFilters[property];
+				filter.columnFilters[property] = propertyFilter;
+			}
+		}
+		
+		var endpoint = $scope.endpoint;
+		var type = $scope.endpointType;
+		var layoutUri = $scope.screenLayout.uri;
+		
+		var request = {
+				tableType: tableType,
+				filter: filter,
+				endpoint: endpoint,
+				type: type,
+				layoutUri: layoutUri
+		};
+		
+		$http.post('http://localhost:8090/data/table', request)
+		.success(function (data, status, headers, config) {
+			var newInstances = data;
+			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
+				if ($scope.dataModel.tables[i].typeUri == tableType) {
+					for (var j = 0; j < newInstances.length; j++) {
+						if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
+							$scope.dataModel.tables[i].instances.push(newInstances[j]);
+						}
+					}
+				}
+			}
+		})
+		.error(function (data, status, header, config) {
+			alert('ERROR');
+		});
 		
 	};
 	

@@ -62,7 +62,7 @@
 				</tr>
 				<tr>
 					<th ng-repeat="property in table.columnsURIs" style="width: {{layouts[table.typeUri].width / table.columnsURIs.length}}px;">
-						<input type="text" style="width: 100px;" ng-model="filters[table.typeUri][property]" />
+						<input type="text" style="width: 100px;" ng-model="filters[table.typeUri][property]" ng-change="filterChanged(table);" />
 					</th>
 				</tr>
 			</thead>

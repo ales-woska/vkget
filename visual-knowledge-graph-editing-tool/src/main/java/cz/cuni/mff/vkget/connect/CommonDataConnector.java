@@ -26,7 +26,7 @@ import cz.cuni.mff.vkget.data.model.RdfTable;
 public class CommonDataConnector implements DataConnector {
 	
 	private SparqlConnector connector;
-	private static final int LIMIT = 20;
+	private static final int LIMIT = 40;
 	
 	public CommonDataConnector() {}
 	
@@ -160,6 +160,7 @@ public class CommonDataConnector implements DataConnector {
 		int j = 0;
 		for (RowLayout rowLayout: blockLayout.getProperties()) {
 			if (rowLayout.getProperty().equals("rdfs:label")) {
+				propertyVarMap.put("rdfs:label", "typeLabel");
 				continue;
 			}
 			String property = "y" + j;
@@ -181,6 +182,9 @@ public class CommonDataConnector implements DataConnector {
 		if (filter != null && filter.getUriFilters() != null && filter.getUriFilters().size() > 0) {
 			filterSb.append(" && (");
 			for (String uriFilter: filter.getUriFilters()) {
+				if (uriFilter.isEmpty()) {
+					continue;
+				}
 				if (!filter.getUriFilters().get(0).equals(uriFilter)) {
 					filterSb.append("or ?uri = <").append(uriFilter).append("> ");
 				} else {
@@ -192,7 +196,13 @@ public class CommonDataConnector implements DataConnector {
 		
 		if (filter != null && filter.getColumnFilters() != null && filter.getColumnFilters().size() > 0) {
 			for (String property: filter.getColumnFilters().keySet()) {
+				if (property.isEmpty()) {
+					continue;
+				}
 				String filterValue = filter.getColumnFilters().get(property);
+				if (filterValue.isEmpty()) {
+					continue;
+				}
 				filterSb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), \"").append(filterValue).append("\")) ");
 			}
 		}
