@@ -2,28 +2,30 @@ package cz.cuni.mff.vkget.data.model;
 
 import java.io.Serializable;
 
+import cz.cuni.mff.vkget.data.common.Property;
+
 /**
  * Literal value of instance (@see RdfInstance).
  * @author Ales Woska
  *
  */
-public class RdfProperty implements Serializable {
+public class RdfLiteralProperty implements Serializable {
 	/**
 	 * identifier of the property. e.g. rdfs:label or dbpedia-owl:length
 	 */
-	private String propertyURI;
+	private Property property;
 	
 	/**
 	 * value ~ table cell
 	 */
 	private Object value;
 
-	public String getPropertyURI() {
-		return propertyURI;
+	public Property getProperty() {
+		return property;
 	}
 
-	public void setPropertyURI(String propertyURI) {
-		this.propertyURI = propertyURI;
+	public void setProperty(Property property) {
+		this.property = property;
 	}
 
 	public Object getValue() {

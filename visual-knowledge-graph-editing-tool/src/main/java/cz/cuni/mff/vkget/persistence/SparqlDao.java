@@ -1,6 +1,7 @@
 package cz.cuni.mff.vkget.persistence;
 
-import cz.cuni.mff.vkget.data.RdfEntity;
+import cz.cuni.mff.vkget.data.common.RdfEntity;
+import cz.cuni.mff.vkget.data.common.Uri;
 
 /**
  * DAO interface for @see RdfEntity objects
@@ -21,6 +22,6 @@ public interface SparqlDao<T extends RdfEntity> {
 	 * @param uri
 	 * @return
 	 */
-	T load(String uri);
+	T load(Uri uri);
 
 }

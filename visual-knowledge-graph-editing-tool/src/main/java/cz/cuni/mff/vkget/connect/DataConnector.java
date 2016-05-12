@@ -1,5 +1,6 @@
 package cz.cuni.mff.vkget.connect;
 
+import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.RdfFilter;
@@ -26,5 +27,5 @@ public interface DataConnector {
 	 * @param screenLayout Layout definition
 	 * @return
 	 */
-	RdfTable loadTableData(String tableType, RdfFilter filter, ScreenLayout screenLayout);
+	RdfTable loadTableData(Type tableType, RdfFilter filter, ScreenLayout screenLayout);
 }

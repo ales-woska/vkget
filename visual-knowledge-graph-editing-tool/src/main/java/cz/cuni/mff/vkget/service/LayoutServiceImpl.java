@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.persistence.ScreenLayoutDao;
 
@@ -31,7 +32,7 @@ public class LayoutServiceImpl implements LayoutService {
 	 * @inheritDoc
 	 */
 	@Override
-	public ScreenLayout getLayout(String uri) {
+	public ScreenLayout getLayout(Uri uri) {
 		return dao.load(uri);
 	}
 	

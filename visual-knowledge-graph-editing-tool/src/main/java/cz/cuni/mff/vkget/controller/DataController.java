@@ -3,6 +3,7 @@ package cz.cuni.mff.vkget.controller;
 import java.util.List;
 
 import cz.cuni.mff.vkget.connect.EndpointType;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.LoadTableData;
 import cz.cuni.mff.vkget.data.model.RdfChange;
@@ -22,7 +23,7 @@ public interface DataController {
 	 * @param layoutUri
 	 * @return
 	 */
-	public DataModel loadData(String endpoint, EndpointType type, String layoutUri);
+	public DataModel loadData(String endpoint, EndpointType type, Uri layoutUri);
 	
 	/**
 	 * Loads new instances by given filter within loadTableData

@@ -10,6 +10,8 @@ import cz.cuni.mff.vkget.connect.CommonDataConnector;
 import cz.cuni.mff.vkget.connect.DataConnector;
 import cz.cuni.mff.vkget.connect.EndpointType;
 import cz.cuni.mff.vkget.connect.VirtuosoDataConnector;
+import cz.cuni.mff.vkget.data.common.Type;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.RdfChange;
@@ -33,40 +35,39 @@ public class DataServiceImpl implements DataService {
 	 */
 	@Override
 	public String generateUpdateScript(List<RdfChange> changes) {
-		StringBuilder updates = new StringBuilder("UPDATE {\n");
-		StringBuilder inserts = new StringBuilder("INSERT {\n");
-		StringBuilder deletes = new StringBuilder("DELETE {\n");
+		StringBuilder updates = new StringBuilder("MODIFY {\n");
+		StringBuilder inserts = new StringBuilder("INSERT DATA {\n");
+		StringBuilder deletes = new StringBuilder("DELETE DATA {\n");
 		
-		int updatesCount = 0;
 		int insertsCount = 0;
+		int updatesCount = 0;
 		int deletesCount = 0;
 		
-		
 		for (RdfChange change: changes) {
-			boolean oldValueEmpty = change.getOldValue() == null || change.getOldValue().isEmpty();
-			boolean newValueEmpty = change.getNewValue() == null || change.getNewValue().isEmpty();
+			boolean oldValueEmpty = change.getOldValue() == null;
+			boolean newValueEmpty = change.getNewValue() == null;
 			
 			if (oldValueEmpty && !newValueEmpty) {
 				insertsCount++;
-				inserts.append("\t<").append(change.getObjectUri()).append("> ").append(change.getProperty());
-				if (change.getNewValue().contains("http://")) {
-					inserts.append(" <").append(change.getNewValue()).append("> .\n");
+				inserts.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				if (change.getNewValue() instanceof Uri) {
+					inserts.append(" <").append((Uri)change.getNewValue()).append("> .\n");
 				} else {
 					inserts.append(" '").append(change.getNewValue()).append("' .\n");
 				}
 			} else if (newValueEmpty && !oldValueEmpty) {
 				deletesCount++;
-				deletes.append("\t<").append(change.getObjectUri()).append("> ").append(change.getProperty());
-				if (change.getOldValue().contains("http://")) {
-					deletes.append(" <").append(change.getOldValue()).append("> .\n");
+				deletes.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				if (change.getOldValue() instanceof Uri) {
+					deletes.append(" <").append((Uri)change.getOldValue()).append("> .\n");
 				} else {
 					deletes.append(" '").append(change.getOldValue()).append("' .\n");
 				}
 			} else {
 				updatesCount++;
-				updates.append("\t<").append(change.getObjectUri()).append("> ").append(change.getProperty());
-				if (change.getNewValue().contains("http://")) {
-					updates.append(" <").append(change.getNewValue()).append("> .\n");
+				updates.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				if (change.getNewValue() instanceof Uri) {
+					updates.append(" <").append((Uri)change.getNewValue()).append("> .\n");
 				} else {
 					updates.append(" '").append(change.getNewValue()).append("' .\n");
 				}
@@ -93,7 +94,7 @@ public class DataServiceImpl implements DataService {
 	 * @inheritDoc
 	 */
 	@Override
-	public DataModel loadDataModel(String endpoint, EndpointType endpointType, String layoutUri) {
+	public DataModel loadDataModel(String endpoint, EndpointType endpointType, Uri layoutUri) {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
 		
 		DataConnector connector = getConnector(endpoint, endpointType);
@@ -106,7 +107,7 @@ public class DataServiceImpl implements DataService {
 	 * @inheritDoc
 	 */
 	@Override
-	public List<RdfInstance> loadTableData(String tableType, RdfFilter filter, String endpoint, EndpointType endpointType, String layoutUri) {
+	public List<RdfInstance> loadTableData(Type tableType, RdfFilter filter, String endpoint, EndpointType endpointType, Uri layoutUri) {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
 		DataConnector connector = getConnector(endpoint, endpointType);
 		RdfTable table = connector.loadTableData(tableType, filter, screenLayout);

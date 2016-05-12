@@ -2,6 +2,7 @@ package cz.cuni.mff.vkget.service;
 
 import java.util.List;
 
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 
 /**
@@ -22,7 +23,7 @@ public interface LayoutService {
 	 * @param uri
 	 * @return
 	 */
-	ScreenLayout getLayout(String uri);
+	ScreenLayout getLayout(Uri uri);
 
 	/**
 	 * Saves changes into storage and creates record if doesn't exists.

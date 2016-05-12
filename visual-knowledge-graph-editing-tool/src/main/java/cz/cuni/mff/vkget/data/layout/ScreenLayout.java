@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cz.cuni.mff.vkget.data.RdfEntity;
+import cz.cuni.mff.vkget.data.common.RdfEntity;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
@@ -48,12 +49,12 @@ public class ScreenLayout extends RdfEntity {
 	}
 
 	@Override
-	public String getUri() {
+	public Uri getUri() {
 		return uri;
 	}
 
 	@Override
-	public void setUri(String uri) {
+	public void setUri(Uri uri) {
 		this.uri = uri;
 	}
 

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
@@ -32,7 +34,7 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 			Constants.PREFIX_PART
 			+ "SELECT DISTINCT * WHERE { "
 			+ "  ?layout " + Constants.RDF_TYPE + " " + Constants.ScreenLayoutType + " . "
-			+ "  ?layout " + Constants.RDFS_TITLE + " ?name . "
+			+ "  ?layout " + Constants.RDFS_LABEL + " ?name . "
 			+ "}";
 	
 	@Autowired
@@ -51,7 +53,7 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 		insertQuery.append("INSERT DATA { <").append(layout.getUri()).append("> ");
 		
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append("; ");
-		insertQuery.append(" ").append(Constants.RDFS_TITLE).append(" \"").append(layout.getName()).append("\"; ");
+		insertQuery.append(" ").append(Constants.RDFS_LABEL).append(" \"").append(layout.getName()).append("\"; ");
 		insertQuery.append(" ").append(NAMESPACES).append(" \"").append(layout.getNamespacesAsString()).append("\"; ");
 		
 		for (BlockLayout bl: layout.getBlockLayouts()) {
@@ -85,7 +87,7 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 			QuerySolution solution = results.next();
 
 			ScreenLayout layout = new ScreenLayout();
-			String uri = solution.get("layout").asResource().getURI();
+			Uri uri = new Uri(solution.get("layout").asResource().getURI());
 			layout.setUri(uri);
 			layout.setName(solution.get("name").asLiteral().getLexicalForm());
 			
@@ -103,7 +105,7 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
      * @inheritDoc
      */
 	@Override
-	public ScreenLayout load(String uri) {
+	public ScreenLayout load(Uri uri) {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -121,7 +123,7 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 			Resource resource = node.asResource();
 			String namespace = resource.getNameSpace();
 			String nsPrefix = model.getNsURIPrefix(namespace);
-			String property = nsPrefix + ":" + resource.getLocalName();
+			Property property = new Property(nsPrefix, resource.getLocalName());
 			
 			node = solution.get("value");
 			String value = (node.isLiteral()) ? node.asLiteral().getString() : node.asResource().getURI();
@@ -129,48 +131,63 @@ public class ScreenLayoutDao implements SparqlDao<ScreenLayout> {
 				continue;
 			}
 
-			switch (property) {
-				case Constants.RDFS_TITLE: layout.setName(value); break;
-				case NAMESPACES: layout.setNamespacesFromString(value); break;
+			if (property.equals(Constants.RDFS_LABEL)) {
+				layout.setName(value);
+			} else if (property.equals(NAMESPACES)) {
+				layout.setNamespacesFromString(value);
 			}
 		}
 		layout.setBlockLayouts(this.loadBlockLayouts(layout.getUri()));
 		layout.setLineLayouts(this.loadLineLayouts(layout.getUri()));
+		fillBlocksToLines(layout);
 		return layout;
 	}
     
-    private List<BlockLayout> loadBlockLayouts(String uri) {
+    private List<BlockLayout> loadBlockLayouts(Uri blockLayoutUri) {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> " + Constants.BlockLayoutProperty + " ?uri . "
+				+ " <" + blockLayoutUri + "> " + Constants.BlockLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
 		List<BlockLayout> layouts = new ArrayList<BlockLayout>();
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
-			String blUri = solution.get("uri").asResource().getURI();
+			Uri blUri = new Uri(solution.get("uri").asResource().getURI());
 			BlockLayout bl = blockDao.load(blUri);
 			layouts.add(bl);
 		}
 		return layouts;
     }
     
-    private List<LineLayout> loadLineLayouts(String uri) {
+    private List<LineLayout> loadLineLayouts(Uri lineLayoutUri) {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> " + Constants.LineLayoutProperty + " ?uri . "
+				+ " <" + lineLayoutUri + "> " + Constants.LineLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
 		List<LineLayout> layouts = new ArrayList<LineLayout>();
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
-			String lluri = solution.get("uri").asResource().getURI();
+			Uri lluri = new Uri(solution.get("uri").asResource().getURI());
 			LineLayout ll = lineDao.load(lluri);
 			layouts.add(ll);
 		}
 		return layouts;
+    }
+    
+    private void fillBlocksToLines(ScreenLayout layout) {
+    	for (LineLayout lineLayout: layout.getLineLayouts()) {
+    		for (BlockLayout blockLayout: layout.getBlockLayouts()) {
+    			if (lineLayout.getFromType().getUri().equals(blockLayout.getUri())) {
+    				lineLayout.setFromType(blockLayout);
+    			}
+    			if (lineLayout.getToType().getUri().equals(blockLayout.getUri())) {
+    				lineLayout.setToType(blockLayout);
+    			}
+    		}
+    	}
     }
     
 }

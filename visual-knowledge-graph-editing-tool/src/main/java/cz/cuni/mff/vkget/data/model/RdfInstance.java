@@ -3,6 +3,9 @@ package cz.cuni.mff.vkget.data.model;
 import java.io.Serializable;
 import java.util.List;
 
+import cz.cuni.mff.vkget.data.common.Type;
+import cz.cuni.mff.vkget.data.common.Uri;
+
 /**
  * Instance of RDF object ~ table row
  * @author Ales Woska
@@ -13,12 +16,12 @@ public class RdfInstance implements Serializable {
 	/**
 	 * Instance URI
 	 */
-	private String objectURI;
+	private Uri uri;
 	
 	/**
-	 * rdf:type, is same as RdfTable.typeURI
+	 * rdf:type, is same as RdfTable.type
 	 */
-	private String type;
+	private Type type;
 	
 	/**
 	 * properties leading to other table
@@ -28,14 +31,14 @@ public class RdfInstance implements Serializable {
 	/**
 	 * instance properties ~ table cells
 	 */
-	private List<RdfProperty> literalProperties;
+	private List<RdfLiteralProperty> literalProperties;
 
-	public String getObjectURI() {
-		return objectURI;
+	public Uri getUri() {
+		return uri;
 	}
 
-	public void setObjectURI(String objectURI) {
-		this.objectURI = objectURI;
+	public void setUri(Uri uri) {
+		this.uri = uri;
 	}
 
 	public List<RdfObjectProperty> getObjectProperties() {
@@ -46,25 +49,25 @@ public class RdfInstance implements Serializable {
 		this.objectProperties = objectProperties;
 	}
 
-	public List<RdfProperty> getLiteralProperties() {
+	public List<RdfLiteralProperty> getLiteralProperties() {
 		return literalProperties;
 	}
 
-	public void setLiteralProperties(List<RdfProperty> literalProperties) {
+	public void setLiteralProperties(List<RdfLiteralProperty> literalProperties) {
 		this.literalProperties = literalProperties;
 	}
-	
-	public String getType() {
+
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
 	public Object getValueForProperty(String property) {
-		for (RdfProperty rp: literalProperties) {
-			if (rp.getPropertyURI().equals(property)) {
+		for (RdfLiteralProperty rp: literalProperties) {
+			if (rp.getProperty().equals(property)) {
 				return rp.getValue();
 			}
 		}

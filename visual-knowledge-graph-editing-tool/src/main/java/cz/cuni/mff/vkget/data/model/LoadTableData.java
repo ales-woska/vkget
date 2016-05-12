@@ -3,6 +3,8 @@ package cz.cuni.mff.vkget.data.model;
 import java.io.Serializable;
 
 import cz.cuni.mff.vkget.connect.EndpointType;
+import cz.cuni.mff.vkget.data.common.Type;
+import cz.cuni.mff.vkget.data.common.Uri;
 
 /**
  * Container for web service.
@@ -13,7 +15,7 @@ public class LoadTableData implements Serializable {
 	/**
 	 * rdf:type for which table to load
 	 */
-	private String tableType;
+	private Type tableType;
 	
 	/**
 	 * table filter
@@ -33,13 +35,13 @@ public class LoadTableData implements Serializable {
 	/**
 	 * layout definition
 	 */
-	private String layoutUri;
+	private Uri layoutUri;
 
-	public String getTableType() {
+	public Type getTableType() {
 		return tableType;
 	}
 
-	public void setTableType(String tableType) {
+	public void setTableType(Type tableType) {
 		this.tableType = tableType;
 	}
 
@@ -67,11 +69,11 @@ public class LoadTableData implements Serializable {
 		this.type = type;
 	}
 
-	public String getLayoutUri() {
+	public Uri getLayoutUri() {
 		return layoutUri;
 	}
 
-	public void setLayoutUri(String layoutUri) {
+	public void setLayoutUri(Uri layoutUri) {
 		this.layoutUri = layoutUri;
 	}
 

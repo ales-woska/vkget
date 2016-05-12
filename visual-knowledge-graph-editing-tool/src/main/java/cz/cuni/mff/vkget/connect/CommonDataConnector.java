@@ -10,16 +10,19 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.springframework.stereotype.Service;
 
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Type;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
-import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.data.layout.ColumnLayout;
+import cz.cuni.mff.vkget.data.layout.LabelType;
+import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
-import cz.cuni.mff.vkget.data.layout.TitleType;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.RdfFilter;
 import cz.cuni.mff.vkget.data.model.RdfInstance;
+import cz.cuni.mff.vkget.data.model.RdfLiteralProperty;
 import cz.cuni.mff.vkget.data.model.RdfObjectProperty;
-import cz.cuni.mff.vkget.data.model.RdfProperty;
 import cz.cuni.mff.vkget.data.model.RdfTable;
 import cz.cuni.mff.vkget.sparql.Constants;
 
@@ -63,7 +66,7 @@ public class CommonDataConnector implements DataConnector {
 	 * @inheritDoc
 	 */
 	@Override
-	public RdfTable loadTableData(String tableType, RdfFilter filter, ScreenLayout screenLayout) {
+	public RdfTable loadTableData(Type tableType, RdfFilter filter, ScreenLayout screenLayout) {
 		for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
 			if (blockLayout.getForType().equals(tableType)) {
 				RdfTable rdfTable = this.loadRdfTable(screenLayout, filter, blockLayout);
@@ -84,40 +87,40 @@ public class CommonDataConnector implements DataConnector {
 		RdfTable rdfTable = new RdfTable();
 		String query = this.constructTableQuery(blockLayout, screenLayout.getNamespaces(), screenLayout.getLineLayouts(), filter);
 		ResultSet results = this.connector.query(query);
-		rdfTable.setTypeUri(blockLayout.getForType());
+		rdfTable.setType(blockLayout.getForType());
 		rdfTable.setInstances(new ArrayList<RdfInstance>());
 		
-		rdfTable.setColumnsURIs(new ArrayList<String>());
+		rdfTable.setColumns(new ArrayList<Property>());
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
-			rdfTable.getColumnsURIs().add(columnLayout.getProperty());
+			rdfTable.getColumns().add(columnLayout.getProperty());
 		}
 		
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
 			RdfInstance instance = new RdfInstance(); 
-			String objectUri = solution.get("?uri").asResource().getURI();
-			instance.setObjectURI(objectUri);
+			Uri subjectUri = new Uri(solution.get("?uri").asResource().getURI());
+			instance.setUri(subjectUri);
 			instance.setType(blockLayout.getForType());
 
-			instance.setLiteralProperties(new ArrayList<RdfProperty>());
-			if (blockLayout.getTitleTypes().get(0) == TitleType.PROPERTY) {
-				RdfProperty rdfProperty = new RdfProperty();
+			instance.setLiteralProperties(new ArrayList<RdfLiteralProperty>());
+			if (blockLayout.getLabel().getType() == LabelType.PROPERTY) {
+				RdfLiteralProperty rdfProperty = new RdfLiteralProperty();
 				RDFNode rdfNode = solution.get("labelProperty");
-				rdfProperty.setPropertyURI(blockLayout.getTitle());
+				rdfProperty.setProperty(new Property(blockLayout.getLabel().getLabelSource()));
 				rdfProperty.setValue(rdfNode.asLiteral().getString());
 				instance.getLiteralProperties().add(rdfProperty);
 			}
 			int j = 0;
 			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
-				String property = "";
+				String propertyName = "";
 				if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
-					property = "typeLabel";
+					propertyName = "typeLabel";
 				} else {
-					property = "y" + j;
+					propertyName = "y" + j;
 					j++;
 				}
 				
-				RDFNode rdfNode = solution.get(property);
+				RDFNode rdfNode = solution.get(propertyName);
 				Object value = null;
 				
 				if (rdfNode != null) {
@@ -131,10 +134,10 @@ public class CommonDataConnector implements DataConnector {
 				if (value instanceof Number) {
 					value = (Number) value;
 				}
-				String propertyUri = columnLayout.getProperty();
+				Property property = columnLayout.getProperty();
 				
-				RdfProperty rdfProperty = new RdfProperty();
-				rdfProperty.setPropertyURI(propertyUri);
+				RdfLiteralProperty rdfProperty = new RdfLiteralProperty();
+				rdfProperty.setProperty(property);
 				rdfProperty.setValue(value);
 				instance.getLiteralProperties().add(rdfProperty);
 			}
@@ -148,13 +151,13 @@ public class CommonDataConnector implements DataConnector {
 				String varTo = "y" + j;
 				
 				RDFNode rdfNode = solution.get(varTo);
-				String uri = null;
+				Uri uri = null;
 				if (rdfNode != null) {
-					uri = rdfNode.asResource().getURI();
+					uri = new Uri(rdfNode.asResource().getURI());
 				}
 				
 				RdfObjectProperty rdfObjectProperty = new RdfObjectProperty();
-				rdfObjectProperty.setSubjectUri(objectUri);
+				rdfObjectProperty.setSubjectUri(subjectUri);
 				rdfObjectProperty.setProperty(lineLayout.getProperty());
 				rdfObjectProperty.setObjectUri(uri);
 				instance.getObjectProperties().add(rdfObjectProperty);
@@ -182,11 +185,11 @@ public class CommonDataConnector implements DataConnector {
 		
 		sb.append(" ?uri rdf:type ").append(blockLayout.getForType()).append(" . ");
 		sb.append(" ?uri ").append(Constants.RDFS_LABEL).append(" ?typeLabel . ");
-		if (blockLayout.getTitleTypes().get(0) == TitleType.PROPERTY) {
-			sb.append(" OPTIONAL { ?uri ").append(blockLayout.getTitle()).append(" ?labelProperty . } ");
+		if (blockLayout.getLabel().getType() == LabelType.PROPERTY) {
+			sb.append(" OPTIONAL { ?uri ").append(blockLayout.getLabel().getType()).append(" ?labelProperty . } ");
 		}
 		
-		Map<String, String> propertyVarMap = new HashMap<String, String>();
+		Map<Property, String> propertyVarMap = new HashMap<Property, String>();
 		
 		int j = 0;
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
@@ -201,7 +204,7 @@ public class CommonDataConnector implements DataConnector {
 		}
 		
 		for (LineLayout lineLayout: lineLayouts) {
-			if (!(lineLayout.getFromType().equalsIgnoreCase(blockLayout.getForType()))) {
+			if (!(lineLayout.getFromType().getType().equals(blockLayout.getForType()))) {
 				continue;
 			}
 			String varTo = "y" + j;
@@ -212,8 +215,8 @@ public class CommonDataConnector implements DataConnector {
 
 		if (filter != null && filter.getUriFilters() != null && filter.getUriFilters().size() > 0) {
 			filterSb.append(" && (");
-			for (String uriFilter: filter.getUriFilters()) {
-				if (uriFilter.isEmpty()) {
+			for (Uri uriFilter: filter.getUriFilters()) {
+				if (uriFilter == null) {
 					continue;
 				}
 				if (!filter.getUriFilters().get(0).equals(uriFilter)) {
@@ -226,8 +229,8 @@ public class CommonDataConnector implements DataConnector {
 		}
 		
 		if (filter != null && filter.getColumnFilters() != null && filter.getColumnFilters().size() > 0) {
-			for (String property: filter.getColumnFilters().keySet()) {
-				if (property.isEmpty()) {
+			for (Property property: filter.getColumnFilters().keySet()) {
+				if (property == null) {
 					continue;
 				}
 				String filterValue = filter.getColumnFilters().get(property);

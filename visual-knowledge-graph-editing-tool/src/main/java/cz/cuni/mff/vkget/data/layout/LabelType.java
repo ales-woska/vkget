@@ -5,12 +5,12 @@ package cz.cuni.mff.vkget.data.layout;
  * @author Ales Woska
  *
  */
-public enum TitleType {
+public enum LabelType {
 	URI("uri"), LABEL("label"), CONSTANT("constant"), PROPERTY("property");
 
 	private String text;
 
-	TitleType(String text) {
+	LabelType(String text) {
 		this.text = text;
 	}
 
@@ -18,9 +18,9 @@ public enum TitleType {
 		return this.text;
 	}
 
-	public static TitleType fromString(String text) {
+	public static LabelType fromString(String text) {
 		if (text != null) {
-			for (TitleType b : TitleType.values()) {
+			for (LabelType b : LabelType.values()) {
 				if (text.equalsIgnoreCase(b.text)) {
 					return b;
 				}

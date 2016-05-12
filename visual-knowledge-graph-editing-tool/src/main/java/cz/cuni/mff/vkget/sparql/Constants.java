@@ -4,6 +4,9 @@ import java.util.Map;
 
 import org.apache.jena.ext.com.google.common.collect.ImmutableMap;
 
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Type;
+
 /**
  * Constants used in application.
  * @author Ales Woska
@@ -23,57 +26,52 @@ public class Constants {
 	/**
 	 * RDF type of ScreenLayout
 	 */
-	public static final String ScreenLayoutType = VKGET_Prefix + ":ScreenLayout";
+	public static final Type ScreenLayoutType = new Type(VKGET_Prefix, "ScreenLayout");
 	
 	/**
 	 * RDF type of BlockLayout
 	 */
-	public static final String BlockLayoutType = VKGET_Prefix + ":BlockLayout";
+	public static final Type BlockLayoutType = new Type(VKGET_Prefix, "BlockLayout");
 	
 	/**
 	 * RDF type of LineLayout
 	 */
-	public static final String LineLayoutType = VKGET_Prefix + ":LineLayout";
+	public static final Type LineLayoutType = new Type(VKGET_Prefix, "LineLayout");
 	
 	/**
 	 * RDF type of ColumnLayout
 	 */
-	public static final String ColumnLayoutType = VKGET_Prefix + ":ColumnLayout";
+	public static final Type ColumnLayoutType = new Type(VKGET_Prefix, "ColumnLayout");
 	
 	/**
 	 * RDF property 
 	 */
-	public static final String ScreenLayoutProperty = VKGET_Prefix + ":screenLayout";
+	public static final Property ScreenLayoutProperty = new Property(VKGET_Prefix, "screenLayout");
 	
 	/**
 	 * Contain BlockLayout property
 	 */
-	public static final String BlockLayoutProperty = VKGET_Prefix + ":blockLayout";
+	public static final Property BlockLayoutProperty = new Property(VKGET_Prefix, "blockLayout");
 	
 	/**
 	 * Contain LineLayout property
 	 */
-	public static final String LineLayoutProperty = VKGET_Prefix + ":lineLayout";
+	public static final Property LineLayoutProperty = new Property(VKGET_Prefix, "lineLayout");
 	
 	/**
 	 * Contain ColumnLayout property
 	 */
-	public static final String ColumnLayoutProperty = VKGET_Prefix + ":columnLayout";
+	public static final Property ColumnLayoutProperty = new Property(VKGET_Prefix, "columnLayout");
 	
 	/**
 	 * RDF Type property
 	 */
-	public static final String RDF_TYPE = "rdf:type";
-	
-	/**
-	 * RDF Title property
-	 */
-	public static final String RDFS_TITLE = "rdfs:title";
+	public static final Property RDF_TYPE = new Property("rdf", "type");
 	
 	/**
 	 * RDF Label property
 	 */
-	public static final String RDFS_LABEL = "rdfs:label";
+	public static final Property RDFS_LABEL = new Property("rdfs", "label");
 	
 	/**
 	 * Common namespace definition for SPARQL query

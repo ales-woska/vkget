@@ -3,6 +3,9 @@ package cz.cuni.mff.vkget.data.model;
 import java.util.List;
 import java.util.Map;
 
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Uri;
+
 /**
  * Filter for loading instances.
  * @author Ales Woska
@@ -12,31 +15,31 @@ public class RdfFilter {
 	/**
 	 * Pairs of property:value where property is identifier of property by which to filter and value is string value to search by.
 	 */
-	private Map<String, String> columnFilters;
+	private Map<Property, String> columnFilters;
 	
 	/**
-	 * Only instances with there URIs ~ RdfInstace.objectUri
+	 * Only instances with there URIs ~ RdfInstace.uri
 	 */
-	private List<String> uriFilters;
+	private List<Uri> uriFilters;
 	
 	/**
 	 * Max limit of loaded isntances.
 	 */
 	private int limit;
 
-	public Map<String, String> getColumnFilters() {
+	public Map<Property, String> getColumnFilters() {
 		return columnFilters;
 	}
 
-	public void setColumnFilters(Map<String, String> columnFilters) {
+	public void setColumnFilters(Map<Property, String> columnFilters) {
 		this.columnFilters = columnFilters;
 	}
 
-	public List<String> getUriFilters() {
+	public List<Uri> getUriFilters() {
 		return uriFilters;
 	}
 
-	public void setUriFilters(List<String> uriFilters) {
+	public void setUriFilters(List<Uri> uriFilters) {
 		this.uriFilters = uriFilters;
 	}
 

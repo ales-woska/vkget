@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import cz.cuni.mff.vkget.connect.EndpointType;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.model.DataModel;
 import cz.cuni.mff.vkget.data.model.LoadTableData;
 import cz.cuni.mff.vkget.data.model.RdfChange;
@@ -35,7 +36,7 @@ public class DataControllerImpl implements DataController {
 	 */
 	@Override
 	@RequestMapping("/data")
-	public DataModel loadData(@RequestParam("endpoint") String endpoint, @RequestParam("type") EndpointType type, @RequestParam("layoutUri") String layoutUri) {
+	public DataModel loadData(@RequestParam("endpoint") String endpoint, @RequestParam("type") EndpointType type, @RequestParam("layoutUri") Uri layoutUri) {
 		DataModel dataModel = dataService.loadDataModel(endpoint, type, layoutUri);
 		return dataModel;
 	}

@@ -2,6 +2,7 @@ package cz.cuni.mff.vkget.data.layout;
 
 import java.util.List;
 
+import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
@@ -13,7 +14,7 @@ public class BlockLayout extends AbstractLayout {
 	/**
 	 * rdf:type of all instaces
 	 */
-	private String forType;
+	private Type forType;
 	
 	/**
 	 * color of table background
@@ -49,25 +50,16 @@ public class BlockLayout extends AbstractLayout {
 		this.type = Constants.BlockLayoutType;
 	}
 
-	public BlockLayout(String forClass, String title) {
-		this.forType = forClass;
-		this.title = title;
+	public BlockLayout(Type forType, Label label) {
+		this.forType = forType;
+		this.label = label;
 	}
 
-	public ColumnLayout getColumnLayout(String name) {
-		for (ColumnLayout r : properties) {
-			if (r.getProperty().equals(name)) {
-				return r;
-			}
-		}
-		return null;
-	}
-
-	public String getForType() {
+	public Type getForType() {
 		return forType;
 	}
 
-	public void setForType(String forClass) {
+	public void setForType(Type forClass) {
 		this.forType = forClass;
 	}
 

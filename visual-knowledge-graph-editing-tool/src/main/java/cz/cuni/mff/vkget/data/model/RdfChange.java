@@ -2,8 +2,12 @@ package cz.cuni.mff.vkget.data.model;
 
 import java.io.Serializable;
 
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Uri;
+
 /**
  * Change done in frontend.
+ * 
  * @author Ales Woska
  *
  */
@@ -12,52 +16,53 @@ public class RdfChange implements Serializable {
 	/**
 	 * URI of changed instance.
 	 */
-	private String objectUri;
-	
+	private Uri uri;
+
 	/**
-	 * Changed property. If it's an URI then it is reference to other RdfInstance.
+	 * Changed property. If it's an URI then it is reference to other
+	 * RdfInstance.
 	 */
-	private String property;
-	
+	private Property property;
+
 	/**
 	 * Value before change. If is empty then the property is created.
 	 */
-	private String oldValue;
-	
+	private Object oldValue;
+
 	/**
 	 * Value adter change. If is empty then the property is deleted.
 	 */
-	private String newValue;
+	private Object newValue;
 
-	public String getObjectUri() {
-		return objectUri;
+	public Uri getUri() {
+		return uri;
 	}
 
-	public void setObjectUri(String objectUri) {
-		this.objectUri = objectUri;
+	public void setUri(Uri uri) {
+		this.uri = uri;
 	}
 
-	public String getProperty() {
+	public Property getProperty() {
 		return property;
 	}
 
-	public void setProperty(String property) {
+	public void setProperty(Property property) {
 		this.property = property;
 	}
 
-	public String getOldValue() {
+	public Object getOldValue() {
 		return oldValue;
 	}
 
-	public void setOldValue(String oldValue) {
+	public void setOldValue(Object oldValue) {
 		this.oldValue = oldValue;
 	}
 
-	public String getNewValue() {
+	public Object getNewValue() {
 		return newValue;
 	}
 
-	public void setNewValue(String newValue) {
+	public void setNewValue(Object newValue) {
 		this.newValue = newValue;
 	}
 

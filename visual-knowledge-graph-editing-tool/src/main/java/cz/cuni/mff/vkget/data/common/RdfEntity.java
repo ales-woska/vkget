@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.data;
+package cz.cuni.mff.vkget.data.common;
 
 import java.io.Serializable;
 
@@ -11,26 +11,26 @@ public abstract class RdfEntity implements Serializable {
 	/**
 	 * unique resource identifier
 	 */
-	protected String uri;
+	protected Uri uri;
 	
 	/**
 	 * rdf:type
 	 */
-	protected String type;
+	protected Type type;
 
-	public String getUri() {
+	public Uri getUri() {
 		return uri;
 	}
 
-	public void setUri(String uri) {
+	public void setUri(Uri uri) {
 		this.uri = uri;
 	}
 
-	public String getType() {
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 

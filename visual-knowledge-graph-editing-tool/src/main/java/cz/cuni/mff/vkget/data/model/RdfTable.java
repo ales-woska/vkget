@@ -3,6 +3,9 @@ package cz.cuni.mff.vkget.data.model;
 import java.io.Serializable;
 import java.util.List;
 
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Type;
+
 /**
  * RdfTable hold collection of instances with same type.
  * @author Ales Woska
@@ -13,7 +16,7 @@ public class RdfTable implements Serializable {
 	/**
 	 * rdf:type for the table
 	 */
-	private String typeUri;
+	private Type type;
 	
 	/**
 	 * table instances - rows
@@ -23,14 +26,14 @@ public class RdfTable implements Serializable {
 	/**
 	 * URIs of table columns
 	 */
-	private List<String> columnsURIs;
-
-	public String getTypeUri() {
-		return typeUri;
+	private List<Property> columns;
+	
+	public Type getType() {
+		return type;
 	}
 
-	public void setTypeUri(String classUri) {
-		this.typeUri = classUri;
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 	public List<RdfInstance> getInstances() {
@@ -41,12 +44,12 @@ public class RdfTable implements Serializable {
 		this.instances = instances;
 	}
 
-	public List<String> getColumnsURIs() {
-		return columnsURIs;
+	public List<Property> getColumns() {
+		return columns;
 	}
 
-	public void setColumnsURIs(List<String> columnsURIs) {
-		this.columnsURIs = columnsURIs;
+	public void setColumns(List<Property> columns) {
+		this.columns = columns;
 	}
 
 }

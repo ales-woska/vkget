@@ -1,65 +1,28 @@
 package cz.cuni.mff.vkget.data.layout;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cz.cuni.mff.vkget.data.RdfEntity;
+import cz.cuni.mff.vkget.data.common.RdfEntity;
 
 /**
  * common properties for @see LineLayout and @see BlockLayout
+ * 
  * @author Ales Woska
  *
  */
 public abstract class AbstractLayout extends RdfEntity {
-	
-	/**
-	 * source of title
-	 * constant - show as is
-	 * label - isn't used
-	 * uri - isn't used
-	 * property - identifier of property to show
-	 */
-	protected String title;
-	
-	/**
-	 * Order of properties how the title should be loaded
-	 */
-	protected List<TitleType> titleTypes = new ArrayList<TitleType>();
-	
-	/**
-	 * other visual properties
-	 */
-	protected String fontColor;
-	protected int fontSize;
-	protected String lineColor;
+
+	protected Label label;
+	protected String fontColor = "#000000";
+	protected int fontSize = 10;
+	protected String lineColor = "#000000";
 	protected LineType lineType = LineType.SOLID;
-	protected int lineThickness;
+	protected int lineThickness = 1;
 
-	public List<TitleType> getTitleTypes() {
-		return titleTypes;
+	public Label getLabel() {
+		return label;
 	}
 
-	public String getTitleTypesAsString() {
-		StringBuilder sb = new  StringBuilder();
-		for (TitleType type: this.titleTypes) {
-			sb.append(" ").append(type.getText());
-		}
-		return sb.toString().trim();
-	}
-	
-	public void setTitleTypes(List<TitleType> titleTypes) {
-		this.titleTypes = titleTypes;
-	}
-	
-	public void setTitleTypesFromString(String titleTypes) {
-		if (titleTypes == null) {
-			return;
-		}
-		String[] types = titleTypes.split(" ");
-		this.titleTypes = new ArrayList<TitleType>();
-		for (String type: types) {
-			this.titleTypes.add(TitleType.fromString(type));
-		}
+	public void setLabel(Label label) {
+		this.label = label;
 	}
 
 	public String getFontColor() {
@@ -90,16 +53,8 @@ public abstract class AbstractLayout extends RdfEntity {
 		return lineType;
 	}
 
-	public String getLineTypeAsString() {
-		return lineType.getText();
-	}
-
 	public void setLineType(LineType lineType) {
 		this.lineType = lineType;
-	}
-
-	public void setLineTypeFromString(String lineType) {
-		this.lineType = LineType.fromString(lineType);
 	}
 
 	public int getLineThickness() {
@@ -108,14 +63,6 @@ public abstract class AbstractLayout extends RdfEntity {
 
 	public void setLineThickness(int lineThickness) {
 		this.lineThickness = lineThickness;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 }

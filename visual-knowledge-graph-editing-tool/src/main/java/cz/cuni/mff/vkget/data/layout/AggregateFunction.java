@@ -6,7 +6,7 @@ package cz.cuni.mff.vkget.data.layout;
  *
  */
 public enum AggregateFunction {
-	NOTHING("nothing"), MIN("min"), MAX("max"), AVG("avg");
+	NOTHING("nothing"), MIN("min"), MAX("max"), AVG("avg"), MEDIAN("med");
 
 	private String text;
 

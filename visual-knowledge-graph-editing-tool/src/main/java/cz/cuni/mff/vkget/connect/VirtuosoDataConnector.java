@@ -6,10 +6,12 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
 import cz.cuni.mff.vkget.data.layout.ColumnLayout;
+import cz.cuni.mff.vkget.data.layout.LabelType;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
-import cz.cuni.mff.vkget.data.layout.TitleType;
 import cz.cuni.mff.vkget.data.model.RdfFilter;
 import cz.cuni.mff.vkget.sparql.Constants;
 
@@ -41,11 +43,11 @@ public class VirtuosoDataConnector extends CommonDataConnector {
 		
 		sb.append(" ?uri rdf:type ").append(blockLayout.getForType()).append(" . ");
 		sb.append(" ?uri ").append(Constants.RDFS_LABEL).append(" ?typeLabel . ");
-		if (blockLayout.getTitleTypes().get(0) == TitleType.PROPERTY) {
-			sb.append(" OPTIONAL { ?uri ").append(blockLayout.getTitle()).append(" ?labelProperty . } ");
+		if (blockLayout.getLabel().getType() == LabelType.PROPERTY) {
+			sb.append(" OPTIONAL { ?uri ").append(blockLayout.getLabel().getLabelSource()).append(" ?labelProperty . } ");
 		}
 		
-		Map<String, String> propertyVarMap = new HashMap<String, String>();
+		Map<Property, String> propertyVarMap = new HashMap<Property, String>();
 		
 		int j = 0;
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
@@ -60,7 +62,7 @@ public class VirtuosoDataConnector extends CommonDataConnector {
 		}
 		
 		for (LineLayout lineLayout: lineLayouts) {
-			if (!(lineLayout.getFromType().equalsIgnoreCase(blockLayout.getForType()))) {
+			if (!(lineLayout.getFromType().getType().equals(blockLayout.getForType()))) {
 				continue;
 			}
 			String varTo = "y" + j;
@@ -71,8 +73,8 @@ public class VirtuosoDataConnector extends CommonDataConnector {
 
 		if (filter != null && filter.getUriFilters() != null && filter.getUriFilters().size() > 0) {
 			filterSb.append(" && (");
-			for (String uriFilter: filter.getUriFilters()) {
-				if (uriFilter.isEmpty()) {
+			for (Uri uriFilter: filter.getUriFilters()) {
+				if (uriFilter == null) {
 					continue;
 				}
 				if (!filter.getUriFilters().get(0).equals(uriFilter)) {
@@ -85,8 +87,8 @@ public class VirtuosoDataConnector extends CommonDataConnector {
 		}
 		
 		if (filter != null && filter.getColumnFilters() != null && filter.getColumnFilters().size() > 0) {
-			for (String property: filter.getColumnFilters().keySet()) {
-				if (property.isEmpty()) {
+			for (Property property: filter.getColumnFilters().keySet()) {
+				if (property == null) {
 					continue;
 				}
 				String filterValue = filter.getColumnFilters().get(property);

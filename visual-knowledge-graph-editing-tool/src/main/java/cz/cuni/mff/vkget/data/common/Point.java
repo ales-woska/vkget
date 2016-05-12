@@ -1,4 +1,4 @@
-package cz.cuni.mff.vkget.data;
+package cz.cuni.mff.vkget.data.common;
 
 import java.io.Serializable;
 

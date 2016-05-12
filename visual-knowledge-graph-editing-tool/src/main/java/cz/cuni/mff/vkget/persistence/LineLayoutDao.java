@@ -7,7 +7,13 @@ import org.apache.jena.rdf.model.Resource;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Uri;
+import cz.cuni.mff.vkget.data.layout.BlockLayout;
+import cz.cuni.mff.vkget.data.layout.Label;
+import cz.cuni.mff.vkget.data.layout.LabelType;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
+import cz.cuni.mff.vkget.data.layout.LineType;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
@@ -25,8 +31,9 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 	private final String LINE_COLOR = Constants.VKGET_Prefix + ":" + "lineColor";
 	private final String LINE_TYPE = Constants.VKGET_Prefix + ":" + "lineType";
 	private final String LINE_THICKNESS = Constants.VKGET_Prefix + ":" + "lineThickness";
-	private final String TITLE = Constants.VKGET_Prefix + ":" + "title";
-	private final String TITLE_TYPES = Constants.VKGET_Prefix + ":" + "titleTypes";
+	private final String LABEL_SOURCE = Constants.VKGET_Prefix + ":" + "labelSource";
+	private final String LABEL_TYPE = Constants.VKGET_Prefix + ":" + "labelType";
+	private final String LABEL_LANG = Constants.VKGET_Prefix + ":" + "labelLang";
 	private final String POINTS = Constants.VKGET_Prefix + ":" + "points";
 
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
@@ -35,7 +42,7 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 	 * @inheritDoc
 	 */
 	@Override
-	public LineLayout load(String uri) {
+	public LineLayout load(Uri uri) {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -44,6 +51,9 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 		ResultSet results = sparql.query(loadBlockQuery);
 		LineLayout layout = new LineLayout();
 		layout.setUri(uri);
+		layout.setLabel(new Label());
+		layout.setFromType(new BlockLayout());
+		layout.setToType(new BlockLayout());
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
 			
@@ -58,14 +68,15 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 			switch (property) {
 				case FONT_COLOR: layout.setFontColor(value); break;
 				case FONT_SIZE: layout.setFontSize(Integer.valueOf(value)); break;
-				case FROM_TYPE: layout.setFromType(value); break;
-				case PROPERTY: layout.setProperty(value); break;
-				case TO_TYPE: layout.setToType(value); break;
+				case FROM_TYPE: layout.getFromType().setUri(new Uri(value)); break;
+				case PROPERTY: layout.setProperty(new Property(value)); break;
+				case TO_TYPE: layout.getToType().setUri(new Uri(value)); break;
 				case LINE_COLOR: layout.setLineColor(value); break;
-				case LINE_TYPE: layout.setLineTypeFromString(value); break;
+				case LINE_TYPE: layout.setLineType(LineType.fromString(value)); break;
 				case LINE_THICKNESS: layout.setLineThickness(Integer.valueOf(value)); break;
-				case TITLE: layout.setTitle(value); break;
-				case TITLE_TYPES: layout.setTitleTypesFromString(value); break;
+				case LABEL_SOURCE: layout.getLabel().setLabelSource(value); break;
+				case LABEL_LANG: layout.getLabel().setLang(value); break;
+				case LABEL_TYPE: layout.getLabel().setType(LabelType.fromString(value)); break;
 				case POINTS: layout.setPointsFromString(value); break;
 			}
 		}
@@ -86,13 +97,14 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 		insertQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
 		insertQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
 		insertQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
-		insertQuery.append(" ").append(FROM_TYPE).append(" \"").append(layout.getFromType()).append("\"; ");
-		insertQuery.append(" ").append(TO_TYPE).append(" \"").append(layout.getToType()).append("\"; ");
+		insertQuery.append(" ").append(FROM_TYPE).append(" \"").append(layout.getFromType().getType()).append("\"; ");
+		insertQuery.append(" ").append(TO_TYPE).append(" \"").append(layout.getToType().getType()).append("\"; ");
 		insertQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
 		insertQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
-		insertQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getLineTypeAsString()).append("\"; ");
-		insertQuery.append(" ").append(TITLE).append(" \"").append(layout.getTitle()).append("\"; ");
-		insertQuery.append(" ").append(TITLE_TYPES).append(" \"").append(layout.getTitleTypesAsString()).append("\"; ");
+		insertQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getType()).append("\"; ");
+		insertQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
+		insertQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
+		insertQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
 		insertQuery.append(" ").append(POINTS).append(" \"").append(layout.getPointsAsString()).append("\". ");
 		
 		insertQuery.append(" } ");

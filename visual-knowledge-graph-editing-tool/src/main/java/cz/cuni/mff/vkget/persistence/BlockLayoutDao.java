@@ -11,8 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
+import cz.cuni.mff.vkget.data.common.Type;
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
 import cz.cuni.mff.vkget.data.layout.ColumnLayout;
+import cz.cuni.mff.vkget.data.layout.Label;
+import cz.cuni.mff.vkget.data.layout.LabelType;
+import cz.cuni.mff.vkget.data.layout.LineType;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
@@ -27,8 +32,9 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 	private final String LINE_COLOR = Constants.VKGET_Prefix + ":" + "lineColor";
 	private final String LINE_TYPE = Constants.VKGET_Prefix + ":" + "lineType";
 	private final String LINE_THICKNESS = Constants.VKGET_Prefix + ":" + "lineThickness";
-	private final String TITLE = Constants.VKGET_Prefix + ":" + "title";
-	private final String TITLE_TYPES = Constants.VKGET_Prefix + ":" + "titleTypes";
+	private final String LABEL_SOURCE = Constants.VKGET_Prefix + ":" + "labelSource";
+	private final String LABEL_TYPE = Constants.VKGET_Prefix + ":" + "labelType";
+	private final String LABEL_LANG = Constants.VKGET_Prefix + ":" + "labelLang";
 	private final String FOR_TYPE = Constants.VKGET_Prefix + ":" + "forType";
 	private final String BACKGROUND = Constants.VKGET_Prefix + ":" + "background";
 	private final String HEIGHT = Constants.VKGET_Prefix + ":" + "height";
@@ -45,7 +51,7 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 	 * @inheritDoc
 	 */
 	@Override
-	public BlockLayout load(String uri) {
+	public BlockLayout load(Uri uri) {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -54,6 +60,7 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 		ResultSet results = sparql.query(loadBlockQuery);
 		BlockLayout layout = new BlockLayout();
 		layout.setUri(uri);
+		layout.setLabel(new Label());
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
 			
@@ -70,11 +77,12 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 				case FONT_COLOR: layout.setFontColor(value); break;
 				case FONT_SIZE: layout.setFontSize(Integer.valueOf(value)); break;
 				case LINE_COLOR: layout.setLineColor(value); break;
-				case LINE_TYPE: layout.setLineTypeFromString(value); break;
+				case LINE_TYPE: layout.setLineType(LineType.fromString(value)); break;
 				case LINE_THICKNESS: layout.setLineThickness(Integer.valueOf(value)); break;
-				case TITLE: layout.setTitle(value); break;
-				case TITLE_TYPES: layout.setTitleTypesFromString(value); break;
-				case FOR_TYPE: layout.setForType(value); break;
+				case LABEL_SOURCE: layout.getLabel().setLabelSource(value); break;
+				case LABEL_LANG: layout.getLabel().setLang(value); break;
+				case LABEL_TYPE: layout.getLabel().setType(LabelType.fromString(value)); break;
+				case FOR_TYPE: layout.setForType(new Type(value)); break;
 				case BACKGROUND: layout.setBackground(value); break;
 				case HEIGHT: layout.setHeight(Integer.valueOf(value)); break;
 				case WIDTH: layout.setWidth(Integer.valueOf(value)); break;
@@ -86,7 +94,7 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 		return layout;
 	}
     
-    private List<ColumnLayout> loadColumnLayouts(String uri) {
+    private List<ColumnLayout> loadColumnLayouts(Uri uri) {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -96,7 +104,7 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 		List<ColumnLayout> layouts = new ArrayList<ColumnLayout>();
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
-			String rlUri = solution.get("uri").asResource().getURI();
+			Uri rlUri = new Uri(solution.get("uri").asResource().getURI());
 			ColumnLayout bl = columnLayoutDao.load(rlUri);
 			layouts.add(bl);
 		}
@@ -118,9 +126,10 @@ public class BlockLayoutDao implements SparqlDao<BlockLayout> {
 		insertQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
 		insertQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
 		insertQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
-		insertQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getLineTypeAsString()).append("\"; ");
-		insertQuery.append(" ").append(TITLE).append(" \"").append(layout.getTitle()).append("\"; ");
-		insertQuery.append(" ").append(TITLE_TYPES).append(" \"").append(layout.getTitleTypesAsString()).append("\"; ");
+		insertQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getLineType().name()).append("\"; ");
+		insertQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
+		insertQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
+		insertQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
 		insertQuery.append(" ").append(FOR_TYPE).append(" \"").append(layout.getForType()).append("\"; ");
 		insertQuery.append(" ").append(BACKGROUND).append(" \"").append(layout.getBackground()).append("\"; ");
 		insertQuery.append(" ").append(HEIGHT).append(" \"").append(layout.getHeight()).append("\"; ");

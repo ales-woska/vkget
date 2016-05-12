@@ -2,6 +2,9 @@ package cz.cuni.mff.vkget.data.model;
 
 import java.io.Serializable;
 
+import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Uri;
+
 /**
  * Property containing reference to other type's instance via its URI.
  * 
@@ -9,43 +12,43 @@ import java.io.Serializable;
  *
  */
 public class RdfObjectProperty implements Serializable {
-	
+
 	/**
 	 * URI of source instance
 	 */
-	private String subjectUri;
-	
+	private Uri subjectUri;
+
 	/**
 	 * URI of target instance
 	 */
-	private String objectUri;
-	
+	private Uri objectUri;
+
 	/**
 	 * identifier of property which connects them.
 	 */
-	private String property;
+	private Property property;
 
-	public String getProperty() {
+	public Property getProperty() {
 		return property;
 	}
 
-	public void setProperty(String property) {
+	public void setProperty(Property property) {
 		this.property = property;
 	}
 
-	public String getSubjectUri() {
+	public Uri getSubjectUri() {
 		return subjectUri;
 	}
 
-	public void setSubjectUri(String subjectUri) {
+	public void setSubjectUri(Uri subjectUri) {
 		this.subjectUri = subjectUri;
 	}
 
-	public String getObjectUri() {
+	public Uri getObjectUri() {
 		return objectUri;
 	}
 
-	public void setObjectUri(String objectUri) {
+	public void setObjectUri(Uri objectUri) {
 		this.objectUri = objectUri;
 	}
 

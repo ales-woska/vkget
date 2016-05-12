@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 import cz.cuni.mff.vkget.service.LayoutService;
 
@@ -39,7 +40,7 @@ public class LayoutControllerImpl implements LayoutController {
 	 */
 	@Override
 	@RequestMapping("/layout")
-	public ScreenLayout getLayout(@RequestParam("uri") String uri) {
+	public ScreenLayout getLayout(@RequestParam("uri") Uri uri) {
 		ScreenLayout layout = service.getLayout(uri);
 		return layout;
 	}
