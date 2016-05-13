@@ -14,9 +14,9 @@
 <link rel="stylesheet" type="text/css" href="css/fix.css" />
 <link rel="stylesheet" type="text/css" href="css/vkget.css" />
 
-<script src="js/jquery-1.12.2.min.js"></script>
+<script src="js/jquery-1.12.3.js"></script>
 <script src="js/angular.js"></script>
-<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap.js"></script>
 <script src="work.js"></script>
 
 <title>Visual Knowledge Graph Editing Tool Workbench</title>
@@ -39,41 +39,41 @@
 
 		<table ng-repeat="table in dataModel.tables" class="vkget_table"
 			style="
-				background-color: {{layouts[table.typeUri].background}};
-				color: {{layouts[table.typeUri].fontColor}};
-				font-size: {{layouts[table.typeUri].fontSize}}px;
-				left: {{layouts[table.typeUri].left}}px;
-				top: {{layouts[table.typeUri].top}}px;
-				width: {{layouts[table.typeUri].width}}px;
-				border: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};">
+				background-color: {{layouts[table.type].background}};
+				color: {{layouts[table.type].fontColor}};
+				font-size: {{layouts[table.type].fontSize}}px;
+				left: {{layouts[table.type].left}}px;
+				top: {{layouts[table.type].top}}px;
+				width: {{layouts[table.type].width}}px;
+				border: {{layouts[table.type].lineThickness}}px {{layouts[table.type].lineType}} {{layouts[table.type].lineColor}};">
 			
-			<thead style="border-bottom: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};">
+			<thead style="border-bottom: {{layouts[table.type].lineThickness}}px {{layouts[table.type].lineType}} {{layouts[table.type].lineColor}};">
 				<tr>
-					<th style="border-bottom: {{layouts[table.typeUri].lineThickness}}px {{layouts[table.typeUri].lineType}} {{layouts[table.typeUri].lineColor}};"
-						class="caption" colspan="{{table.columnsURIs.length}}">
-						{{layouts[table.typeUri].title}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})</th>
+					<th style="border-bottom: {{layouts[table.type].lineThickness}}px {{layouts[table.type].lineType}} {{layouts[table.type].lineColor}};"
+						class="caption" colspan="{{table.columns.length}}">
+						{{layouts[table.type].title}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})</th>
 				</tr>
 				<tr>
-					<th class="columnCaption" ng-repeat="property in table.columnsURIs" 
-						style="width: {{layouts[table.typeUri].width / table.columnsURIs.length}}px;"
+					<th class="columnCaption" ng-repeat="property in table.columns" 
+						style="width: {{layouts[table.type].width / table.columns.length}}px;"
 						ng-click="order(this, $index);">
-						{{getTitleForProperty(layouts[table.typeUri], property);}}
+						{{getTitleForProperty(layouts[table.type], property);}}
 					</th>
 				</tr>
 				<tr>
-					<th ng-repeat="property in table.columnsURIs" style="width: {{layouts[table.typeUri].width / table.columnsURIs.length}}px;">
-						<input type="text" style="width: 100px;" ng-model="filters[table.typeUri][property]" ng-change="filterChanged(table);" />
+					<th ng-repeat="property in table.columns" style="width: {{layouts[table.type].width / table.columns.length}}px;">
+						<input type="text" style="width: 100px;" ng-model="filters[table.type][property]" ng-change="filterChanged(table);" />
 					</th>
 				</tr>
 			</thead>
 			
-			<tbody style="height: {{layouts[table.typeUri].height}}px;">
+			<tbody style="height: {{layouts[table.type].height}}px;">
 				<tr ng-repeat="instance in table.instances | filter : filterInstances" 
 					ng-click="selectInstance(table, instance);" 
 					ng-class="instance == table.selectedInstance ? 'selectedInstance' : ''">
 					<td ng-repeat="property in instance.literalProperties" 
 						ng-right-click="contextMenu(table, instance, property)"
-						style="width: {{layouts[table.typeUri].width / instance.literalProperties.length}}px;">
+						style="width: {{layouts[table.type].width / instance.literalProperties.length}}px;">
 						{{property.value}}
 					</td>
 				</tr>
@@ -84,7 +84,6 @@
 		<svg>
 			<g ng-repeat="lineLayout in screenLayout.lineLayouts">
 				<polyline
-					ng-click=""
 					fill="none"
 					stroke="{{lineLayout.lineColor}}"
 					stroke-width="{{lineLayout.lineThickness}}"
@@ -229,9 +228,9 @@
 							</div>
 						</div>
 						<div class="form-group" ng-repeat="literalProperty in selectedTd.instance.literalProperties">
-							<label class="col-sm-4 control-label">{{literalProperty.propertyURI}}</label>
+							<label class="col-sm-4 control-label">{{literalProperty.property}}</label>
 							<div class="col-sm-6">
-								<input type="text" class="form-control" ng-model="addRowObject[literalProperty.propertyURI]" />
+								<input type="text" class="form-control" ng-model="addRowObject[literalProperty.property]" />
 							</div>
 						</div>
 						<div class="modal-footer">
@@ -263,10 +262,10 @@
 								</thead>
 								<tbody>
 									<tr ng-repeat="objectProperty in selectedTd.instance.objectProperties">
-										<td><input type="checkbox" ng-model="removeLinkedPropertyObject[objectProperty.property][objectProperty.objectUri]" /></td>
+										<td><input type="checkbox" ng-model="removeLinkedPropertyObject[objectProperty.property][objectProperty.uri.uri]" /></td>
 									    <td style="padding: 10px;">{{getObjectPropertyTitle(objectProperty.property);}}</td>
-									    <td style="padding: 10px;">{{getObjectPropertyValue(objectProperty.objectUri);}}</td>
-									    <td style="padding: 10px;">{{objectProperty.objectUri}}</td>
+									    <td style="padding: 10px;">{{getObjectPropertyValue(objectProperty.uri);}}</td>
+									    <td style="padding: 10px;">{{objectProperty.uri}}</td>
 									</tr>
 								</tbody>
 							</table>
@@ -300,7 +299,7 @@
 							<label class="col-sm-4 control-label">Property</label>
 							<div class="col-sm-6">
 								<select required class="form-control" ng-model="addLinkedPropertyObject['property']"
-									ng-options="lineLayout.property as getObjectPropertyTitle(lineLayout.property) for lineLayout in screenLayout.lineLayouts | filter: {fromType: selectedTd.table.typeUri}">
+									ng-options="lineLayout.property as getObjectPropertyTitle(lineLayout.property) for lineLayout in screenLayout.lineLayouts | filter: {fromType: selectedTd.table.type}">
 								</select>
 							</div>
 						</div>
@@ -308,7 +307,7 @@
 							<label class="col-sm-4 control-label">Value</label>
 							<div class="col-sm-6">
 								<select required class="form-control" ng-model="addLinkedPropertyObject['value']" 
-									ng-options="instance.objectURI as getObjectPropertyValue(instance.objectURI) for instance in getLinkedPropertyInstances(selectedTd.table.typeUri, addLinkedPropertyObject['property'])">
+									ng-options="instance.uri.uri as getObjectPropertyValue(instance.uri) for instance in getLinkedPropertyInstances(selectedTd.table.type, addLinkedPropertyObject['property'])">
 								</select>
 							</div>
 						</div>

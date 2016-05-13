@@ -1,5 +1,7 @@
 package cz.cuni.mff.vkget.persistence;
 
+import java.util.List;
+
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
@@ -22,27 +24,33 @@ import cz.cuni.mff.vkget.sparql.Constants;
  *
  */
 @Repository
-public class LineLayoutDao implements SparqlDao<LineLayout> {
-	private final String FONT_COLOR = Constants.VKGET_Prefix + ":" + "fontColor";
-	private final String FONT_SIZE = Constants.VKGET_Prefix + ":" + "fontSize";
-	private final String FROM_TYPE = Constants.VKGET_Prefix + ":" + "fromType";
-	private final String PROPERTY = Constants.VKGET_Prefix + ":" + "property";
-	private final String TO_TYPE = Constants.VKGET_Prefix + ":" + "toType";
-	private final String LINE_COLOR = Constants.VKGET_Prefix + ":" + "lineColor";
-	private final String LINE_TYPE = Constants.VKGET_Prefix + ":" + "lineType";
-	private final String LINE_THICKNESS = Constants.VKGET_Prefix + ":" + "lineThickness";
-	private final String LABEL_SOURCE = Constants.VKGET_Prefix + ":" + "labelSource";
-	private final String LABEL_TYPE = Constants.VKGET_Prefix + ":" + "labelType";
-	private final String LABEL_LANG = Constants.VKGET_Prefix + ":" + "labelLang";
-	private final String POINTS = Constants.VKGET_Prefix + ":" + "points";
+public class LineLayoutDao extends AbstractDao<LineLayout> {
+	private final Property FONT_COLOR = new Property(Constants.VKGET_Prefix, "fontColor");
+	private final Property FONT_SIZE = new Property(Constants.VKGET_Prefix, "fontSize");
+	private final Property FROM_TYPE = new Property(Constants.VKGET_Prefix, "fromType");
+	private final Property PROPERTY = new Property(Constants.VKGET_Prefix, "property");
+	private final Property TO_TYPE = new Property(Constants.VKGET_Prefix, "toType");
+	private final Property LINE_COLOR = new Property(Constants.VKGET_Prefix, "lineColor");
+	private final Property LINE_TYPE = new Property(Constants.VKGET_Prefix, "lineType");
+	private final Property LINE_THICKNESS = new Property(Constants.VKGET_Prefix, "lineThickness");
+	private final Property LABEL_SOURCE = new Property(Constants.VKGET_Prefix, "labelSource");
+	private final Property LABEL_TYPE = new Property(Constants.VKGET_Prefix, "labelType");
+	private final Property LABEL_LANG = new Property(Constants.VKGET_Prefix, "labelLang");
+	private final Property POINTS = new Property(Constants.VKGET_Prefix, "points");
 
+	
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
+	
+	@Override
+	protected SparqlConnector getSparqlConnector() {
+		return sparql;
+	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	@Override
-	public LineLayout load(Uri uri) {
+	public LineLayout get(Uri uri) {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -64,20 +72,31 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 			if (value == "null") {
 				continue;
 			}
-			
-			switch (property) {
-				case FONT_COLOR: layout.setFontColor(value); break;
-				case FONT_SIZE: layout.setFontSize(Integer.valueOf(value)); break;
-				case FROM_TYPE: layout.getFromType().setUri(new Uri(value)); break;
-				case PROPERTY: layout.setProperty(new Property(value)); break;
-				case TO_TYPE: layout.getToType().setUri(new Uri(value)); break;
-				case LINE_COLOR: layout.setLineColor(value); break;
-				case LINE_TYPE: layout.setLineType(LineType.fromString(value)); break;
-				case LINE_THICKNESS: layout.setLineThickness(Integer.valueOf(value)); break;
-				case LABEL_SOURCE: layout.getLabel().setLabelSource(value); break;
-				case LABEL_LANG: layout.getLabel().setLang(value); break;
-				case LABEL_TYPE: layout.getLabel().setType(LabelType.fromString(value)); break;
-				case POINTS: layout.setPointsFromString(value); break;
+
+			if (property.equals(FONT_COLOR)) {
+				layout.setFontColor(value);
+			} else if (property.equals(FONT_SIZE)) {
+				layout.setFontSize(Integer.valueOf(value));
+			} else if (property.equals(FROM_TYPE)) {
+				layout.getFromType().setUri(new Uri(value));
+			} else if (property.equals(PROPERTY)) {
+				layout.setProperty(new Property(value));
+			} else if (property.equals(TO_TYPE)) {
+				layout.getToType().setUri(new Uri(value));
+			} else if (property.equals(LINE_COLOR)) {
+				layout.setLineColor(value);
+			} else if (property.equals(LINE_TYPE)) {
+				layout.setLineType(LineType.fromString(value));
+			} else if (property.equals(LINE_THICKNESS)) {
+				layout.setLineThickness(Integer.valueOf(value));
+			} else if (property.equals(LABEL_SOURCE)) {
+				layout.getLabel().setLabelSource(value);
+			} else if (property.equals(LABEL_LANG)) {
+				layout.getLabel().setLang(value);
+			} else if (property.equals(LABEL_TYPE)) {
+				layout.getLabel().setType(LabelType.fromString(value));
+			} else if (property.equals(POINTS)) {
+				layout.setPointsFromString(value);
 			}
 		}
 		return layout;
@@ -109,9 +128,40 @@ public class LineLayoutDao implements SparqlDao<LineLayout> {
 		
 		insertQuery.append(" } ");
 		
-		sparql.insertQuery(insertQuery.toString());
-		
-		
+		sparql.executeQuery(insertQuery.toString());
     }
+
+	/**
+	 * @inheritDoc
+	 */
+    @Override
+	public void update(LineLayout layout) {
+		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
+		updateQuery.append("DELETE { <").append(layout.getUri()).append("> ?p ?o");
+		updateQuery.append("INSERT { <").append(layout.getUri()).append("> ");
+		
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.LineLayoutType).append("; ");
+		updateQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
+		updateQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
+		updateQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
+		updateQuery.append(" ").append(FROM_TYPE).append(" \"").append(layout.getFromType().getType()).append("\"; ");
+		updateQuery.append(" ").append(TO_TYPE).append(" \"").append(layout.getToType().getType()).append("\"; ");
+		updateQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
+		updateQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
+		updateQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getType()).append("\"; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
+		updateQuery.append(" ").append(POINTS).append(" \"").append(layout.getPointsAsString()).append("\". ");
+		updateQuery.append(" } WHERE { <").append(layout.getUri()).append("> ?p ?o . }");
+    	
+    	sparql.executeQuery(updateQuery.toString());
+    }
+
+	@Override
+	public List<LineLayout> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }

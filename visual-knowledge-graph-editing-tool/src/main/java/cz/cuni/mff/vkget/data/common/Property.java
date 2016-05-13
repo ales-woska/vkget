@@ -10,6 +10,8 @@ public class Property {
 	private String prefix;
 	private String name;
 	
+	public Property() {}
+	
 	public Property(String property) {
 		if (property == null || property.isEmpty()) {
 			prefix = null;

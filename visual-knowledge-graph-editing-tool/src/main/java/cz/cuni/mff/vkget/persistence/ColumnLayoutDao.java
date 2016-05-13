@@ -1,5 +1,7 @@
 package cz.cuni.mff.vkget.persistence;
 
+import java.util.List;
+
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
@@ -21,20 +23,25 @@ import cz.cuni.mff.vkget.sparql.Constants;
  *
  */
 @Repository
-public class ColumnLayoutDao implements SparqlDao<ColumnLayout> {
-	private final String LABEL_SOURCE = Constants.VKGET_Prefix + ":" + "labelSource";
-	private final String LABEL_TYPE = Constants.VKGET_Prefix + ":" + "labelType";
-	private final String LABEL_LANG = Constants.VKGET_Prefix + ":" + "labelLang";
-	private final String PROPERTY = Constants.VKGET_Prefix + ":" + "property";
-	private final String AGGREGATE_FUNCTIONS = Constants.VKGET_Prefix + ":" + "aggregateFunctions";
-
+public class ColumnLayoutDao extends AbstractDao<ColumnLayout> {
+	private final Property LABEL_SOURCE = new Property(Constants.VKGET_Prefix, "labelSource");
+	private final Property LABEL_TYPE = new Property(Constants.VKGET_Prefix, "labelType");
+	private final Property LABEL_LANG = new Property(Constants.VKGET_Prefix, "labelLang");
+	private final Property PROPERTY = new Property(Constants.VKGET_Prefix, "property");
+	private final Property AGGREGATE_FUNCTIONS = new Property(Constants.VKGET_Prefix, "aggregateFunctions");
+	
 	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
+	
+	@Override
+	protected SparqlConnector getSparqlConnector() {
+		return sparql;
+	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	@Override
-	public ColumnLayout load(Uri uri) {
+	public ColumnLayout get(Uri uri) {
 		String loadRowQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
@@ -56,12 +63,20 @@ public class ColumnLayoutDao implements SparqlDao<ColumnLayout> {
 				continue;
 			}
 
-			switch (property) {
-				case LABEL_SOURCE: layout.getLabel().setLabelSource(value); break;
-				case LABEL_LANG: layout.getLabel().setLang(value); break;
-				case LABEL_TYPE: layout.getLabel().setType(LabelType.fromString(value)); break;
-				case PROPERTY: layout.setProperty(new Property(value)); break;
-				case AGGREGATE_FUNCTIONS: layout.setAggregateFunction(AggregateFunction.fromString(value)); break;
+			if (property.equals(LABEL_SOURCE)) {
+				layout.getLabel().setLabelSource(value);
+			}
+			if (property.equals(LABEL_LANG)) {
+				layout.getLabel().setLang(value);
+			}
+			if (property.equals(LABEL_TYPE)) {
+				layout.getLabel().setType(LabelType.fromString(value));
+			}
+			if (property.equals(PROPERTY)) {
+				layout.setProperty(new Property(value));
+			}
+			if (property.equals(AGGREGATE_FUNCTIONS)) {
+				layout.setAggregateFunction(AggregateFunction.fromString(value));
 			}
 		}
 		return layout;
@@ -72,22 +87,43 @@ public class ColumnLayoutDao implements SparqlDao<ColumnLayout> {
 	 */
     @Override
 	public void insert(ColumnLayout layout) {
+		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
+		updateQuery.append("INSERT DATA { ");
+		updateQuery.append("<").append(layout.getUri()).append("> ");
 		
-		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
-		insertQuery.append("INSERT DATA { ");
-		insertQuery.append("<").append(layout.getUri()).append("> ");
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.ColumnLayoutType).append("\"; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
+		updateQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
+		updateQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" \"").append(layout.getAggregateFunction().name()).append("\". ");
 		
-		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.ColumnLayoutType).append("\"; ");
-		insertQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
-		insertQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
-		insertQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
-		insertQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
-		insertQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" \"").append(layout.getAggregateFunction().name()).append("\". ");
+		updateQuery.append(" }");
 		
-		insertQuery.append(" }");
-		
-		sparql.insertQuery(insertQuery.toString());
-		
-		
+		sparql.executeQuery(updateQuery.toString());
     }
+
+	@Override
+	public void update(ColumnLayout layout) {
+		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
+		updateQuery.append("DELETE { <").append(layout.getUri()).append("> ?p ?o");
+		updateQuery.append("INSERT { <").append(layout.getUri()).append("> ");
+
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.ColumnLayoutType).append("\"; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
+		updateQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
+		updateQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" \"").append(layout.getAggregateFunction().name()).append("\". ");
+		
+		updateQuery.append(" } WHERE { <").append(layout.getUri()).append("> ?p ?o . }");
+    	
+    	sparql.executeQuery(updateQuery.toString());
+	}
+
+	@Override
+	public List<ColumnLayout> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

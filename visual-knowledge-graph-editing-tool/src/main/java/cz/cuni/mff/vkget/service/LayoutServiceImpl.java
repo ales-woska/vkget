@@ -25,7 +25,7 @@ public class LayoutServiceImpl implements LayoutService {
 	 */
 	@Override
 	public List<ScreenLayout> getLayoutList() {
-		return dao.loadScreenLayouts();
+		return dao.getAll();
 	}
 	
 	/**
@@ -33,7 +33,7 @@ public class LayoutServiceImpl implements LayoutService {
 	 */
 	@Override
 	public ScreenLayout getLayout(Uri uri) {
-		return dao.load(uri);
+		return dao.get(uri);
 	}
 	
 	/**
@@ -41,7 +41,19 @@ public class LayoutServiceImpl implements LayoutService {
 	 */
 	@Override
 	public void saveOrUpdateLayout(ScreenLayout layout) {
-		dao.insert(layout);
+		if (dao.exists(layout)) {
+			dao.update(layout);
+		} else {
+			dao.insert(layout);
+		}
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void removeLayout(ScreenLayout layout) {
+		dao.delete(layout);
 	}
 	
 }

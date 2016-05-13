@@ -31,4 +31,10 @@ public interface LayoutService {
 	 */
 	void saveOrUpdateLayout(ScreenLayout layout);
 
+	/**
+	 * Removes layout
+	 * @param layout
+	 */
+	void removeLayout(ScreenLayout layout);
+
 }

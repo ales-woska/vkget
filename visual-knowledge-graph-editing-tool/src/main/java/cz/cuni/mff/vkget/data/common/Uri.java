@@ -2,6 +2,8 @@ package cz.cuni.mff.vkget.data.common;
 
 public class Uri {
 	private String uri;
+	
+	public Uri() {}
 
 	public Uri(String uri) {
 		this.uri = uri;

@@ -2,7 +2,6 @@ package cz.cuni.mff.vkget.controller;
 
 import java.util.List;
 
-import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
 
 /**
@@ -23,12 +22,18 @@ public interface LayoutController {
 	 * @param uri
 	 * @return
 	 */
-	ScreenLayout getLayout(Uri uri);
+	ScreenLayout getLayout(String uri);
 
 	/**
 	 * Saves or updates layout.
 	 * @param layout
 	 */
 	void saveLayout(ScreenLayout layout);
+
+	/**
+	 * Removes layout.
+	 * @param layout
+	 */
+	void removeLayout(ScreenLayout layout);
 	
 }

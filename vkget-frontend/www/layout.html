@@ -14,10 +14,10 @@
 <link rel="stylesheet" type="text/css" href="css/fix.css" />
 <link rel="stylesheet" type="text/css" href="css/vkget.css" />
 
-<script src="js/jquery-1.12.2.min.js"></script>
+<script src="js/jquery-1.12.3.js"></script>
 <script src="js/angular.js"></script>
 <script src="js/angular-route.js"></script>
-<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap.js"></script>
 <script src="layout.js"></script>
 
 <title>Visual Knowledge Graph Editing Tool Home</title>
@@ -26,9 +26,13 @@
 <body>
 	<div ng-app="vkget" ng-controller="layoutController">
 		<div ng-include="'menu.html'"></div>
-		<div class="alert alert-info fade in {{show}}">
-		    <a href="#" class="close" data-dismiss="alert">&times;</a>
-		    <strong>Success!</strong> {{savedName}} saved.
+
+		<!-- MESSAGES -->
+		<div class="messages" ng-show="messages.length > 0">
+			<div ng-repeat="message in messages" class="alert alert-{{message.type}} fade in">
+			    <button type="button" class="close" ng-click="cancelErrorMessage(message);"><span>&times;</span></button>
+			    <strong>{{message.caption}}</strong> {{message.text}}
+			</div>
 		</div>
 
 		<div class="container">
@@ -39,11 +43,14 @@
 			
 			<div class="row">
 				<div class="list-group">
-					<a ng-repeat="layout in layouts" target="_self" href="edit_layout.html?uri={{layout.uri}}" class="list-group-item">{{layout.name}}</a>
+					<div ng-repeat="screenLayout in layouts" class="list-group-item">
+						<a target="_self" href="edit_layout.html?uri={{screenLayout.uri.uri}}">{{screenLayout.name}}</a>
+						<a class="removeLink" ng-click="removeLayout(screenLayout)"><span class="glyphicon glyphicon-remove"></span></a>
+					</div>
 				</div>
 				
 				<a href="edit_layout.html" target="_self" type="button" class="btn btn-default btn-success">
-					<span class="glyphicon glyphicon-plus"></span> Add new layout
+					<span class="glyphicon glyphicon-plus"></span> Add a new layout
 				</a>
 			</div>
 	

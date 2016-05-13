@@ -65,8 +65,6 @@ app.directive('blockForm', function () {
     directive.templateUrl = 'blockForm.html';
     directive.scope = {
         currBlock: '=block',
-        addTitleType: "&addTitleType",
-        removeTitleType: "&removeTitleType",
         addProperty: "&addProperty",
         removeProperty: "&removeProperty"
     };
@@ -88,6 +86,7 @@ app.directive('lineForm', function () {
 
 app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.screenLayout = newScreenLayout();
+	$scope.messages = [];
 	
 	var uri = $location.search()['uri'];
 	if (uri) {
@@ -199,38 +198,26 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 
 	$scope.addProperty = function(blockLayout) {
-		var property = blockLayout.toAddProperty;
-		if (property == null) {
+		var newColumn = blockLayout.toAddProperty;
+		if (newColumn == null) {
 			return;
 		}
 		var columnLayout = {
-			property: property.property,
-			title: property.title,
-			titleTypes: [property.titleType],
-			aggregateFunctions: [property.aggregateFunction]
+			property: newColumn.property,
+			label: {
+				labelSource: newColumn.label.labelSource,
+				type: newColumn.label.type,
+				lang: newColumn.label.lang
+			},
+			aggregateFunction: newColumn.aggregateFunction
 		};
 		blockLayout.properties.push(columnLayout);
+		blockLayout.toAddProperty = [];
 	};
 	
 	$scope.removeProperty = function(blockLayout, property) {
 		var index = blockLayout.properties.indexOf(property);
 		blockLayout.properties.splice(index, 1);
-	};
-
-	$scope.addTitleType = function(blockLayout) {
-		var titleType = blockLayout.toAddTitle;
-		if (titleType == null) {
-			return;
-		}
-		if (!blockLayout.titleTypes) {
-			blockLayout.titleTypes = [];
-		}
-		blockLayout.titleTypes.push(titleType);
-	};
-	
-	$scope.removeTitleType = function(blockLayout, titleType) {
-		var index = blockLayout.titleTypes.indexOf(titleType);
-		blockLayout.titleTypes.splice(index, 1);
 	};
 
 	$scope.openModal = function(blockLayout) {
@@ -307,13 +294,25 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		$scope.mouseDownLL = null;
 	};
 	
+	$scope.cancelErrorMessage = function(message) {
+		var index = $scope.messages.indexOf(message);
+		if (index > -1) {
+			$scope.messages.splice(index, 1);
+		}
+	};
+	
 	$scope.saveLayout = function() {
 		$http.post('http://localhost:8090/layout/save', $scope.screenLayout)
         .success(function (data, status, headers, config) {
 			$window.location.href = "layout.html?saved=" + $scope.screenLayout.name;
         })
         .error(function (data, status, header, config) {
-        	$('.alert').show();
+        	var message = {
+    			caption: 'Error!',
+    			text: data.error,
+    			type: 'danger'
+        	};
+        	$scope.messages.push(message);
         });
 	};
 	
@@ -340,10 +339,14 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	
 	function newScreenLayout() {
 		var screenLayout = {};
-		screenLayout.uri = '';
+		screenLayout.uri = {uri: ''};
 		screenLayout.name = '';
 		screenLayout.blockLayouts = [];
 		screenLayout.lineLayouts = [];
+		screenLayout.namespaces = {
+           "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+           "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
+		};
 		return screenLayout;
 	}
 	
@@ -376,7 +379,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			}
 		}
 		
-		blockLayout.uri = '#new_block' + uriPostfix;
+		blockLayout.uri = {uri: '#new_block' + uriPostfix};
 		blockLayout.forType = 'for_type' + forTypePostfix;
 		blockLayout.background = '#aaaaaa',
 		blockLayout.height = 100;
@@ -384,8 +387,11 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		blockLayout.left = 0;
 		blockLayout.top = 0;
 		blockLayout.properties = [];
-		blockLayout.title = '';
-		blockLayout.titleTypes = ['CONSTANT'];
+		blockLayout.label = {
+			labelSource: '',
+			type: 'CONSTANT',
+			lang: 'en'
+		};
 		blockLayout.fontColor = 'black';
 		blockLayout.fontSize = 10;
 		blockLayout.lineColor = 'black';
@@ -410,11 +416,14 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			}
 		}
 		
-		lineLayout.uri = '#new_line' + uriPostfix;
+		lineLayout.uri = {uri: '#new_line' + uriPostfix};
 		lineLayout.fromType = '';
 		lineLayout.toType = '';
-		lineLayout.title = '';
-		lineLayout.titleTypes = ['CONSTANT'];
+		lineLayout.label = {
+			labelSource: '',
+			type: 'CONSTANT',
+			lang: 'en'
+		};
 		lineLayout.fontColor = 'black';
 		lineLayout.fontSize = 10;
 		lineLayout.lineColor = 'black';

@@ -40,8 +40,8 @@ public class LayoutControllerImpl implements LayoutController {
 	 */
 	@Override
 	@RequestMapping("/layout")
-	public ScreenLayout getLayout(@RequestParam("uri") Uri uri) {
-		ScreenLayout layout = service.getLayout(uri);
+	public ScreenLayout getLayout(@RequestParam("uri") String uri) {
+		ScreenLayout layout = service.getLayout(new Uri(uri));
 		return layout;
 	}
 
@@ -52,6 +52,15 @@ public class LayoutControllerImpl implements LayoutController {
 	@RequestMapping(value = "/layout/save", method = RequestMethod.POST)
 	public void saveLayout(@RequestBody ScreenLayout layout) {
 		service.saveOrUpdateLayout(layout);
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	@RequestMapping(value = "/layout/remove", method = RequestMethod.POST)
+	public void removeLayout(@RequestBody ScreenLayout layout) {
+		service.removeLayout(layout);
 	}
 	
 }

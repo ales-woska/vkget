@@ -53,7 +53,7 @@ public class SparqlConnector {
 		return results;
 	}
 	
-	public void insertQuery(String sparqlQuery) {
+	public void executeQuery(String sparqlQuery) {
 		UpdateRequest update = new UpdateRequest();
 		update.add(sparqlQuery);
 //		HttpAuthenticator authenticator = new SimpleAuthenticator(user, password.toCharArray());

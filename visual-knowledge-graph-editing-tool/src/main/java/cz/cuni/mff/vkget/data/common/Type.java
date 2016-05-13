@@ -9,6 +9,8 @@ public class Type {
 	private String prefix;
 	private String name;
 	
+	public Type() {}
+	
 	public Type(String type) {
 		if (type == null || type.isEmpty()) {
 			prefix = null;

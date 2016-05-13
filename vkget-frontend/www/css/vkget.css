@@ -113,10 +113,12 @@ div.vkget_line_title {
 	cursor: pointer;
 }
 
-.modal a.removeTitleType {
+a.removeLink {
 	position: absolute;
 	right: 5px;
 	padding: 0px;
+	cursor: pointer;
+	color: black;
 }
 
 svg {
@@ -175,4 +177,8 @@ table.vkget_table tbody tr.selectedInstance:hover {
 	min-height: 200px;
 	max-height: 500px;
 	overflow: auto;
+}
+
+.list-group {
+	position: relative;
 }
