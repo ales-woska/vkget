@@ -55,7 +55,7 @@ public class ColumnLayoutDao extends AbstractDao<ColumnLayout> {
 			QuerySolution solution = results.next();
 			
 			Resource resource = solution.get("property").asResource();
-			String property = Constants.VKGET_Prefix + ":" + resource.getLocalName();
+			Property property = new Property(Constants.VKGET_Prefix, resource.getLocalName());
 			
 			RDFNode node = solution.get("value");
 			String value = (node.isLiteral()) ? node.asLiteral().getString() : node.asResource().getURI();
@@ -91,12 +91,12 @@ public class ColumnLayoutDao extends AbstractDao<ColumnLayout> {
 		updateQuery.append("INSERT DATA { ");
 		updateQuery.append("<").append(layout.getUri()).append("> ");
 		
-		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.ColumnLayoutType).append("\"; ");
-		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
-		updateQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
-		updateQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" \"").append(layout.getAggregateFunction().name()).append("\". ");
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ColumnLayoutType).append("; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		updateQuery.append(" ").append(PROPERTY).append(" '").append(layout.getProperty()).append("'; ");
+		updateQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" '").append(layout.getAggregateFunction().name()).append("'. ");
 		
 		updateQuery.append(" }");
 		
@@ -106,19 +106,31 @@ public class ColumnLayoutDao extends AbstractDao<ColumnLayout> {
 	@Override
 	public void update(ColumnLayout layout) {
 		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("DELETE { <").append(layout.getUri()).append("> ?p ?o");
+		updateQuery.append("DELETE { <").append(layout.getUri()).append("> ?p ?o } ");
 		updateQuery.append("INSERT { <").append(layout.getUri()).append("> ");
 
-		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.ColumnLayoutType).append("\"; ");
-		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
-		updateQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
-		updateQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" \"").append(layout.getAggregateFunction().name()).append("\". ");
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ColumnLayoutType).append("; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		updateQuery.append(" ").append(PROPERTY).append(" '").append(layout.getProperty()).append("'; ");
+		updateQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" '").append(layout.getAggregateFunction().name()).append("'. ");
 		
 		updateQuery.append(" } WHERE { <").append(layout.getUri()).append("> ?p ?o . }");
     	
     	sparql.executeQuery(updateQuery.toString());
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void insertOrUpdate(ColumnLayout layout) {
+		if (exists(layout)) {
+			update(layout);
+		} else {
+			insert(layout);
+		}
 	}
 
 	@Override

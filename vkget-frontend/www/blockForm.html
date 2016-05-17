@@ -1,4 +1,4 @@
-<div id="blockForm{{currBlock.forType | colons}}" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog">
+<div id="blockForm{{currBlock.forType.type | colons}}" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog">
 
 
 
@@ -21,7 +21,7 @@
 					<div class="form-group">
 						<label for="forType" class="col-sm-2 control-label">For rdf:type</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" placeholder="Class" ng-model="currBlock.forType">
+							<input type="text" class="form-control" placeholder="Class" ng-model="currBlock.forType.type">
 						</div>
 					</div>
 					<div class="form-group">
@@ -56,7 +56,7 @@
 								</thead>
 								<tbody>
 									<tr ng-repeat="columnLayout in currBlock.properties">
-										<td><input type="text" class="form-control" placeholder="Property" ng-model="columnLayout.property" /></td>
+										<td><input type="text" class="form-control" placeholder="Property" ng-model="columnLayout.property.property" /></td>
 										<td>
 											<select class="form-control" ng-model="columnLayout.label.type">
 												<option value="URI">URI</option>
@@ -79,7 +79,7 @@
 										<td><a type="button" ng-click="removeProperty({blockLayout: currBlock, property: columnLayout})"><span class="glyphicon glyphicon-remove"></span></a></td>
 									</tr>
 									<tr>
-										<td><input type="text" class="form-control" placeholder="Property" ng-model="currBlock.toAddProperty.property" /></td>
+										<td><input type="text" class="form-control" placeholder="Property" ng-model="currBlock.toAddProperty.property.property" /></td>
 										<td>
 											<select class="form-control" ng-model="currBlock.toAddProperty.label.type">
 												<option value="URI">URI</option>

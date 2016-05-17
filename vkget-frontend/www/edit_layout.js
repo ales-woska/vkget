@@ -193,7 +193,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.openLineModal = function(lineLayout) {
-		var id = "#lineForm" + escapeUri(lineLayout.uri);
+		var id = "#lineForm" + escapeUri(lineLayout.uri.uri);
 		$(id).modal('toggle');
 	};
 
@@ -203,6 +203,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			return;
 		}
 		var columnLayout = {
+			uri: blockLayout.uri.uri + "Column" + blockLayout.properties.length,
 			property: newColumn.property,
 			label: {
 				labelSource: newColumn.label.labelSource,
@@ -221,7 +222,8 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 
 	$scope.openModal = function(blockLayout) {
-		var id = "#blockForm" + escapeUri(blockLayout.forType);
+		var forType = blockLayout.forType.type;
+		var id = "#blockForm" + escapeUri(forType);
 		$(id).modal('toggle');
 	};
 	
@@ -357,7 +359,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		for (var i in screenLayout.blockLayouts) {
 			var existing = screenLayout.blockLayouts[i];
 			var uri = existing.uri;
-			var uriIndex = uri.indexOf('#new_block');
+			var uriIndex = uri.uri.indexOf('#new_block');
 			if (uriIndex != -1) {
 				uriPostfix = uri.substring(uriIndex + 10);
 				if (uriPostfix != '') {
@@ -370,7 +372,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		for (var i in screenLayout.blockLayouts) {
 			var existing = screenLayout.blockLayouts[i];
 			var forType = existing.forType;
-			var uriIndex = forType.indexOf('for_type');
+			var uriIndex = forType.name.indexOf('for_type');
 			if (uriIndex != -1) {
 				forTypePostfix = forType.substring(uriIndex + 8);
 				if (forTypePostfix != '') {
@@ -407,7 +409,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		for (var i in screenLayout.blockLayouts) {
 			var blockLayout = screenLayout.blockLayouts[i];
 			var uri = blockLayout.uri;
-			var uriIndex = uri.indexOf('#new_line');
+			var uriIndex = uri.uri.indexOf('#new_line');
 			if (uriIndex != -1) {
 				uri.substring(uriIndex + 9);
 				if (uriPostfix != '') {

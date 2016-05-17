@@ -66,7 +66,7 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 			QuerySolution solution = results.next();
 			
 			Resource resource = solution.get("property").asResource();
-			String property = Constants.VKGET_Prefix + ":" + resource.getLocalName();
+			Property property = new Property(Constants.VKGET_Prefix, resource.getLocalName());
 			RDFNode node = solution.get("value");
 			String value = (node.isLiteral()) ? node.asLiteral().getString() : node.asResource().getURI();
 			if (value == "null") {
@@ -110,21 +110,21 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 		
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
 		insertQuery.append("INSERT DATA { ");
-		insertQuery.append("<").append(layout.getUri()).append("> ");
+		insertQuery.append("<").append(layout.getUri().getUri()).append("> ");
 		
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.LineLayoutType).append("; ");
-		insertQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
-		insertQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
-		insertQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
-		insertQuery.append(" ").append(FROM_TYPE).append(" \"").append(layout.getFromType().getType()).append("\"; ");
-		insertQuery.append(" ").append(TO_TYPE).append(" \"").append(layout.getToType().getType()).append("\"; ");
-		insertQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
-		insertQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
-		insertQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getType()).append("\"; ");
-		insertQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
-		insertQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
-		insertQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
-		insertQuery.append(" ").append(POINTS).append(" \"").append(layout.getPointsAsString()).append("\". ");
+		insertQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
+		insertQuery.append(" ").append(FONT_SIZE).append(" '").append(layout.getFontSize()).append("'; ");
+		insertQuery.append(" ").append(PROPERTY).append(" '").append(layout.getProperty()).append("'; ");
+		insertQuery.append(" ").append(FROM_TYPE).append(" '").append(layout.getFromType().getType()).append("'; ");
+		insertQuery.append(" ").append(TO_TYPE).append(" '").append(layout.getToType().getType()).append("'; ");
+		insertQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
+		insertQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
+		insertQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getType()).append("'; ");
+		insertQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		insertQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		insertQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		insertQuery.append(" ").append(POINTS).append(" '").append(layout.getPointsAsString()).append("'. ");
 		
 		insertQuery.append(" } ");
 		
@@ -137,26 +137,38 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
     @Override
 	public void update(LineLayout layout) {
 		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("DELETE { <").append(layout.getUri()).append("> ?p ?o");
-		updateQuery.append("INSERT { <").append(layout.getUri()).append("> ");
+		updateQuery.append("DELETE { <").append(layout.getUri().getUri()).append("> ?p ?o } ");
+		updateQuery.append("INSERT { <").append(layout.getUri().getUri()).append("> ");
 		
 		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.LineLayoutType).append("; ");
-		updateQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
-		updateQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
-		updateQuery.append(" ").append(PROPERTY).append(" \"").append(layout.getProperty()).append("\"; ");
-		updateQuery.append(" ").append(FROM_TYPE).append(" \"").append(layout.getFromType().getType()).append("\"; ");
-		updateQuery.append(" ").append(TO_TYPE).append(" \"").append(layout.getToType().getType()).append("\"; ");
-		updateQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
-		updateQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
-		updateQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getType()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
-		updateQuery.append(" ").append(POINTS).append(" \"").append(layout.getPointsAsString()).append("\". ");
-		updateQuery.append(" } WHERE { <").append(layout.getUri()).append("> ?p ?o . }");
+		updateQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
+		updateQuery.append(" ").append(FONT_SIZE).append(" '").append(layout.getFontSize()).append("'; ");
+		updateQuery.append(" ").append(PROPERTY).append(" '").append(layout.getProperty()).append("'; ");
+		updateQuery.append(" ").append(FROM_TYPE).append(" '").append(layout.getFromType().getType()).append("'; ");
+		updateQuery.append(" ").append(TO_TYPE).append(" '").append(layout.getToType().getType()).append("'; ");
+		updateQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
+		updateQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
+		updateQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getType()).append("'; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		updateQuery.append(" ").append(POINTS).append(" '").append(layout.getPointsAsString()).append("'. ");
+		updateQuery.append(" } WHERE { <").append(layout.getUri().getUri()).append("> ?p ?o . }");
     	
     	sparql.executeQuery(updateQuery.toString());
     }
+	
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void insertOrUpdate(LineLayout layout) {
+		if (exists(layout)) {
+			update(layout);
+		} else {
+			insert(layout);
+		}
+	}
 
 	@Override
 	public List<LineLayout> getAll() {

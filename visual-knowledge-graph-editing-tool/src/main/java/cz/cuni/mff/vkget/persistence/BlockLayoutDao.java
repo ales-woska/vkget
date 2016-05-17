@@ -61,7 +61,7 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> ?property ?value . "
+				+ " <" + uri.getUri() + "> ?property ?value . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlockQuery);
 		BlockLayout layout = new BlockLayout();
@@ -71,7 +71,7 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 			QuerySolution solution = results.next();
 			
 			Resource resource = solution.get("property").asResource();
-			String property = Constants.VKGET_Prefix + ":" + resource.getLocalName();
+			Property property = new Property(Constants.VKGET_Prefix, resource.getLocalName());
 			
 			RDFNode node = solution.get("value");
 			String value = (node.isLiteral()) ? node.asLiteral().getString() : node.asResource().getURI();
@@ -138,30 +138,34 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		
 		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
 		updateQuery.append("INSERT DATA { ");
-		updateQuery.append("<").append(layout.getUri()).append("> ");
+		updateQuery.append("<").append(layout.getUri().getUri()).append("> ");
 		
-		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.BlockLayoutType).append("\"; ");
-		updateQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
-		updateQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
-		updateQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
-		updateQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
-		updateQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getLineType().name()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
-		updateQuery.append(" ").append(FOR_TYPE).append(" \"").append(layout.getForType()).append("\"; ");
-		updateQuery.append(" ").append(BACKGROUND).append(" \"").append(layout.getBackground()).append("\"; ");
-		updateQuery.append(" ").append(HEIGHT).append(" \"").append(layout.getHeight()).append("\"; ");
-		updateQuery.append(" ").append(WIDTH).append(" \"").append(layout.getWidth()).append("\"; ");
-		updateQuery.append(" ").append(LEFT).append(" \"").append(layout.getLeft()).append("\"; ");
-		updateQuery.append(" ").append(TOP).append(" \"").append(layout.getTop()).append("\". ");
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.BlockLayoutType).append("; ");
+		updateQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
+		updateQuery.append(" ").append(FONT_SIZE).append(" '").append(layout.getFontSize()).append("'; ");
+		updateQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
+		updateQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
+		updateQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getLineType().name()).append("'; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		updateQuery.append(" ").append(FOR_TYPE).append(" '").append(layout.getForType()).append("'; ");
+		updateQuery.append(" ").append(BACKGROUND).append(" '").append(layout.getBackground()).append("'; ");
+		updateQuery.append(" ").append(HEIGHT).append(" '").append(layout.getHeight()).append("'; ");
+		updateQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'; ");
+		updateQuery.append(" ").append(LEFT).append(" '").append(layout.getLeft()).append("'; ");
+		updateQuery.append(" ").append(TOP).append(" '").append(layout.getTop()).append("'. ");
+
+		for (ColumnLayout cl: layout.getProperties()) {
+			updateQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.ColumnLayoutProperty).append(" <").append(cl.getUri().getUri()).append("> . ");
+		}
 		
 		updateQuery.append(" }");
 		
 		sparql.executeQuery(updateQuery.toString());
 				
 		for (ColumnLayout columnLayout: layout.getProperties()) {
-			columnLayoutDao.insert(columnLayout);
+			columnLayoutDao.insertOrUpdate(columnLayout);
 		}
 		
     }
@@ -172,34 +176,49 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
     @Override
     public void update(BlockLayout layout) {
     	StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("DELETE { <").append(layout.getUri()).append("> ?p ?o");
-		updateQuery.append("INSERT { <").append(layout.getUri()).append("> ");
+		updateQuery.append("DELETE { <").append(layout.getUri().getUri()).append("> ?p ?o } ");
+		updateQuery.append("INSERT { <").append(layout.getUri().getUri()).append("> ");
 
-		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" \"").append(Constants.BlockLayoutType).append("\"; ");
-		updateQuery.append(" ").append(FONT_COLOR).append(" \"").append(layout.getFontColor()).append("\"; ");
-		updateQuery.append(" ").append(FONT_SIZE).append(" \"").append(layout.getFontSize()).append("\"; ");
-		updateQuery.append(" ").append(LINE_COLOR).append(" \"").append(layout.getLineColor()).append("\"; ");
-		updateQuery.append(" ").append(LINE_THICKNESS).append(" \"").append(layout.getLineThickness()).append("\"; ");
-		updateQuery.append(" ").append(LINE_TYPE).append(" \"").append(layout.getLineType().name()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_SOURCE).append(" \"").append(layout.getLabel().getLabelSource()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_TYPE).append(" \"").append(layout.getLabel().getType()).append("\"; ");
-		updateQuery.append(" ").append(LABEL_LANG).append(" \"").append(layout.getLabel().getLang()).append("\"; ");
-		updateQuery.append(" ").append(FOR_TYPE).append(" \"").append(layout.getForType()).append("\"; ");
-		updateQuery.append(" ").append(BACKGROUND).append(" \"").append(layout.getBackground()).append("\"; ");
-		updateQuery.append(" ").append(HEIGHT).append(" \"").append(layout.getHeight()).append("\"; ");
-		updateQuery.append(" ").append(WIDTH).append(" \"").append(layout.getWidth()).append("\"; ");
-		updateQuery.append(" ").append(LEFT).append(" \"").append(layout.getLeft()).append("\"; ");
-		updateQuery.append(" ").append(TOP).append(" \"").append(layout.getTop()).append("\". ");
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.BlockLayoutType).append("; ");
+		updateQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
+		updateQuery.append(" ").append(FONT_SIZE).append(" '").append(layout.getFontSize()).append("'; ");
+		updateQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
+		updateQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
+		updateQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getLineType().name()).append("'; ");
+		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		updateQuery.append(" ").append(FOR_TYPE).append(" '").append(layout.getForType()).append("'; ");
+		updateQuery.append(" ").append(BACKGROUND).append(" '").append(layout.getBackground()).append("'; ");
+		updateQuery.append(" ").append(HEIGHT).append(" '").append(layout.getHeight()).append("'; ");
+		updateQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'; ");
+		updateQuery.append(" ").append(LEFT).append(" '").append(layout.getLeft()).append("'; ");
+		updateQuery.append(" ").append(TOP).append(" '").append(layout.getTop()).append("'. ");
+
+		for (ColumnLayout cl: layout.getProperties()) {
+			updateQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.ColumnLayoutProperty).append(" <").append(cl.getUri().getUri()).append("> . ");
+		}
 		
-		updateQuery.append(" }");
+		updateQuery.append(" } WHERE { <").append(layout.getUri().getUri()).append("> ?p ?o . }");
 		
 		sparql.executeQuery(updateQuery.toString());
 				
 		for (ColumnLayout columnLayout: layout.getProperties()) {
-			columnLayoutDao.insert(columnLayout);
+			columnLayoutDao.insertOrUpdate(columnLayout);
 		}
-    	
     }
+	
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void insertOrUpdate(BlockLayout layout) {
+		if (exists(layout)) {
+			update(layout);
+		} else {
+			insert(layout);
+		}
+	}
 
 	@Override
 	public List<BlockLayout> getAll() {

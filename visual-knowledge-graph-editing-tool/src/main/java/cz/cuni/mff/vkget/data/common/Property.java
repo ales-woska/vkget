@@ -1,29 +1,42 @@
 package cz.cuni.mff.vkget.data.common;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import cz.cuni.mff.vkget.utils.PropertyJsonDeserializer;
+
 
 /**
  * 
  * @author Ales Woska
  *
  */
+@JsonDeserialize(using = PropertyJsonDeserializer.class)
 public class Property {
+	private String property;
 	private String prefix;
 	private String name;
 	
 	public Property() {}
 	
 	public Property(String property) {
+		this.property = property;
 		if (property == null || property.isEmpty()) {
 			prefix = null;
 			name = null;
 		} else {
 			String[] p = property.split(":");
-			prefix = p[0];
-			name = p[1];
+			if (p.length == 1) {
+				prefix = "";
+				name = p[0];
+			} else {
+				prefix = p[0];
+				name = p[1];
+			}
 		}
 	}
 	
 	public Property(String prefix, String name) {
+		this.property = prefix + ":" + name;
 		this.prefix = prefix;
 		this.name = name;
 	}
@@ -36,6 +49,10 @@ public class Property {
 		return name;
 	}
 	
+	public String getProperty() {
+		return property;
+	}
+
 	@Override
 	public String toString() {
 		if (prefix == null || prefix.isEmpty()) {

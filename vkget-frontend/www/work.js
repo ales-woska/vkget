@@ -549,7 +549,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		        var layouts = {};
 		        for (var key = 0; key < layout.blockLayouts.length; key++) {
 		        	var bl = layout.blockLayouts[key];
-		        	layouts[bl.forType] = bl;
+		        	layouts[bl.forType.type] = bl;
 		        }
 				for (var i = 0; i < layout.lineLayouts.length; i++) {
 					polyline(layout.lineLayouts[i]);

@@ -77,14 +77,14 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 		insertQuery.append("INSERT DATA { <").append(layout.getUri()).append("> ");
 		
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append("; ");
-		insertQuery.append(" ").append(Constants.RDFS_LABEL).append(" \"").append(layout.getName()).append("\"; ");
-		insertQuery.append(" ").append(NAMESPACES).append(" \"").append(layout.getNamespacesAsString()).append("\"; ");
+		insertQuery.append(" ").append(Constants.RDFS_LABEL).append(" '").append(layout.getName()).append("'; ");
+		insertQuery.append(" ").append(NAMESPACES).append(" '").append(layout.getNamespacesAsString()).append("'. ");
 		
 		for (BlockLayout bl: layout.getBlockLayouts()) {
-			insertQuery.append(" ").append(Constants.BlockLayoutProperty).append(" <").append(bl.getUri()).append("> ; ");
+			insertQuery.append(" <").append(layout.getUri()).append("> ").append(Constants.BlockLayoutProperty).append(" <").append(bl.getUri()).append("> . ");
 		}
 		for (LineLayout ll: layout.getLineLayouts()) {
-			insertQuery.append(" ").append(Constants.LineLayoutProperty).append(" <").append(ll.getUri()).append("> ; ");
+			insertQuery.append(" <").append(layout.getUri()).append("> ").append(Constants.LineLayoutProperty).append(" <").append(ll.getUri()).append("> . ");
 		}
 		
 		insertQuery.append(" }");
@@ -92,12 +92,24 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
     	sparql.executeQuery(insertQuery.toString());
     	
         for (BlockLayout block: layout.getBlockLayouts()) {
-            blockDao.insert(block);
+            blockDao.insertOrUpdate(block);
         }
         for (LineLayout line: layout.getLineLayouts()) {
-            lineDao.insert(line);
+            lineDao.insertOrUpdate(line);
         }
     }
+	
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void insertOrUpdate(ScreenLayout layout) {
+		if (exists(layout)) {
+			update(layout);
+		} else {
+			insert(layout);
+		}
+	}
 
 	/**
 	 * @inheritDoc
@@ -105,29 +117,29 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
     @Override
 	public void update(ScreenLayout layout) {
 		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("DELETE { <").append(layout.getUri()).append("> ?p ?o } ");
-		updateQuery.append("INSERT { <").append(layout.getUri()).append("> ");
+		updateQuery.append("DELETE { <").append(layout.getUri().getUri()).append("> ?p ?o } ");
+		updateQuery.append("INSERT { <").append(layout.getUri().getUri()).append("> ");
 		
-		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append("; ");
-		updateQuery.append(" ").append(Constants.RDFS_LABEL).append(" \"").append(layout.getName()).append("\"; ");
-		updateQuery.append(" ").append(NAMESPACES).append(" \"").append(layout.getNamespacesAsString()).append("\"; ");
+		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append(" ; ");
+		updateQuery.append(" ").append(Constants.RDFS_LABEL).append(" '").append(layout.getName()).append("' ; ");
+		updateQuery.append(NAMESPACES).append(" '").append(layout.getNamespacesAsString()).append("' . ");
 		
 		for (BlockLayout bl: layout.getBlockLayouts()) {
-			updateQuery.append(" ").append(Constants.BlockLayoutProperty).append(" <").append(bl.getUri()).append("> ; ");
+			updateQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.BlockLayoutProperty).append(" <").append(bl.getUri().getUri()).append("> . ");
 		}
 		for (LineLayout ll: layout.getLineLayouts()) {
-			updateQuery.append(" ").append(Constants.LineLayoutProperty).append(" <").append(ll.getUri()).append("> ; ");
+			updateQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.LineLayoutProperty).append(" <").append(ll.getUri().getUri()).append("> . ");
 		}
 		
-		updateQuery.append(" } WHERE { <").append(layout.getUri()).append("> ?p ?o . }");
+		updateQuery.append(" } WHERE { <").append(layout.getUri().getUri()).append("> ?p ?o . }");
     	
     	sparql.executeQuery(updateQuery.toString());
     	
         for (BlockLayout block: layout.getBlockLayouts()) {
-            blockDao.update(block);
+            blockDao.insertOrUpdate(block);
         }
         for (LineLayout line: layout.getLineLayouts()) {
-            lineDao.update(line);
+            lineDao.insertOrUpdate(line);
         }
     }
     
@@ -222,7 +234,7 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + blockLayoutUri + "> " + Constants.BlockLayoutProperty + " ?uri . "
+				+ " <" + blockLayoutUri.getUri() + "> " + Constants.BlockLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
 		List<BlockLayout> layouts = new ArrayList<BlockLayout>();
@@ -239,7 +251,7 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + lineLayoutUri + "> " + Constants.LineLayoutProperty + " ?uri . "
+				+ " <" + lineLayoutUri.getUri() + "> " + Constants.LineLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
 		List<LineLayout> layouts = new ArrayList<LineLayout>();

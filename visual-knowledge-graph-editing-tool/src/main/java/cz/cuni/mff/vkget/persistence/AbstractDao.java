@@ -52,4 +52,9 @@ public abstract class AbstractDao<T extends RdfEntity> implements SparqlDao<T> {
 	@Override
 	public abstract List<T> getAll();
 
+	public void insertOrUpdate(T layout) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

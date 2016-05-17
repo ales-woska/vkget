@@ -1,6 +1,5 @@
 package cz.cuni.mff.vkget.data.layout;
 
-import cz.cuni.mff.vkget.data.common.Uri;
 
 /**
  * 
@@ -8,26 +7,16 @@ import cz.cuni.mff.vkget.data.common.Uri;
  *
  */
 public class Label {
-	private Uri forUri;
 	private LabelType type;
 	private String labelSource;
 	private String lang;
 	
 	public Label() {}
 	
-	public Label(Uri uri, LabelType type, String source, String lang) {
-		this.forUri = uri;
+	public Label(LabelType type, String source, String lang) {
 		this.type = type;
 		this.labelSource = source;
 		this.lang = lang;
-	}
-
-	public Uri getForUri() {
-		return forUri;
-	}
-
-	public void setForUri(Uri forUri) {
-		this.forUri = forUri;
 	}
 
 	public LabelType getType() {
