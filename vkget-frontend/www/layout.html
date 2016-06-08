@@ -44,7 +44,7 @@
 			<div class="row">
 				<div class="list-group">
 					<div ng-repeat="screenLayout in layouts" class="list-group-item">
-						<a target="_self" href="edit_layout.html?uri={{screenLayout.uri.uri}}">{{screenLayout.name}}</a>
+						<a target="_self" href="edit_layout.html?uri={{screenLayout.uri.uri | urlencode }}">{{screenLayout.name}}</a>
 						<a class="removeLink" ng-click="removeLayout(screenLayout)"><span class="glyphicon glyphicon-remove"></span></a>
 					</div>
 				</div>

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.RdfEntity;
 import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
 import cz.cuni.mff.vkget.data.layout.Label;
@@ -106,7 +107,9 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 	 * @inheritDoc
 	 */
     @Override
-	public void insert(LineLayout layout) {
+	public void insert(LineLayout layout, RdfEntity parent) {
+		String rawUri = parent.getUri().getUri() + "_" + escepeUri(layout.getFromType().getType().getType() + "_" + layout.getToType().getType().getType());
+		layout.setUri(getUniqueId(rawUri));
 		
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
 		insertQuery.append("INSERT DATA { ");
@@ -162,11 +165,11 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 	 * @inheritDoc
 	 */
 	@Override
-	public void insertOrUpdate(LineLayout layout) {
+	public void insertOrUpdate(LineLayout layout, RdfEntity parent) {
 		if (exists(layout)) {
 			update(layout);
 		} else {
-			insert(layout);
+			insert(layout, parent);
 		}
 	}
 

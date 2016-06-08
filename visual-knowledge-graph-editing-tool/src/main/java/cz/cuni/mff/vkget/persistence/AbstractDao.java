@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.log4j.Logger;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.common.RdfEntity;
@@ -11,6 +12,7 @@ import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 public abstract class AbstractDao<T extends RdfEntity> implements SparqlDao<T> {
+	private Logger logger = Logger.getLogger(AbstractDao.class);
 	protected abstract SparqlConnector getSparqlConnector();
     
     @Override
@@ -41,20 +43,33 @@ public abstract class AbstractDao<T extends RdfEntity> implements SparqlDao<T> {
 	}
 	
 	@Override
-	public abstract void insert(T entity);
+	public abstract void insert(T entity, RdfEntity parent);
 
 	@Override
 	public abstract void update(T entity);
+	
+	@Override
+	public abstract void insertOrUpdate(T entity, RdfEntity parent);
 
 	@Override
 	public abstract T get(Uri uri);
 
 	@Override
 	public abstract List<T> getAll();
-
-	public void insertOrUpdate(T layout) {
-		// TODO Auto-generated method stub
-		
+	
+	protected Uri getUniqueId(String uri) {
+		// TODO check uniqueness
+		Uri uniqueId = new Uri(uri);
+		return uniqueId;
 	}
-
+	
+	protected String escepeUri(String uri) {
+		/*try {
+			return URLEncoder.encode(uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			logger.error("Cannot encode URI");
+		}
+		return null;*/
+		return uri.replaceAll("[ :/#]", "_");
+	}
 }

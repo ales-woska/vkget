@@ -1,5 +1,6 @@
 package cz.cuni.mff.vkget.data.common;
 
+
 public class Uri {
 	private String uri;
 	

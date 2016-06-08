@@ -41,7 +41,7 @@ public class LayoutServiceImpl implements LayoutService {
 	 */
 	@Override
 	public void saveOrUpdateLayout(ScreenLayout layout) {
-		dao.insertOrUpdate(layout);
+		dao.insertOrUpdate(layout, null);
 	}
 	
 	/**

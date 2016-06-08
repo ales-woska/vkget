@@ -326,7 +326,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				if (lineLayout.toType != instance.type) {
 					continue;
 				} else {
-					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType);
+					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType.type);
 					if (sourceTable && sourceTable.selectedInstance) {
 						if (!sourceTable.selectedInstance.objectProperties || sourceTable.selectedInstance.objectProperties.length == 0) {
 							return false;
@@ -417,7 +417,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		var tableType = '';
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			var lineLayout = $scope.screenLayout.lineLayouts[i];
-			if (lineLayout.fromType == sourceTable.type) {
+			if (lineLayout.fromType.type == sourceTable.type) {
 				tableType = lineLayout.toType;
 			}
 		}

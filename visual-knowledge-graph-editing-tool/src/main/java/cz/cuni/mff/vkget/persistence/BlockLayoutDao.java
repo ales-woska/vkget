@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.RdfEntity;
 import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
@@ -134,39 +135,41 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 	 * @inheritDoc
 	 */
     @Override
-	public void insert(BlockLayout layout) {
+	public void insert(BlockLayout layout, RdfEntity parent) {
+    	String rawUri = parent.getUri().getUri() + "_" + escepeUri(layout.getForType().getType());
+    	layout.setUri(getUniqueId(rawUri));
+    	
+		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
+		insertQuery.append("INSERT DATA { ");
+		insertQuery.append("<").append(layout.getUri().getUri()).append("> ");
 		
-		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("INSERT DATA { ");
-		updateQuery.append("<").append(layout.getUri().getUri()).append("> ");
+		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.BlockLayoutType).append("; ");
+		insertQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
+		insertQuery.append(" ").append(FONT_SIZE).append(" '").append(layout.getFontSize()).append("'; ");
+		insertQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
+		insertQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
+		insertQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getLineType().name()).append("'; ");
+		insertQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		insertQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		insertQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		insertQuery.append(" ").append(FOR_TYPE).append(" '").append(layout.getForType()).append("'; ");
+		insertQuery.append(" ").append(BACKGROUND).append(" '").append(layout.getBackground()).append("'; ");
+		insertQuery.append(" ").append(HEIGHT).append(" '").append(layout.getHeight()).append("'; ");
+		insertQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'; ");
+		insertQuery.append(" ").append(LEFT).append(" '").append(layout.getLeft()).append("'; ");
+		insertQuery.append(" ").append(TOP).append(" '").append(layout.getTop()).append("'. ");
 		
-		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.BlockLayoutType).append("; ");
-		updateQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
-		updateQuery.append(" ").append(FONT_SIZE).append(" '").append(layout.getFontSize()).append("'; ");
-		updateQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
-		updateQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
-		updateQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getLineType().name()).append("'; ");
-		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
-		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
-		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
-		updateQuery.append(" ").append(FOR_TYPE).append(" '").append(layout.getForType()).append("'; ");
-		updateQuery.append(" ").append(BACKGROUND).append(" '").append(layout.getBackground()).append("'; ");
-		updateQuery.append(" ").append(HEIGHT).append(" '").append(layout.getHeight()).append("'; ");
-		updateQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'; ");
-		updateQuery.append(" ").append(LEFT).append(" '").append(layout.getLeft()).append("'; ");
-		updateQuery.append(" ").append(TOP).append(" '").append(layout.getTop()).append("'. ");
+		for (ColumnLayout columnLayout: layout.getProperties()) {
+			columnLayoutDao.insertOrUpdate(columnLayout, layout);
+		}
 
 		for (ColumnLayout cl: layout.getProperties()) {
-			updateQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.ColumnLayoutProperty).append(" <").append(cl.getUri().getUri()).append("> . ");
+			insertQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.ColumnLayoutProperty).append(" <").append(cl.getUri().getUri()).append("> . ");
 		}
 		
-		updateQuery.append(" }");
+		insertQuery.append(" }");
 		
-		sparql.executeQuery(updateQuery.toString());
-				
-		for (ColumnLayout columnLayout: layout.getProperties()) {
-			columnLayoutDao.insertOrUpdate(columnLayout);
-		}
+		sparql.executeQuery(insertQuery.toString());
 		
     }
     
@@ -204,7 +207,7 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		sparql.executeQuery(updateQuery.toString());
 				
 		for (ColumnLayout columnLayout: layout.getProperties()) {
-			columnLayoutDao.insertOrUpdate(columnLayout);
+			columnLayoutDao.insertOrUpdate(columnLayout, layout);
 		}
     }
 	
@@ -212,11 +215,11 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 	 * @inheritDoc
 	 */
 	@Override
-	public void insertOrUpdate(BlockLayout layout) {
+	public void insertOrUpdate(BlockLayout layout, RdfEntity parent) {
 		if (exists(layout)) {
 			update(layout);
 		} else {
-			insert(layout);
+			insert(layout, parent);
 		}
 	}
 

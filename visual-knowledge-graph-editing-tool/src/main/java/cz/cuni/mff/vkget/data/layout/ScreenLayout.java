@@ -24,6 +24,11 @@ public class ScreenLayout extends RdfEntity {
 	private Map<String, String> namespaces;
 	
 	/**
+	 * How many tables will be affected by selecting an instance or entering a filter.
+	 */
+	private PropagationType filterPropagation;
+	
+	/**
 	 * Definitions of tables ~ @see RdfTable
 	 */
 	private List<BlockLayout> blockLayouts;
@@ -98,6 +103,14 @@ public class ScreenLayout extends RdfEntity {
 		this.namespaces = namespaces;
 	}
 	
+	public PropagationType getFilterPropagation() {
+		return filterPropagation;
+	}
+
+	public void setFilterPropagation(PropagationType filterPropagation) {
+		this.filterPropagation = filterPropagation;
+	}
+
 	public void setNamespacesFromString(String namespaces) {
 		if (namespaces == null || namespaces.isEmpty()) {
 			return;
@@ -110,13 +123,4 @@ public class ScreenLayout extends RdfEntity {
 		this.namespaces = map;
 	}
 
-	public BlockLayout findLayoutForType(String type) {
-		for (BlockLayout layout: blockLayouts) {
-			if (layout.getForType().equals(type)) {
-				return layout;
-			}
-		}
-		return null;
-	}
-	
 }

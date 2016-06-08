@@ -7,6 +7,12 @@ app.config(function($locationProvider) {
       });
   });
 
+app.filter('urlencode', function() {
+	return function(input) {
+		return window.encodeURIComponent(input);
+	};
+});
+
 app.controller('layoutController', function($scope, $http, $location) {
 	$scope.messages = [];
 	

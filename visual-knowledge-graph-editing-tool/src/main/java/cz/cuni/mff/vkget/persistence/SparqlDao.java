@@ -17,10 +17,12 @@ public interface SparqlDao<T extends RdfEntity> {
 	 * Insert new entity.
 	 * @param entity
 	 */
-	void insert(T entity);
+	void insert(T entity, RdfEntity parent);
 	
 	void update(T entity);
 	
+	void insertOrUpdate(T entity, RdfEntity parent);
+
 	void delete(T entity);
 	
 	boolean exists(T entity);

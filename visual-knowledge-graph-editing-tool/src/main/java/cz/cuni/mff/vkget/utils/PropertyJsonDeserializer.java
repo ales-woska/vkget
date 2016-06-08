@@ -21,6 +21,9 @@ public class PropertyJsonDeserializer extends JsonDeserializer<Property> {
         if (node.isTextual()) {
         	stringProperty = node.asText();
         	property = new Property(stringProperty);
+        } else if (node.has("property")) {
+        	stringProperty = node.get("property").asText();
+        	property = new Property(stringProperty);
         } else {
         	String prefix = node.get("prefix").asText();
         	String name = node.get("name").asText();

@@ -21,6 +21,9 @@ public class TypeJsonDeserializer extends JsonDeserializer<Type> {
         if (node.isTextual()) {
         	stringType = node.asText();
         	type = new Type(stringType);
+        } else if (node.has("type")) {
+        	stringType = node.get("type").asText();
+        	type = new Type(stringType);
         } else {
         	String prefix = node.get("prefix").asText();
         	String name = node.get("name").asText();

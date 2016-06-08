@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.RdfEntity;
 import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.AggregateFunction;
 import cz.cuni.mff.vkget.data.layout.ColumnLayout;
@@ -86,21 +87,24 @@ public class ColumnLayoutDao extends AbstractDao<ColumnLayout> {
 	 * @inheritDoc
 	 */
     @Override
-	public void insert(ColumnLayout layout) {
-		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("INSERT DATA { ");
-		updateQuery.append("<").append(layout.getUri()).append("> ");
+	public void insert(ColumnLayout layout, RdfEntity parent) {
+		String rawUri = parent.getUri().getUri() + "_" + escepeUri(layout.getProperty().getProperty());
+		layout.setUri(getUniqueId(rawUri));
 		
-		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ColumnLayoutType).append("; ");
-		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
-		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
-		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
-		updateQuery.append(" ").append(PROPERTY).append(" '").append(layout.getProperty()).append("'; ");
-		updateQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" '").append(layout.getAggregateFunction().name()).append("'. ");
+		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
+		insertQuery.append("INSERT DATA { ");
+		insertQuery.append("<").append(layout.getUri()).append("> ");
 		
-		updateQuery.append(" }");
+		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ColumnLayoutType).append("; ");
+		insertQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
+		insertQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
+		insertQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
+		insertQuery.append(" ").append(PROPERTY).append(" '").append(layout.getProperty()).append("'; ");
+		insertQuery.append(" ").append(AGGREGATE_FUNCTIONS).append(" '").append(layout.getAggregateFunction().name()).append("'. ");
 		
-		sparql.executeQuery(updateQuery.toString());
+		insertQuery.append(" }");
+		
+		sparql.executeQuery(insertQuery.toString());
     }
 
 	@Override
@@ -125,11 +129,11 @@ public class ColumnLayoutDao extends AbstractDao<ColumnLayout> {
 	 * @inheritDoc
 	 */
 	@Override
-	public void insertOrUpdate(ColumnLayout layout) {
+	public void insertOrUpdate(ColumnLayout layout, RdfEntity parent) {
 		if (exists(layout)) {
 			update(layout);
 		} else {
-			insert(layout);
+			insert(layout, parent);
 		}
 	}
 

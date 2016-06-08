@@ -1,5 +1,11 @@
 function escapeUri(uri) {
-	return uri.replace(/#|:|\.|\//gi, "");
+	var result = uri;
+	if (uri.uri) {
+		result = uri.uri;
+	} else {
+		result = uri;
+	}
+	return result.replace(/#|:|\.|\//gi, "");
 }
 
 function polyline(lineLayout) {
@@ -90,6 +96,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	
 	var uri = $location.search()['uri'];
 	if (uri) {
+		uri = window.encodeURIComponent(uri);
 		$http.get("http://localhost:8090/layout?uri=" + uri).then(
 				function(response) {
 					$scope.uri = uri;
@@ -139,24 +146,43 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 		
 	$scope.addLine = function() {
-		var newLine = newLineLayout($scope.screenLayout);
-		$scope.screenLayout.lineLayouts.push(newLine);
+		if ($scope.screenLayout.blockLayouts.length < 2) {
+			alert('To make a new connection there must be at least 2 tables.');
+			return;
+		}
+		var newLine = null;
+		var lineLayouts = $scope.screenLayout.lineLayouts;
+		var lineLayout = $scope.screenLayout.lineLayouts[$scope.screenLayout.lineLayouts.length - 1];
+		if (lineLayouts.length == 0 || (lineLayout.fromType.type && lineLayout.toType.type)) {
+			newLine = newLineLayout($scope.screenLayout);
+			$scope.screenLayout.lineLayouts.push(newLine);
+		} else {
+			newLine = lineLayout;
+		}
 		setTimeout(function(){
-			$scope.openLineModal(newLine);
+			$scope.toggleLineModal(newLine);
 		}, 100);
 	};
 	
 	$scope.saveLine = function(lineLayout) {
 		var index = $scope.screenLayout.lineLayouts.indexOf(lineLayout);
+		var error = false;
 		for (var i in $scope.screenLayout.lineLayouts) {
 			var curr = $scope.screenLayout.lineLayouts[i];
-			if (i != index && curr.fromType == lineLayout.fromType && curr.fromType == lineLayout.fromType) {
-				$scope.screenLayout.lineLayouts.splice(index, 1);
+			if (i != index && curr.fromType.type == lineLayout.fromType.type && curr.toType.type == lineLayout.toType.type) {
 				alert('Connection between types already exists, canceling.');
+				error = true;
+			}
+			if (i != index && curr.fromType.type == lineLayout.toType.type && curr.toType.type == lineLayout.fromType.type) {
+				alert('WARNING: connection in opposite direction already exists.');
+			}
+			if (lineLayout.fromType.type == lineLayout.toType.type) {
+				alert('Connection can\'t be targeted to the same type, canceling.');
+				error = true;
 			}
 		}
 		
-		if (lineLayout) {
+		if (!error && lineLayout) {
 			if (!lineLayout.points) {
 				lineLayout.points = [];
 			}
@@ -164,35 +190,41 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			var b2 = null;
 			for (var j in $scope.screenLayout.blockLayouts) {
 				var b = $scope.screenLayout.blockLayouts[j];
-				if (b.forType == lineLayout.fromType) {
+				if (b.forType.type == lineLayout.fromType.type) {
 					b1 = b;
-				} else if (b.forType == lineLayout.toType) {
+				} else if (b.forType.type == lineLayout.toType.type) {
 					b2 = b;
 				}
 			}
 			if (!b1 || !b2) {
 				$scope.screenLayout.lineLayouts.splice(index, 1);
-				alert('One of the sources doesn\'t exists, canceling.');
+				alert('One of sources doesn\'t exists, canceling.');
+				error = true;
 			}
-			var x = b1.left + (b1.width/2); 
-			var y = b1.top + (b1.height/2);
-			var point = {
-				x: x,
-				y: y
-			};
-			lineLayout.points.push(point);
-			x = b2.left + (b2.width/2); 
-			y = b2.top + (b2.height/2);
-			point = {
-				x: x,
-				y: y
-			};
-			lineLayout.points.push(point);
-			polyline(lineLayout);
+			
+			if (!error) {
+				var x = b1.left + (b1.width/2); 
+				var y = b1.top + (b1.height/2);
+				var point = {
+					x: x,
+					y: y
+				};
+				lineLayout.points.push(point);
+				x = b2.left + (b2.width/2); 
+				y = b2.top + (b2.height/2);
+				point = {
+					x: x,
+					y: y
+				};
+				lineLayout.points.push(point);
+				polyline(lineLayout);
+			}
 		}
+		
+		$scope.toggleLineModal(lineLayout);
 	};
 	
-	$scope.openLineModal = function(lineLayout) {
+	$scope.toggleLineModal = function(lineLayout) {
 		var id = "#lineForm" + escapeUri(lineLayout.uri.uri);
 		$(id).modal('toggle');
 	};
@@ -238,7 +270,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			$scope.mouseDownBL = blockLayout;			
 			for (var i in $scope.screenLayout.lineLayouts) {
 				var lineLayout = $scope.screenLayout.lineLayouts[i];
-				if (lineLayout.fromType == blockLayout.forType || lineLayout.toType == blockLayout.forType) {
+				if (lineLayout.fromType.type == blockLayout.forType.type || lineLayout.toType.type == blockLayout.forType.type) {
 					$scope.mouseDownLL = lineLayout;
 				}
 			}
@@ -258,9 +290,9 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			var diffPointX  = null;
 			var diffPointY = null;
 			if ($scope.mouseDownLL) {
-				if ($scope.mouseDownLL.fromType == $scope.mouseDownBL.forType) {
+				if ($scope.mouseDownLL.fromType.type == $scope.mouseDownBL.forType.type) {
 					point = $scope.mouseDownLL.points[0];
-				} else if ($scope.mouseDownLL.toType == $scope.mouseDownBL.forType) {
+				} else if ($scope.mouseDownLL.toType.type == $scope.mouseDownBL.forType.type) {
 					point = $scope.mouseDownLL.points[$scope.mouseDownLL.points.length - 1];
 				}
 				diffPointX = point.x - $scope.mouseDownBL.left;
@@ -304,6 +336,14 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.saveLayout = function() {
+		// remove empty line layouts
+		for (var i = 0; i < $scope.screenLayout.lineLayouts; i++) {
+			var lineLayout = $scope.screenLayout.lineLayouts[i];
+			if (!lineLayout.fromType.type || !lineLayout.toType.type) {
+				$scope.screenLayout.lineLayouts.splice(i, 1);
+			}
+		}
+		
 		$http.post('http://localhost:8090/layout/save', $scope.screenLayout)
         .success(function (data, status, headers, config) {
 			$window.location.href = "layout.html?saved=" + $scope.screenLayout.name;
@@ -330,7 +370,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.removeTable = function(blockLayout) {
 		for (var i in $scope.screenLayout.lineLayouts) {
 			var ll = $scope.screenLayout.lineLayouts[i];
-			if (ll.fromType == blockLayout.forType || ll.toType == blockLayout.forType) {
+			if (ll.fromType.type == blockLayout.forType.type || ll.toType.type == blockLayout.forType.type) {
 				$scope.screenLayout.lineLayouts.splice(i, 1);
 			}
 		}
@@ -361,7 +401,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			var uri = existing.uri;
 			var uriIndex = uri.uri.indexOf('#new_block');
 			if (uriIndex != -1) {
-				uriPostfix = uri.substring(uriIndex + 10);
+				uriPostfix = uri.uri.substring(uriIndex + 10);
 				if (uriPostfix != '') {
 					uriPostfix++;
 				}
@@ -374,15 +414,18 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			var forType = existing.forType;
 			var uriIndex = forType.name.indexOf('for_type');
 			if (uriIndex != -1) {
-				forTypePostfix = forType.substring(uriIndex + 8);
+				forTypePostfix = forType.name.substring(uriIndex + 8);
 				if (forTypePostfix != '') {
 					forTypePostfix++;
 				}
 			}
 		}
 		
-		blockLayout.uri = {uri: '#new_block' + uriPostfix};
-		blockLayout.forType = 'for_type' + forTypePostfix;
+		var uri = '#new_block' + uriPostfix;
+		var forType = 'for_type' + forTypePostfix;
+		
+		blockLayout.uri = {uri: uri};
+		blockLayout.forType = {type: forType, name: forType, prefix: ""};
 		blockLayout.background = '#aaaaaa',
 		blockLayout.height = 100;
 		blockLayout.width = 100;
@@ -403,35 +446,35 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	}
 	
 	function newLineLayout(screenLayout) {
-		var lineLayout = {};
+		var newLineLayout = {};
 		
 		var uriPostfix = 0;
-		for (var i in screenLayout.blockLayouts) {
-			var blockLayout = screenLayout.blockLayouts[i];
-			var uri = blockLayout.uri;
+		for (var i in screenLayout.lineLayouts) {
+			var lineLayout = screenLayout.lineLayouts[i];
+			var uri = lineLayout.uri;
 			var uriIndex = uri.uri.indexOf('#new_line');
 			if (uriIndex != -1) {
-				uri.substring(uriIndex + 9);
+				uriPostfix = uri.uri.substring(uriIndex + 9);
 				if (uriPostfix != '') {
 					uriPostfix++;
 				}
 			}
 		}
 		
-		lineLayout.uri = {uri: '#new_line' + uriPostfix};
-		lineLayout.fromType = '';
-		lineLayout.toType = '';
-		lineLayout.label = {
+		newLineLayout.uri = {uri: '#new_line' + uriPostfix};
+		newLineLayout.fromType = {};
+		newLineLayout.toType = {};
+		newLineLayout.label = {
 			labelSource: '',
 			type: 'CONSTANT',
 			lang: 'en'
 		};
-		lineLayout.fontColor = 'black';
-		lineLayout.fontSize = 10;
-		lineLayout.lineColor = 'black';
-		lineLayout.lineType = 'SOLID';
-		lineLayout.lineThickness = 1;
-		lineLayout.points = [];
-		return lineLayout;
+		newLineLayout.fontColor = 'black';
+		newLineLayout.fontSize = 10;
+		newLineLayout.lineColor = 'black';
+		newLineLayout.lineType = 'SOLID';
+		newLineLayout.lineThickness = 1;
+		newLineLayout.points = [];
+		return newLineLayout;
 	}
 });

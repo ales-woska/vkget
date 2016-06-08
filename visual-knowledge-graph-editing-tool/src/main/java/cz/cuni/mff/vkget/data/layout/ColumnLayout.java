@@ -1,6 +1,7 @@
 package cz.cuni.mff.vkget.data.layout;
 
 import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.RdfEntity;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
@@ -8,16 +9,18 @@ import cz.cuni.mff.vkget.sparql.Constants;
  * @author Ales Woska
  *
  */
-public class ColumnLayout extends AbstractLayout {
+public class ColumnLayout extends RdfEntity {
 	/**
 	 * Which property is shown in column
 	 */
-    private Property property;
+	protected Property property;
+
+	protected Label label;
     
     /**
      * What aggregate function to use in case of multiple values.
      */
-    private AggregateFunction aggregateFunctions = AggregateFunction.NOTHING;
+	protected AggregateFunction aggregateFunction = AggregateFunction.NOTHING;
     
     public ColumnLayout() {
     	this.type = Constants.ColumnLayoutType;
@@ -32,11 +35,20 @@ public class ColumnLayout extends AbstractLayout {
 	}
 
 	public AggregateFunction getAggregateFunction() {
-		return aggregateFunctions;
+		return aggregateFunction;
 	}
 
 	public void setAggregateFunction(AggregateFunction aggregateFunctions) {
-		this.aggregateFunctions = aggregateFunctions;
+		this.aggregateFunction = aggregateFunctions;
 	}
+
+	public Label getLabel() {
+		return label;
+	}
+
+	public void setLabel(Label label) {
+		this.label = label;
+	}
+	
 
 }
