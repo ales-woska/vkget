@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.common.Property;
 import cz.cuni.mff.vkget.data.common.RdfEntity;
+import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.common.Uri;
-import cz.cuni.mff.vkget.data.layout.BlockLayout;
 import cz.cuni.mff.vkget.data.layout.Label;
 import cz.cuni.mff.vkget.data.layout.LabelType;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
@@ -61,8 +61,6 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 		LineLayout layout = new LineLayout();
 		layout.setUri(uri);
 		layout.setLabel(new Label());
-		layout.setFromType(new BlockLayout());
-		layout.setToType(new BlockLayout());
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
 			
@@ -79,11 +77,11 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 			} else if (property.equals(FONT_SIZE)) {
 				layout.setFontSize(Integer.valueOf(value));
 			} else if (property.equals(FROM_TYPE)) {
-				layout.getFromType().setUri(new Uri(value));
+				layout.setFromType(new Type(value));
 			} else if (property.equals(PROPERTY)) {
 				layout.setProperty(new Property(value));
 			} else if (property.equals(TO_TYPE)) {
-				layout.getToType().setUri(new Uri(value));
+				layout.setToType(new Type(value));
 			} else if (property.equals(LINE_COLOR)) {
 				layout.setLineColor(value);
 			} else if (property.equals(LINE_TYPE)) {
@@ -108,7 +106,7 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 	 */
     @Override
 	public void insert(LineLayout layout, RdfEntity parent) {
-		String rawUri = parent.getUri().getUri() + "_" + escepeUri(layout.getFromType().getType().getType() + "_" + layout.getToType().getType().getType());
+		String rawUri = parent.getUri().getUri() + "_" + escepeUri(layout.getFromType().getType() + "_" + layout.getToType().getType());
 		layout.setUri(getUniqueId(rawUri));
 		
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);

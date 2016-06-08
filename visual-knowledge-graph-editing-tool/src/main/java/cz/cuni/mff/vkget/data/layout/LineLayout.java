@@ -5,6 +5,7 @@ import java.util.List;
 
 import cz.cuni.mff.vkget.data.common.Point;
 import cz.cuni.mff.vkget.data.common.Property;
+import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 /**
@@ -14,8 +15,8 @@ import cz.cuni.mff.vkget.sparql.Constants;
  */
 public class LineLayout extends AbstractLayout {
 	
-	private BlockLayout fromType;
-	private BlockLayout toType;
+	private Type fromType;
+	private Type toType;
 	private Property property;
 	private List<Point> points;
 	
@@ -23,22 +24,22 @@ public class LineLayout extends AbstractLayout {
 		this.type = Constants.LineLayoutType;
 	}
 
-	public BlockLayout getFromType() {
+	public Type getFromType() {
 		return fromType;
 	}
 
 
-	public void setFromType(BlockLayout fromType) {
+	public void setFromType(Type fromType) {
 		this.fromType = fromType;
 	}
 
 
-	public BlockLayout getToType() {
+	public Type getToType() {
 		return toType;
 	}
 
 
-	public void setToType(BlockLayout toType) {
+	public void setToType(Type toType) {
 		this.toType = toType;
 	}
 
@@ -80,5 +81,20 @@ public class LineLayout extends AbstractLayout {
 			this.points.add(new Point(Integer.valueOf(x), Integer.valueOf(y)));
 		}
 	}
+	
+	public int getLeft() {
+		int middle = getPoints().size() / 2 - 1;
+		Point point1 = getPoints().get(middle);
+		Point point2 = getPoints().get(middle + 1);
+		return (point1.x + point2.x) / 2;
+	}
+	
+	public int getTop() {
+		int middle = getPoints().size() / 2 - 1;
+		Point point1 = getPoints().get(middle);
+		Point point2 = getPoints().get(middle + 1);
+		return (point1.y + point2.y) / 2;
+	}
+
 
 }

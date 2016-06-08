@@ -13,6 +13,12 @@ app.config(function($locationProvider) {
       });
   });
 
+app.filter('urlencode', function() {
+	return function(input) {
+		return window.encodeURIComponent(input);
+	};
+});
+
 app.directive('ngRightClick', function($parse) {
     return function(scope, element, attrs) {
         var fn = $parse(attrs.ngRightClick);
@@ -174,7 +180,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		};
 		instance.objectProperties.push({
 			property: property,
-			subjectUri: instance.uri,
+			subjectUri: instance.uri.uri,
 			objectUri: value
 		});
 		$scope.changes.push(change);
@@ -244,9 +250,6 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				left : e.pageX,
 				top : e.pageY
 			});
-			
-			
-			
 			return false;
 		});
 	};
@@ -323,7 +326,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
 			for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 				var lineLayout = $scope.screenLayout.lineLayouts[i];
-				if (lineLayout.toType != instance.type) {
+				if (lineLayout.toType.type != instance.type.type) {
 					continue;
 				} else {
 					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType.type);
@@ -334,7 +337,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 						for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
 							var objectProperty = sourceTable.selectedInstance.objectProperties[j];
 							if (objectProperty.property == lineLayout.property) {
-								if (objectProperty.uri == instance.uri) {
+								if (objectProperty.uri.uri == instance.uri.uri) {
 									return true;
 								}
 							}
@@ -345,21 +348,21 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			}
 		}
 		
-		var tableFilters = $scope.filters[instance.type];
+		var tableFilters = $scope.filters[instance.type.type];
 		if (!tableFilters) {
 			return true;
 		}
 		
 		for (var i = 0; i < instance.literalProperties.length; i++) {
-			var property = instance.literalProperties[i];
-			var propertyFilter = tableFilters[property.property];
+			var literalProperty = instance.literalProperties[i];
+			var propertyFilter = tableFilters[literalProperty.property.property];
 			if (!propertyFilter) {
 				continue;
 			}
-			if (!property.value) {
+			if (!literalProperty.value) {
 				return false;
 			}
-			var value = property.value.toString();
+			var value = literalProperty.value.toString();
 			if (value.toLowerCase().indexOf(propertyFilter.toLowerCase()) == -1) {
 				return false;
 			}
@@ -369,8 +372,10 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	
 	function getTableByType(dataModel, type) {
 		for (var i = 0; i < dataModel.tables.length; i++) {
-			if (dataModel.tables[i].type == type) {
-				return dataModel.tables[i];
+			var table = dataModel.tables[i];
+			var tableType = dataModel.tables[i].type.type;
+			if (tableType == type) {
+				return table;
 			}
 		}
 		return null;
@@ -382,13 +387,13 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
     };
 	
 	$scope.getTitleForProperty = function(layout, property) {
-		if (layout === undefined) {
+		if (!layout) {
 			return "";
 		}
     	for (var j = 0; j < layout.properties.length; j++) {
     		var rl = layout.properties[j];
-    		if (rl.property == property) {
-    			return rl.title;
+    		if (rl.property.property == property.property) {
+    			return rl.label.labelSource;
     		}
     	}
 	};
@@ -410,15 +415,15 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
         $scope.layouts = response.data;
 		$('#layoutLoading').hide();
 		$('#layoutSelect').show();
-		$scope.layout = $scope.layouts[0].uri;
+		$scope.layout = $scope.layouts[0].uri.uri;
     });
 	
 	$scope.reloadTable = function(sourceTable, instance) {
 		var tableType = '';
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			var lineLayout = $scope.screenLayout.lineLayouts[i];
-			if (lineLayout.fromType.type == sourceTable.type) {
-				tableType = lineLayout.toType;
+			if (lineLayout.fromType.type == sourceTable.type.type) {
+				tableType = lineLayout.toType.type;
 			}
 		}
 		
@@ -429,12 +434,12 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		};
 		for (var i = 0; i < instance.objectProperties.length; i++) {
 			var objectProperty = instance.objectProperties[i];
-			filter.uriFilters.push(objectProperty.uri);
+			filter.uriFilters.push(objectProperty.subjectUri.uri);
 		}
 		
 		var endpoint = $scope.endpoint;
 		var type = $scope.endpointType;
-		var layoutUri = $scope.screenLayout.uri;
+		var layoutUri = $scope.screenLayout.uri.uri;
 		
 		var request = {
 			tableType: tableType,
@@ -448,7 +453,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
         .success(function (data, status, headers, config) {
         	var newInstances = data;
 			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
-				if ($scope.dataModel.tables[i].type == tableType) {
+				if ($scope.dataModel.tables[i].type.type == tableType) {
 					for (var j = 0; j < newInstances.length; j++) {
 						if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
 							$scope.dataModel.tables[i].instances.push(newInstances[j]);
@@ -464,7 +469,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	};
 	
 	$scope.filterChanged = function(sourceTable) {
-		var tableType = sourceTable.type;
+		var tableType = sourceTable.type.type;
 		
 		var filter = {
 			limit: 40,
@@ -472,18 +477,18 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			columnFilters: {}				
 		};
 		
-		var tableFilters = $scope.filters[sourceTable.type];
+		var tableFilters = $scope.filters[sourceTable.type.type];
 		if (tableFilters) {
 			for (var i = 0; i < sourceTable.columns.length; i++) {
 				var property = sourceTable.columns[i];
-				var propertyFilter = tableFilters[property];
-				filter.columnFilters[property] = propertyFilter;
+				var propertyFilter = tableFilters[property.property];
+				filter.columnFilters[property.property] = propertyFilter;
 			}
 		}
 		
 		var endpoint = $scope.endpoint;
 		var type = $scope.endpointType;
-		var layoutUri = $scope.screenLayout.uri;
+		var layoutUri = $scope.screenLayout.uri.uri;
 		
 		var request = {
 				tableType: tableType,
@@ -497,7 +502,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		.success(function (data, status, headers, config) {
 			var newInstances = data;
 			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
-				if ($scope.dataModel.tables[i].type == tableType) {
+				if ($scope.dataModel.tables[i].type.type == tableType) {
 					for (var j = 0; j < newInstances.length; j++) {
 						if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
 							$scope.dataModel.tables[i].instances.push(newInstances[j]);
@@ -514,7 +519,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	
 	function containsInstance(table, instance) {
 		for (var i = 0; i < table.instances.length; i++) {
-			if (table.instances[i].uri == instance.uri) {
+			if (table.instances[i].uri.uri == instance.uri.uri) {
 				return true;
 			}
 		}
@@ -567,7 +572,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		var title = property;
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			if ($scope.screenLayout.lineLayouts[i].property == property) {
-				title = $scope.screenLayout.lineLayouts[i].title;
+				title = $scope.screenLayout.lineLayouts[i].label.labelSource;
 			};
 		}
 		return title;
@@ -579,7 +584,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			var table = $scope.dataModel.tables[i];
 			for (var j = 0; j < table.instances.length; j++) {
 				var instance = table.instances[j];
-				if (instance.uri == uri) {
+				if (instance.uri.uri == uri) {
 					for (var k = 0; k < instance.literalProperties.length; k++) {
 						var property = instance.literalProperties[k];
 						if (property.property == 'rdfs:label') {
@@ -604,10 +609,10 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			var lineLayout = $scope.screenLayout.lineLayouts[i];
 			if (lineLayout.fromType == type && lineLayout.property == property) {
-				var toType = lineLayout.toType;
+				var toType = lineLayout.toType.type;
 				for (var j = 0; j < $scope.dataModel.tables.length; j++) {
 					var table = $scope.dataModel.tables[j];
-					if (table.type == toType) {
+					if (table.type.type == toType) {
 						return table.instances;
 					}
 				}
