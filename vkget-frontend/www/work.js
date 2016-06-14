@@ -323,6 +323,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.filters = {};
 	
 	$scope.filterInstances = function(instance) {
+		var show = true;
 		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
 			for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 				var lineLayout = $scope.screenLayout.lineLayouts[i];
@@ -334,40 +335,39 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 						if (!sourceTable.selectedInstance.objectProperties || sourceTable.selectedInstance.objectProperties.length == 0) {
 							return false;
 						}
+						show = false;
 						for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
 							var objectProperty = sourceTable.selectedInstance.objectProperties[j];
 							if (objectProperty.property.property == lineLayout.property.property) {
 								if (objectProperty.objectUri.uri == instance.uri.uri) {
-									return true;
+									show = true;
 								}
 							}
 						}
-						return false;
 					}
 				}
 			}
 		}
 		
 		var tableFilters = $scope.filters[instance.type.type];
-		if (!tableFilters) {
-			return true;
+		if (tableFilters) {
+			for (var i = 0; i < instance.literalProperties.length; i++) {
+				var literalProperty = instance.literalProperties[i];
+				var propertyFilter = tableFilters[literalProperty.property.property];
+				if (!propertyFilter) {
+					continue;
+				}
+				if (!literalProperty.value) {
+					show = false;
+				}
+				var value = literalProperty.value.toString();
+				if (value.toLowerCase().indexOf(propertyFilter.toLowerCase()) == -1) {
+					show = false;
+				}
+			}
 		}
 		
-		for (var i = 0; i < instance.literalProperties.length; i++) {
-			var literalProperty = instance.literalProperties[i];
-			var propertyFilter = tableFilters[literalProperty.property.property];
-			if (!propertyFilter) {
-				continue;
-			}
-			if (!literalProperty.value) {
-				return false;
-			}
-			var value = literalProperty.value.toString();
-			if (value.toLowerCase().indexOf(propertyFilter.toLowerCase()) == -1) {
-				return false;
-			}
-		}
-		return true;
+		return show;
 	};
 	
 	function getTableByType(dataModel, type) {
@@ -435,8 +435,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		for (var i = 0; i < instance.objectProperties.length; i++) {
 			var objectProperty = instance.objectProperties[i];
 			var uri = objectProperty.subjectUri.uri;
-			var property = objectProperty.property.property;
-			filter.uriFilters[property] = uri;
+			filter.uriFilters[objectProperty.property.property] = uri;
 		}
 		
 		var endpoint = $scope.endpoint;
@@ -475,7 +474,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		
 		var filter = {
 			limit: 40,
-			uriFilters: [],
+			uriFilters: {},
 			columnFilters: {}				
 		};
 		
