@@ -68,23 +68,18 @@ public class VirtuosoDataConnector extends CommonDataConnector {
 			String varTo = "y" + j;
 			sb.append(" OPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . } ");
 		}
-		
-		StringBuilder filterSb = new StringBuilder("lang(?typeLabel) = 'en'");
 
 		if (filter != null && filter.getUriFilters() != null && filter.getUriFilters().size() > 0) {
-			filterSb.append(" && (");
-			for (Uri uriFilter: filter.getUriFilters()) {
-				if (uriFilter == null) {
+			for (Property uriProperty: filter.getUriFilters().keySet()) {
+				Uri uriValue = filter.getUriFilters().get(uriProperty);
+				if (uriValue == null) {
 					continue;
 				}
-				if (!filter.getUriFilters().get(0).equals(uriFilter)) {
-					filterSb.append("or ?uri = <").append(uriFilter).append("> ");
-				} else {
-					filterSb.append("?uri = <").append(uriFilter).append("> ");
-				}
+				sb.append("<").append(uriValue.getUri()).append("> ").append(uriProperty.getProperty()).append(" ?uri . ");
 			}
-			filterSb.append(") ");
 		}
+		
+		sb.append("} FILTER (lang(?typeLabel) = 'en'");
 		
 		if (filter != null && filter.getColumnFilters() != null && filter.getColumnFilters().size() > 0) {
 			for (Property property: filter.getColumnFilters().keySet()) {
@@ -95,11 +90,11 @@ public class VirtuosoDataConnector extends CommonDataConnector {
 				if (filterValue.isEmpty()) {
 					continue;
 				}
-				filterSb.append(" && (?").append(propertyVarMap.get(property)).append(" bif:contains '").append(filterValue).append("') ");
+				sb.append(" && (?").append(propertyVarMap.get(property)).append(" bif:contains '").append(filterValue).append("') ");
 			}
 		}
 		
-		sb.append("} FILTER (").append(filterSb.toString()).append(") ");
+		sb.append(") ");
 		
 		int limit = LIMIT;
 		if (filter != null && filter.getLimit() > 0) {

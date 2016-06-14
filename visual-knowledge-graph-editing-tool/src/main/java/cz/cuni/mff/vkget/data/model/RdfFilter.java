@@ -1,6 +1,5 @@
 package cz.cuni.mff.vkget.data.model;
 
-import java.util.List;
 import java.util.Map;
 
 import cz.cuni.mff.vkget.data.common.Property;
@@ -20,7 +19,7 @@ public class RdfFilter {
 	/**
 	 * Only instances with there URIs ~ RdfInstace.uri
 	 */
-	private List<Uri> uriFilters;
+	private Map<Property, Uri> uriFilters;
 	
 	/**
 	 * Max limit of loaded isntances.
@@ -35,11 +34,11 @@ public class RdfFilter {
 		this.columnFilters = columnFilters;
 	}
 
-	public List<Uri> getUriFilters() {
+	public Map<Property, Uri> getUriFilters() {
 		return uriFilters;
 	}
 
-	public void setUriFilters(List<Uri> uriFilters) {
+	public void setUriFilters(Map<Property, Uri> uriFilters) {
 		this.uriFilters = uriFilters;
 	}
 

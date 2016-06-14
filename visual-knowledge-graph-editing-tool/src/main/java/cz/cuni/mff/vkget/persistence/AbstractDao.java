@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.log4j.Logger;
 
 import cz.cuni.mff.vkget.connect.SparqlConnector;
 import cz.cuni.mff.vkget.data.common.RdfEntity;
@@ -12,7 +11,6 @@ import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.sparql.Constants;
 
 public abstract class AbstractDao<T extends RdfEntity> implements SparqlDao<T> {
-	private Logger logger = Logger.getLogger(AbstractDao.class);
 	protected abstract SparqlConnector getSparqlConnector();
     
     @Override

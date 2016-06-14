@@ -204,29 +204,24 @@ public class CommonDataConnector implements DataConnector {
 		}
 		
 		for (LineLayout lineLayout: lineLayouts) {
-			if (!(lineLayout.getFromType().getType().equals(blockLayout.getForType()))) {
+			if (!(lineLayout.getFromType().equals(blockLayout.getForType()))) {
 				continue;
 			}
 			String varTo = "y" + j;
 			sb.append(" OPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . } ");
 		}
-		
-		StringBuilder filterSb = new StringBuilder("lang(?typeLabel) = 'en'");
 
 		if (filter != null && filter.getUriFilters() != null && filter.getUriFilters().size() > 0) {
-			filterSb.append(" && (");
-			for (Uri uriFilter: filter.getUriFilters()) {
-				if (uriFilter == null) {
+			for (Property uriProperty: filter.getUriFilters().keySet()) {
+				Uri uriValue = filter.getUriFilters().get(uriProperty);
+				if (uriValue == null) {
 					continue;
 				}
-				if (!filter.getUriFilters().get(0).equals(uriFilter)) {
-					filterSb.append("or ?uri = <").append(uriFilter).append("> ");
-				} else {
-					filterSb.append("?uri = <").append(uriFilter).append("> ");
-				}
+				sb.append("<").append(uriValue.getUri()).append("> ").append(uriProperty.getProperty()).append(" ?uri . ");
 			}
-			filterSb.append(") ");
 		}
+		
+		sb.append("} FILTER (lang(?typeLabel) = 'en'");
 		
 		if (filter != null && filter.getColumnFilters() != null && filter.getColumnFilters().size() > 0) {
 			for (Property property: filter.getColumnFilters().keySet()) {
@@ -237,11 +232,11 @@ public class CommonDataConnector implements DataConnector {
 				if (filterValue.isEmpty()) {
 					continue;
 				}
-				filterSb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), \"").append(filterValue).append("\")) ");
+				sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), \"").append(filterValue).append("\")) ");
 			}
 		}
 		
-		sb.append("} FILTER (").append(filterSb.toString()).append(") ");
+		sb.append(") ");
 		
 		int limit = LIMIT;
 		if (filter != null && filter.getLimit() > 0) {

@@ -336,8 +336,8 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 						}
 						for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
 							var objectProperty = sourceTable.selectedInstance.objectProperties[j];
-							if (objectProperty.property == lineLayout.property) {
-								if (objectProperty.uri.uri == instance.uri.uri) {
+							if (objectProperty.property.property == lineLayout.property.property) {
+								if (objectProperty.objectUri.uri == instance.uri.uri) {
 									return true;
 								}
 							}
@@ -429,12 +429,14 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		
 		var filter = {
 			limit: 40,
-			uriFilters: [],
+			uriFilters: {},
 			columnFilters: {}				
 		};
 		for (var i = 0; i < instance.objectProperties.length; i++) {
 			var objectProperty = instance.objectProperties[i];
-			filter.uriFilters.push(objectProperty.subjectUri.uri);
+			var uri = objectProperty.subjectUri.uri;
+			var property = objectProperty.property.property;
+			filter.uriFilters[property] = uri;
 		}
 		
 		var endpoint = $scope.endpoint;
@@ -608,7 +610,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.getLinkedPropertyInstances = function(type, property) {
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			var lineLayout = $scope.screenLayout.lineLayouts[i];
-			if (lineLayout.fromType == type && lineLayout.property == property) {
+			if (lineLayout.fromType.type == type && lineLayout.property.property == property) {
 				var toType = lineLayout.toType.type;
 				for (var j = 0; j < $scope.dataModel.tables.length; j++) {
 					var table = $scope.dataModel.tables[j];
