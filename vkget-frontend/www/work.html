@@ -18,12 +18,21 @@
 <script src="js/angular.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="work.js"></script>
+<script src="commons.js"></script>
 
 <title>Visual Knowledge Graph Editing Tool Workbench</title>
 </head>
 
 <body ng-app="vkget" ng-controller="dataController">
 	<div ng-include="'menu.html'"></div>
+
+	<!-- MESSAGES -->
+	<div class="messages" ng-show="messages.length > 0">
+		<div ng-repeat="message in messages" class="alert alert-{{message.type}} fade in">
+		    <button type="button" class="close" ng-click="cancelErrorMessage(message);"><span>&times;</span></button>
+		    <strong>{{message.caption}}</strong> {{message.text}}
+		</div>
+	</div>
 	
 	<div id="loading">
 		<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...

@@ -193,6 +193,9 @@ public class CommonDataConnector implements DataConnector {
 		
 		int j = 0;
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
+			if (columnLayout.isUriColumn()) {
+				continue;
+			}
 			if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
 				propertyVarMap.put(Constants.RDFS_LABEL, "typeLabel");
 				continue;

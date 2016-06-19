@@ -1,13 +1,8 @@
 <div id="blockForm{{currBlock.forType.type | colons}}" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog">
 
-
-
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span>&times;</span>
-				</button>
 				<h4 class="modal-title" id="exampleModalLabel">Block layout</h4>
 			</div>
 			<div class="modal-body">
@@ -50,7 +45,11 @@
 								</thead>
 								<tbody>
 									<tr ng-repeat="columnLayout in currBlock.properties">
-										<td><input type="text" class="form-control" placeholder="Property" ng-model="columnLayout.property.property" /></td>
+										<td>
+											<input type="text" class="form-control" placeholder="Property" 
+												ng-disabled="columnLayout.property.property == 'URI' || columnLayout.property.property == 'rdfs:label'" 
+												ng-model="columnLayout.property.property" />
+										</td>
 										<td>
 											<select class="form-control" ng-model="columnLayout.label.type">
 												<option value="URI">URI</option>
@@ -72,8 +71,19 @@
 										</td>
 										<td><a type="button" ng-click="removeProperty({blockLayout: currBlock, property: columnLayout})"><span class="glyphicon glyphicon-remove"></span></a></td>
 									</tr>
+									<tr><td>&nbsp;</td></tr>
 									<tr>
-										<td><input type="text" class="form-control" placeholder="Property" ng-model="currBlock.toAddProperty.property.property" /></td>
+										<td>
+											<select class="form-control" ng-model="currBlock.toAddProperty.columnType" ng-change="columnTypeChanged({blockLayout: currBlock});">
+												<option value="">Choose new column type</option>
+												<option value="URI" selected>URI</option>
+												<option value="LABEL">Label</option>
+												<option value="CUSTOM">Custom</option>
+											</select>
+											<span id="customTypeColumnTd" style="display: none;">
+												<input type="text" class="form-control" placeholder="Property" ng-model="currBlock.toAddProperty.property.property" />
+											</span>
+										</td>
 										<td>
 											<select class="form-control" ng-model="currBlock.toAddProperty.label.type">
 												<option value="URI">URI</option>
@@ -93,7 +103,9 @@
 												<option value="MEDIAN">Mean</option>
 											</select>
 										</td>
-										<td><a type="button" ng-click="addProperty({blockLayout: currBlock})"><span class="glyphicon glyphicon-plus"></span></a></td>
+										<td>
+											<a type="button" ng-click="addProperty({blockLayout: currBlock})"><span class="glyphicon glyphicon-plus"></span></a>
+										</td>
 									</tr>
 								</tbody>
 							</table>
@@ -167,7 +179,7 @@
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			</div>
 		</div>
 	</div>

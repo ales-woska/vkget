@@ -104,7 +104,7 @@
 		
 		<div id="modals">
 			<block-form block="blockLayout" 
-				add-property="addProperty(blockLayout)" remove-property="removeProperty(blockLayout, property)"
+				add-property="addProperty(blockLayout)" remove-property="removeProperty(blockLayout, property)" column-type-changed="columnTypeChanged(blockLayout)"
 				ng-repeat="blockLayout in screenLayout.blockLayouts"></block-form>
 				
 			<line-form ng-repeat="lineLayout in screenLayout.lineLayouts"
@@ -129,6 +129,9 @@
 									</div>
 									<div class="col-sm-8">
 										<input type="text" required ng-model="screenLayout.namespaces[key]" class="form-control" />
+									</div>
+									<div class="col-sm-2">
+										<a type="button" ng-click="removeNamespace(key)"><span class="glyphicon glyphicon-remove"></span></a>
 									</div>
 								</div>
 								<div class="form-group">

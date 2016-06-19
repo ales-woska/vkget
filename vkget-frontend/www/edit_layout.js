@@ -55,7 +55,7 @@ app.filter('subtract', function ($filter) {
 app.directive('linesSvg', function () {
     var directive = {};
     directive.restrict = 'E';
-    directive.templateUrl = 'linesSvg.html';
+    directive.templateUrl = 'lines_svg.html';
     directive.scope = {
         screenLayout: '=screenLayout',
         getLines: '&getLines',
@@ -68,11 +68,12 @@ app.directive('blockForm', function () {
     var directive = {};
     directive.restrict = 'E';
     directive.transclude = true;
-    directive.templateUrl = 'blockForm.html';
+    directive.templateUrl = 'block_form.html';
     directive.scope = {
         currBlock: '=block',
         addProperty: "&addProperty",
-        removeProperty: "&removeProperty"
+        removeProperty: "&removeProperty",
+        columnTypeChanged: "&columnTypeChanged"
     };
 	return directive;
 });
@@ -81,7 +82,7 @@ app.directive('lineForm', function () {
     var directive = {};
     directive.restrict = 'E';
     directive.transclude = true;
-    directive.templateUrl = 'lineForm.html';
+    directive.templateUrl = 'line_form.html';
     directive.scope = {
 		screenLayout: '=screenLayout',
         lineLayout: '=lineLayout',
@@ -90,7 +91,7 @@ app.directive('lineForm', function () {
 	return directive;
 });
 
-app.controller('layoutController', function($scope, $location, $window, $http) {
+app.controller('layoutController', function($scope, $location, $window, $http, vkgetCommons) {
 	$scope.screenLayout = newScreenLayout();
 	$scope.messages = [];
 	
@@ -132,6 +133,14 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.offsetLeft = 0;
 	$scope.parentWidth = 0;
 	$scope.parentHeight = 0;
+	
+	$scope.columnTypeChanged = function(blockLayout) {
+		if (blockLayout.toAddProperty.columnType == 'CUSTOM') {
+			$('#customTypeColumnTd').show();
+		} else {
+			$('#customTypeColumnTd').hide();
+		}
+	};
 	
 	$scope.addNamespace = function() {
 		var key = $scope.newKey;
@@ -234,9 +243,50 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		if (newColumn == null) {
 			return;
 		}
+		
+		var columnType = newColumn.columnType;
+		var property = {};
+		
+		if (columnType == 'URI') {
+			property = {
+				property: 'URI'
+			};
+		} else if (columnType == 'LABEL') {
+			property = {
+				property: 'rdfs:label'
+			};
+		} else {
+			if (newColumn.property) {
+				property = newColumn.property;
+			} else {
+				alert('Please fill property.');
+			}
+		}
+
+		var uriExists = false;
+		for (var i = 0; i < blockLayout.properties.length; i++) {
+			var columnLayout = blockLayout.properties[i];
+			if (columnLayout.property.property == property.property) {
+				uriExists = true;
+				break;
+			}
+		}
+		if (uriExists) {
+			alert('Column ' + property.property + ' already exists.');
+			return;
+		}
+		
+		if (!newColumn.label) {
+			newColumn.label = {
+				labelSource: '',
+				type: '',
+				lang: ''
+			};
+		}
+		
 		var columnLayout = {
 			uri: blockLayout.uri.uri + "Column" + blockLayout.properties.length,
-			property: newColumn.property,
+			property: property,
 			label: {
 				labelSource: newColumn.label.labelSource,
 				type: newColumn.label.type,
@@ -245,7 +295,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			aggregateFunction: newColumn.aggregateFunction
 		};
 		blockLayout.properties.push(columnLayout);
-		blockLayout.toAddProperty = [];
+		blockLayout.toAddProperty = {};
 	};
 	
 	$scope.removeProperty = function(blockLayout, property) {
@@ -349,12 +399,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			$window.location.href = "layout.html?saved=" + $scope.screenLayout.name;
         })
         .error(function (data, status, header, config) {
-        	var message = {
-    			caption: 'Error!',
-    			text: data.error,
-    			type: 'danger'
-        	};
-        	$scope.messages.push(message);
+        	vkgetCommons.showError(data, status, header, config);
         });
 	};
 	

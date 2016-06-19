@@ -36,7 +36,10 @@ public class DataControllerImpl implements DataController {
 	 */
 	@Override
 	@RequestMapping("/data")
-	public DataModel loadData(@RequestParam("endpoint") String endpoint, @RequestParam("type") EndpointType type, @RequestParam("layoutUri") Uri layoutUri) {
+	public DataModel loadData(
+			@RequestParam("endpoint") String endpoint,
+			@RequestParam("type") EndpointType type,
+			@RequestParam("layoutUri") Uri layoutUri) {
 		DataModel dataModel = dataService.loadDataModel(endpoint, type, layoutUri);
 		return dataModel;
 	}

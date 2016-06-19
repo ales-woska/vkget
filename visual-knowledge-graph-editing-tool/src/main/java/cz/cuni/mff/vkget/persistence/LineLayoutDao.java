@@ -121,7 +121,7 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 		insertQuery.append(" ").append(TO_TYPE).append(" '").append(layout.getToType().getType()).append("'; ");
 		insertQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
 		insertQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
-		insertQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getType()).append("'; ");
+		insertQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getLineType().name()).append("'; ");
 		insertQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
 		insertQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
 		insertQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
@@ -149,7 +149,7 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 		updateQuery.append(" ").append(TO_TYPE).append(" '").append(layout.getToType().getType()).append("'; ");
 		updateQuery.append(" ").append(LINE_COLOR).append(" '").append(layout.getLineColor()).append("'; ");
 		updateQuery.append(" ").append(LINE_THICKNESS).append(" '").append(layout.getLineThickness()).append("'; ");
-		updateQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getType()).append("'; ");
+		updateQuery.append(" ").append(LINE_TYPE).append(" '").append(layout.getLineType().name()).append("'; ");
 		updateQuery.append(" ").append(LABEL_SOURCE).append(" '").append(layout.getLabel().getLabelSource()).append("'; ");
 		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
 		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");

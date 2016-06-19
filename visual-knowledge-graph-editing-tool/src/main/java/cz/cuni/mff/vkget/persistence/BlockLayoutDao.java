@@ -197,6 +197,10 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		updateQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'; ");
 		updateQuery.append(" ").append(LEFT).append(" '").append(layout.getLeft()).append("'; ");
 		updateQuery.append(" ").append(TOP).append(" '").append(layout.getTop()).append("'. ");
+		
+		for (ColumnLayout columnLayout: layout.getProperties()) {
+			columnLayoutDao.insertOrUpdate(columnLayout, layout);
+		}
 
 		for (ColumnLayout cl: layout.getProperties()) {
 			updateQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.ColumnLayoutProperty).append(" <").append(cl.getUri().getUri()).append("> . ");
@@ -205,10 +209,6 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		updateQuery.append(" } WHERE { <").append(layout.getUri().getUri()).append("> ?p ?o . }");
 		
 		sparql.executeQuery(updateQuery.toString());
-				
-		for (ColumnLayout columnLayout: layout.getProperties()) {
-			columnLayoutDao.insertOrUpdate(columnLayout, layout);
-		}
     }
 	
 	/**

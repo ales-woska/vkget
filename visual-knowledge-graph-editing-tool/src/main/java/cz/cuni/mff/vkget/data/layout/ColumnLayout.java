@@ -50,5 +50,20 @@ public class ColumnLayout extends RdfEntity {
 		this.label = label;
 	}
 	
+	public boolean isUriColumn() {
+		if (property == null) {
+			return false;
+		}
+		if (property.getPrefix() != null && !property.getPrefix().isEmpty()) {
+			return false;
+		}
+		if (property.getName() == null) {
+			return false;
+		}
+		if (property.getName().equals("URI")) {
+			return true;
+		}
+		return false;
+	}
 
 }
