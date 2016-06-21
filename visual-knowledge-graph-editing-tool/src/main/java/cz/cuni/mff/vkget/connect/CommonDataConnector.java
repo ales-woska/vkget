@@ -113,6 +113,13 @@ public class CommonDataConnector implements DataConnector {
 			int j = 0;
 			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 				String propertyName = "";
+				if (columnLayout.isUriColumn()) {
+					RdfLiteralProperty rdfProperty = new RdfLiteralProperty();
+					rdfProperty.setProperty(columnLayout.getProperty());
+					rdfProperty.setValue(subjectUri.getUri());
+					instance.getLiteralProperties().add(rdfProperty);
+					continue;
+				}
 				if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
 					propertyName = "typeLabel";
 				} else {

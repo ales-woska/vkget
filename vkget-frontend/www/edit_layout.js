@@ -91,7 +91,7 @@ app.directive('lineForm', function () {
 	return directive;
 });
 
-app.controller('layoutController', function($scope, $location, $window, $http, vkgetCommons) {
+app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.screenLayout = newScreenLayout();
 	$scope.messages = [];
 	
@@ -399,7 +399,12 @@ app.controller('layoutController', function($scope, $location, $window, $http, v
 			$window.location.href = "layout.html?saved=" + $scope.screenLayout.name;
         })
         .error(function (data, status, header, config) {
-        	vkgetCommons.showError(data, status, header, config);
+        	var message = {
+    				caption: data.error,
+    				text: data.message,
+    				type: 'danger'
+    	    	};
+    	    	$scope.messages.push(message);
         });
 	};
 	

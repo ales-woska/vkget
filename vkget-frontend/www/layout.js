@@ -13,7 +13,7 @@ app.filter('urlencode', function() {
 	};
 });
 
-app.controller('layoutController', function($scope, $http, $location, vkgetCommons) {
+app.controller('layoutController', function($scope, $http, $location) {
 	$scope.messages = [];
 	
 	var saved = $location.search()['saved'];
@@ -45,7 +45,12 @@ app.controller('layoutController', function($scope, $http, $location, vkgetCommo
 	        	}	
 	        })
 	        .error(function (data, status, header, config) {
-	        	vkgetCommons.showError(data, status, header, config);
+	        	var message = {
+	    				caption: data.error,
+	    				text: data.message,
+	    				type: 'danger'
+	    	    	};
+	        	$scope.messages.push(message);
 	        });
 		}
 	};

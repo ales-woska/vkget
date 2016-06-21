@@ -1,6 +1,6 @@
 table.vkget_table {
     border-spacing: 0px;
-    border-collapse: separate;
+    border-collapse: collapse;
     position: absolute;
     table-layout: fixed;
 }
@@ -16,6 +16,7 @@ table.vkget_table thead .caption {
 
 table.vkget_table th {
 	text-align: center;
+	padding-bottom: 5px;
 }
 
 th.caption, th.columnCaption {

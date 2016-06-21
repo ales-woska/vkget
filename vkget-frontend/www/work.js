@@ -1,4 +1,4 @@
-var app = angular.module('vkget', ['vkgetCommons']);
+var app = angular.module('vkget', []);
 
 app.config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.useXDomain = true;
@@ -31,7 +31,7 @@ app.directive('ngRightClick', function($parse) {
     };
 });
 
-app.controller('dataController', function($scope, $http, $filter, $window, $location, vkgetCommons) {
+app.controller('dataController', function($scope, $http, $filter, $window, $location) {
 	$scope.endpoint = 'http://dbpedia.org/sparql';
 	$scope.endpointType = 'other';
 	$scope.changes = [];
@@ -54,6 +54,185 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	if ($location.search()['type']) {
 		$scope.endpointType = $location.search()['type'];
 	}
+	
+	$scope.editCell = function() {
+		var instance = $scope.selectedTd.instance;
+		var rdfProperty = $scope.selectedTd.property;
+		var oldValue = $scope.oldCellValue;
+		var newValue = $scope.editCellValue;
+		$scope.commonAction(instance.uri.uri, rdfProperty.property, oldValue, newValue);
+		rdfProperty.value = newValue;
+		$('#editCellModal').modal('hide');
+	};
+	
+	$scope.openAddRowModal = function() {
+		$('#addRowModal').modal('show');
+	};
+	
+	$scope.openRemoveLinkedPropertyModal = function() {
+		$('#removeLinkedPropertyModal').modal('show');
+	};
+	
+	$scope.openAddLinkedPropertyModal = function() {
+		$('#addLinkedPropertyModal').modal('show');
+	};
+	
+	$scope.openEditCellModal = function() {
+		var instance = $scope.selectedTd.instance;
+		var rdfProperty = $scope.selectedTd.property;
+		for (var i = 0; i < instance.literalProperties.length; i++) {
+			var currProperty = instance.literalProperties[i].property;
+			if (currProperty == rdfProperty.property) {
+				$scope.oldCellValue = rdfProperty.value;
+				$scope.editCellValue = rdfProperty.value;
+			}
+		}
+		$('#editCellModal').modal('show');
+	};
+	
+	$scope.closeEditCellModal = function() {
+		$('#editCellModal').modal('hide');
+		$scope.hideContextMenu();
+	};
+	
+	$scope.closeAddRowModal = function() {
+		$('#addRowModal').modal('hide');
+		$scope.hideContextMenu();
+	};
+	
+	$scope.closeRemoveLinkedPropertyModal = function() {
+		$('#removeLinkedPropertyModal').modal('hide');
+		$scope.hideContextMenu();
+	};
+	
+	$scope.closeAddLinkedPropertyModal = function() {
+		$('#addLinkedPropertyModal').modal('hide');
+		$scope.hideContextMenu();
+	};
+	
+	$scope.removeCell = function() {
+		var instance = $scope.selectedTd.instance;
+		var property = $scope.selectedTd.property;
+		var oldValue = null;
+		for (var i = 0; i < instance.literalProperties.length; i++) {
+			var currProperty = instance.literalProperties[i].property;
+			if (currProperty == property.property) {
+				oldValue = property.value;
+				property.value = null;
+			}
+		}
+		$scope.commonAction(instance.uri.uri, property.property, oldValue, '');
+	};
+	
+	$scope.addRow = function() {
+		var table = $scope.selectedTd.table;
+		var addRowObject = $scope.addRowObject;
+		var addRowUri = addRowObject['uri'];
+		var newInstance = {
+				uri: addRowUri,
+				type: table.type,
+				literalProperties: [],
+				objectProperties: []
+			};
+		for (var key in addRowObject) {
+			var change = {
+				uri: addRowUri,
+				property: key,
+				oldValue: null,
+				newValue: addRowObject[key]
+			};
+			$scope.changes.push(change);
+			newInstance.literalProperties.push({
+				property: key,
+				value: addRowObject[key],
+			});
+		}
+		table.instances.push(newInstance);
+		$scope.addRowObject = {};
+		$scope.hideContextMenu();
+		$('#addRowModal').modal('hide');
+	};
+	
+	$scope.removeRow = function() {
+		var table = $scope.selectedTd.table;
+		var instance = $scope.selectedTd.instance;
+		for (var i = 0; i < instance.literalProperties.length; i++) {
+			var change = {
+				uri: instance.uri,
+				property: instance.literalProperties[i].property,
+				oldValue: instance.literalProperties[i].value,
+				newValue: null
+			};
+			$scope.changes.push(change);
+		}
+		var index = table.instances.indexOf(instance);
+		table.instances.splice(index, 1);
+		$scope.hideContextMenu();
+	};
+	
+	$scope.addLinkedProperty = function() {
+		var addLinkedPropertyObject = $scope.addLinkedPropertyObject;
+		var instance = $scope.selectedTd.instance;
+		var property = {
+			property: addLinkedPropertyObject['property']
+		};
+		var value = addLinkedPropertyObject['value'];
+		var change = {
+			uri: instance.uri,
+			property: property,
+			oldValue: null,
+			newValue: value
+		};
+		instance.objectProperties.push({
+			property: property,
+			subjectUri: instance.uri,
+			objectUri: {
+				uri: value
+			}
+		});
+		$scope.changes.push(change);
+		$scope.addLinkedPropertyObject = {};
+		$('#addLinkedPropertyModal').modal('hide');
+		$scope.hideContextMenu();
+	};
+	
+	$scope.removeLinkedProperty = function() {
+		var removeLinkedPropertyObject = $scope.removeLinkedPropertyObject;
+		var instance = $scope.selectedTd.instance;
+		
+		for (var property in removeLinkedPropertyObject) {
+			for (value in removeLinkedPropertyObject[property]) {
+				var change = {
+					uri: instance.uri,
+					property: property,
+					oldValue: value,
+					newValue: null
+				};
+				$scope.changes.push(change);
+				
+				$scope.removeLinkedPropertyObject = {};
+				for (var i = 0; i < instance.objectProperties.length; i++) {
+					var objectProperty = instance.objectProperties[i];
+					if (objectProperty.property == property) {
+						instance.objectProperties.splice(i, 1);
+					}
+				}
+			}
+		}
+		$('#removeLinkedPropertyModal').modal('hide');
+		$scope.hideContextMenu();
+	};
+	
+	$scope.commonAction = function(uri, property, oldValue, newValue) {
+		var change = {
+			uri: uri,
+			property: property,
+			oldValue: oldValue,
+			newValue: newValue
+		};
+		$scope.changes.push(change);
+		$scope.hideContextMenu();
+	};
 	
 	$scope.contextMenu = function(table, instance, property) {
 		var $contextMenu = $("#contextMenu");
@@ -90,6 +269,39 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		}
 		$('#contextMenu').hide();
 		$scope.selectedTd = {};
+	};
+	
+	$scope.discardChanges = function() {
+		if (confirm("Are you sure to discard all changes?")) {
+			var original = $scope.originalDataModel;
+			$scope.dataModel = JSON.parse(JSON.stringify(original));
+			$scope.changes = [];
+		}
+	};
+	
+	$scope.confirmChanges = function() {
+		var changes = $scope.changes;
+		$http({
+            url : 'http://localhost:8090/changes',
+            method : "POST",
+            data : changes
+        }).then(function(response) {
+            $scope.updateScript = response.data;
+            $('#updateScriptLoading').hide();
+            $('#updateScriptTextarea').show();
+            
+        }, function(response) {
+            alert('ERROR');
+        });
+		$('#changesModal').modal('show');
+	};
+	
+	$scope.saveChanges = function() {
+//		if (confirm("Are you sure to save all changes?")) {
+			$scope.originalDataModel = JSON.parse(JSON.stringify($scope.dataModel));
+			$scope.changes = [];
+			$('#changesModal').modal('hide');
+		}
 	};
 	
 	$scope.closeChangeModal = function() {
@@ -152,13 +364,19 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 						for (var j = 0; j < newInstances.length; j++) {
 							if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
 								$scope.dataModel.tables[i].instances.push(newInstances[j]);
+								$scope.originalDataModel.tables[i].instances.push(newInstances[j]);
 							}
 						}
 					}
 				}
 	        })
 	        .error(function (data, status, header, config) {
-	        	vkgetCommons.showError(data, status, header, config);
+	        	var message = {
+	    				caption: data.error,
+	    				text: data.message,
+	    				type: 'danger'
+	    	    	};
+	        	$scope.messages.push(message);
 	        });
 		
 	};
@@ -201,13 +419,23 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 						$('#workspace').show();
 				    })
 			        .error(function (data, status, header, config) {
-			        	vkgetCommons.showError(data, status, header, config);
+			        	var message = {
+			    				caption: data.error,
+			    				text: data.message,
+			    				type: 'danger'
+			    	    	};
+			        	$scope.messages.push(message);
 						$('#loading').hide();
 			        });
 				
 		    })
 	        .error(function (data, status, header, config) {
-	        	vkgetCommons.showError(data, status, header, config);
+	        	var message = {
+	    				caption: data.error,
+	    				text: data.message,
+	    				type: 'danger'
+	    	    	};
+	        	$scope.messages.push(message);
 				$('#loading').hide();
 	        });
 	};
@@ -235,22 +463,21 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	};
 	
 	$scope.getObjectPropertyValue = function(uri) {
-		var value = "";
 		for (var i = 0; i < $scope.dataModel.tables.length; i++) {
 			var table = $scope.dataModel.tables[i];
 			for (var j = 0; j < table.instances.length; j++) {
 				var instance = table.instances[j];
 				if (instance.uri.uri == uri) {
 					for (var k = 0; k < instance.literalProperties.length; k++) {
-						var property = instance.literalProperties[k];
-						if (property.property == 'rdfs:label') {
-							value = property.value;
+						var literalProperty = instance.literalProperties[k];
+						if (literalProperty.property.property == 'rdfs:label') {
+							return literalProperty.value;
 						}
 					}
 				}
 			}
 		}
-		return value;
+		return "???";
 	};
 	
 	$scope.getLinkedPropertyInstances = function(type, property) {
@@ -296,6 +523,26 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		}
 	};
 	
+	$scope.filterLineLayouts = function(lineLayout) {
+		if (!lineLayout || !$scope.selectedTd || !$scope.selectedTd.table) {
+			return true;
+		}
+		var type = $scope.selectedTd.table.type.type;
+		if (lineLayout.fromType.type == type) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+	
+	$scope.filterProperties = function(literalProperty) {
+		if (literalProperty.property.property == 'URI') {
+			return false;
+		} else {
+			return true;
+		}
+	};
+	
 	$scope.filterInstances = function(instance) {
 		var show = true;
 		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
@@ -318,18 +565,18 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					}
 				}
 				
-				var targetTable = getTableByType($scope.dataModel, lineLayout.toType.type);
-				if (targetTable && targetTable.selectedInstance && targetTable.selectedInstance.objectProperties) {
-					show = false;
-					for (var j = 0; j < targetTable.selectedInstance.objectProperties.length; j++) {
-						var objectProperty = targetTable.selectedInstance.objectProperties[j];
-						if (objectProperty.property.property == lineLayout.property.property) {
-							if (objectProperty.objectUri.uri == instance.uri.uri) {
-								show = true;
-							}
-						}
-					}
-				}
+//				var targetTable = getTableByType($scope.dataModel, lineLayout.toType.type);
+//				if (targetTable && targetTable.selectedInstance && targetTable.selectedInstance.objectProperties) {
+//					show = false;
+//					for (var j = 0; j < targetTable.selectedInstance.objectProperties.length; j++) {
+//						var objectProperty = targetTable.selectedInstance.objectProperties[j];
+//						if (objectProperty.property.property == lineLayout.property.property) {
+//							if (objectProperty.objectUri && instance.uri && objectProperty.objectUri.uri == instance.uri.uri) {
+//								show = true;
+//							}
+//						}
+//					}
+//				}
 			}
 		}
 		
@@ -399,7 +646,12 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				}
 			})
 			.error(function (data, status, header, config) {
-				vkgetCommons.showError(data, status, header, config);
+				var message = {
+						caption: data.error,
+						text: data.message,
+						type: 'danger'
+			    	};
+				$scope.messages.push(message);
 			});
 		
 	};

@@ -18,7 +18,6 @@
 <script src="js/angular.js"></script>
 <script src="js/bootstrap.js"></script>
 <script src="work.js"></script>
-<script src="commons.js"></script>
 
 <title>Visual Knowledge Graph Editing Tool Workbench</title>
 </head>
@@ -56,11 +55,11 @@
 				width: {{layouts[table.type.type].width}}px;
 				border: {{layouts[table.type.type].lineThickness}}px {{layouts[table.type.type].lineType}} {{layouts[table.type.type].lineColor}};">
 			
-			<thead style="border-bottom: {{layouts[table.type.type].lineThickness}}px {{layouts[table.type.type].lineType}} {{layouts[table.type.type].lineColor}};">
+			<thead>
 				<tr>
-					<th style="border-bottom: {{layouts[table.type.type].lineThickness}}px {{layouts[table.type.type].lineType}} {{layouts[table.type.type].lineColor}};"
-						class="caption" colspan="{{table.columns.length}}">
-						{{layouts[table.type.type].label.labelSource}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})</th>
+					<th class="caption" colspan="{{table.columns.length}}">
+						{{layouts[table.type.type].label.labelSource}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})
+					</th>
 				</tr>
 				<tr>
 					<th class="columnCaption" ng-repeat="property in table.columns" 
@@ -177,7 +176,7 @@
 					</div>
 					<div class="modal-footer">
 						<a type="button" class="btn btn-default" ng-click="download();" />Save...</a>
-						<input type="submit" class="btn btn-default btn-danger" value="Commit changes" ng-click="commitChange();" />
+						<input type="submit" class="btn btn-default btn-danger" value="Save changes" ng-click="saveChanges();" />
 						<input type="submit" class="btn btn-default" value="Close" ng-click="closeChangeModal();" />
 					</div>
 					
@@ -238,10 +237,10 @@
 								<input type="text" class="form-control" placeholder="URI" name="uri" required ng-model="addRowObject['uri']" />
 							</div>
 						</div>
-						<div class="form-group" ng-repeat="literalProperty in selectedTd.instance.literalProperties">
+						<div class="form-group" ng-repeat="literalProperty in selectedTd.instance.literalProperties | filter : filterProperties">
 							<label class="col-sm-4 control-label">{{literalProperty.property.property}}</label>
 							<div class="col-sm-6">
-								<input type="text" class="form-control" ng-model="addRowObject[literalProperty.property]" />
+								<input type="text" class="form-control" ng-model="addRowObject[literalProperty.property.property]" />
 							</div>
 						</div>
 						<div class="modal-footer">
@@ -265,7 +264,7 @@
 				</div>
 				<form class="form-horizontal" ng-submit="removeLinkedProperty();">
 					<div class="modal-body">
-						<div class="form-group" ng-if="selectedTd.instance.objectProperties">
+						<div class="form-group" ng-if="selectedTd.instance.objectProperties.length > 0">
 							<div class="col-sm-10">
 							<table>
 								<thead>
@@ -273,16 +272,16 @@
 								</thead>
 								<tbody>
 									<tr ng-repeat="objectProperty in selectedTd.instance.objectProperties">
-										<td><input type="checkbox" ng-model="removeLinkedPropertyObject[objectProperty.property][objectProperty.uri.uri]" /></td>
-									    <td style="padding: 10px;">{{getObjectPropertyTitle(objectProperty.property);}}</td>
-									    <td style="padding: 10px;">{{getObjectPropertyValue(objectProperty.uri);}}</td>
-									    <td style="padding: 10px;">{{objectProperty.uri}}</td>
+										<td><input type="checkbox" ng-model="removeLinkedPropertyObject[objectProperty.property.property][objectProperty.objectUri.uri]" /></td>
+									    <td style="padding: 10px;">{{getObjectPropertyTitle(objectProperty.property.property);}}</td>
+									    <td style="padding: 10px;">{{getObjectPropertyValue(objectProperty.objectUri.uri);}}</td>
+									    <td style="padding: 10px;">{{objectProperty.objectUri.uri}}</td>
 									</tr>
 								</tbody>
 							</table>
 							</div>
 						</div>
-						<div class="form-group" ng-if="!selectedTd.instance.objectProperties">
+						<div class="form-group" ng-if="selectedTd.instance.objectProperties.length == 0">
 							<div class="col-sm-6">No linked properties.</div>
 						</div>
 						<div class="modal-footer">
@@ -310,7 +309,7 @@
 							<label class="col-sm-4 control-label">Property</label>
 							<div class="col-sm-6">
 								<select required class="form-control" ng-model="addLinkedPropertyObject['property']"
-									ng-options="lineLayout.property as getObjectPropertyTitle(lineLayout.property) for lineLayout in screenLayout.lineLayouts | filter: {fromType: selectedTd.table.type.type}">
+									ng-options="lineLayout.property.property as getObjectPropertyTitle(lineLayout.property.property) for lineLayout in screenLayout.lineLayouts | filter: filterLineLayouts">
 								</select>
 							</div>
 						</div>
@@ -318,7 +317,7 @@
 							<label class="col-sm-4 control-label">Value</label>
 							<div class="col-sm-6">
 								<select required class="form-control" ng-model="addLinkedPropertyObject['value']" 
-									ng-options="instance.uri.uri as getObjectPropertyValue(instance.uri) for instance in getLinkedPropertyInstances(selectedTd.table.type.type, addLinkedPropertyObject['property'])">
+									ng-options="instance.uri.uri as getObjectPropertyValue(instance.uri.uri) for instance in getLinkedPropertyInstances(selectedTd.table.type.type, addLinkedPropertyObject['property'])">
 								</select>
 							</div>
 						</div>
