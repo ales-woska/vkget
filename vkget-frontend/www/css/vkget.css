@@ -183,3 +183,10 @@ table.vkget_table tbody tr.selectedInstance:hover {
 .list-group {
 	position: relative;
 }
+
+input.filter {
+	border-width: 1px;
+	padding: 2px;
+	width: 90%;
+	font-weight: normal;
+}

@@ -110,6 +110,20 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		
+		<!-- Unit tests -->
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>org.easymock</groupId>
+		    <artifactId>easymock</artifactId>
+		    <version>3.4</version>
+		</dependency>
+				
+		
 
 	</dependencies>
 

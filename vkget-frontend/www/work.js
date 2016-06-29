@@ -297,7 +297,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	};
 	
 	$scope.saveChanges = function() {
-//		if (confirm("Are you sure to save all changes?")) {
+		if (confirm("Are you sure to save all changes?")) {
 			$scope.originalDataModel = JSON.parse(JSON.stringify($scope.dataModel));
 			$scope.changes = [];
 			$('#changesModal').modal('hide');
@@ -324,29 +324,97 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			$scope.layout = $scope.layouts[0].uri.uri;
 	    });
 	
-	$scope.reloadTable = function(sourceTable, instance) {
+	$scope.reloadTable = function(instanceTable, instance) {
 		var tableType = '';
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			var lineLayout = $scope.screenLayout.lineLayouts[i];
-			if (lineLayout.fromType.type == sourceTable.type.type) {
+			if (lineLayout.fromType.type == instanceTable.type.type) {
 				tableType = lineLayout.toType.type;
+				if (!tableType) {
+					return;
+				}
+				
+				var filter = {
+					limit: 40,
+					uriFilters: {},
+					columnFilters: {}				
+				};
+				for (var i = 0; i < instance.objectProperties.length; i++) {
+					var objectProperty = instance.objectProperties[i];
+					var uri = objectProperty.subjectUri.uri;
+					var property = objectProperty.property.property;
+					filter.uriFilters[property] = uri;
+				}
+				
+				var endpoint = $scope.endpoint;
+				var type = $scope.endpointType;
+				var layoutUri = $scope.screenLayout.uri.uri;
+				
+				var request = {
+					tableType: tableType,
+					filter: filter,
+					endpoint: endpoint,
+					type: type,
+					layoutUri: layoutUri
+				};
+
+				$scope.loadTableData(request);
+			} else if (lineLayout.toType.type == instanceTable.type.type) {
+				tableType = lineLayout.fromType.type;
+				if (!tableType) {
+					return;
+				}
+				
+				var filter = {
+					limit: 40,
+					uriFilters: {},
+					columnFilters: {}				
+				};
+				for (var i = 0; i < instance.objectProperties.length; i++) {
+					var objectProperty = instance.objectProperties[i];
+					var uri = objectProperty.subjectUri.uri;
+					var property = objectProperty.property.property;
+					filter.uriFilters[property] = uri;
+				}
+				
+				var endpoint = $scope.endpoint;
+				var type = $scope.endpointType;
+				var layoutUri = $scope.screenLayout.uri.uri;
+				
+				var request = {
+					tableType: tableType,
+					filter: filter,
+					endpoint: endpoint,
+					type: type,
+					layoutUri: layoutUri
+				};
+				
+				$scope.loadTableData(request);
 			}
 		}
+	};
+	
+	$scope.filterChanged = function(sourceTable) {
 		
 		var filter = {
 			limit: 40,
 			uriFilters: {},
 			columnFilters: {}				
 		};
-		for (var i = 0; i < instance.objectProperties.length; i++) {
-			var objectProperty = instance.objectProperties[i];
-			var uri = objectProperty.subjectUri.uri;
-			filter.uriFilters[objectProperty.property.property] = uri;
+		
+		var tableFilters = $scope.filters[sourceTable.type.type];
+		if (tableFilters) {
+			for (var i = 0; i < sourceTable.columns.length; i++) {
+				var property = sourceTable.columns[i];
+				var propertyFilter = tableFilters[property.property];
+				filter.columnFilters[property.property] = propertyFilter;
+			}
 		}
 		
 		var endpoint = $scope.endpoint;
 		var type = $scope.endpointType;
 		var layoutUri = $scope.screenLayout.uri.uri;
+		var tableType = sourceTable.type.type;
 		
 		var request = {
 			tableType: tableType,
@@ -355,30 +423,34 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			type: type,
 			layoutUri: layoutUri
 		};
-
+		
+		$scope.loadTableData(request);
+		
+	};
+	
+	$scope.loadTableData = function(request) {
 		$http.post('http://localhost:8090/data/table', request)
-	        .success(function (data, status, headers, config) {
-	        	var newInstances = data;
-				for (var i = 0; i < $scope.dataModel.tables.length; i++) {
-					if ($scope.dataModel.tables[i].type.type == tableType) {
-						for (var j = 0; j < newInstances.length; j++) {
-							if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
-								$scope.dataModel.tables[i].instances.push(newInstances[j]);
-								$scope.originalDataModel.tables[i].instances.push(newInstances[j]);
-							}
+        .success(function (data, status, headers, config) {
+        	var newInstances = data;
+			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
+				if ($scope.dataModel.tables[i].type.type == request.tableType) {
+					for (var j = 0; j < newInstances.length; j++) {
+						if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
+							$scope.dataModel.tables[i].instances.push(newInstances[j]);
+							$scope.originalDataModel.tables[i].instances.push(newInstances[j]);
 						}
 					}
 				}
-	        })
-	        .error(function (data, status, header, config) {
-	        	var message = {
-	    				caption: data.error,
-	    				text: data.message,
-	    				type: 'danger'
-	    	    	};
-	        	$scope.messages.push(message);
-	        });
-		
+			}
+        })
+        .error(function (data, status, header, config) {
+        	var message = {
+    				caption: data.error,
+    				text: data.message,
+    				type: 'danger'
+    	    	};
+        	$scope.messages.push(message);
+        });
 	};
 	
 	$scope.run = function() {
@@ -548,35 +620,39 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
 			for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 				var lineLayout = $scope.screenLayout.lineLayouts[i];
-				if (lineLayout.toType.type != instance.type.type) {
-					continue;
-				}
-				
-				var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType.type);
-				if (sourceTable && sourceTable.selectedInstance && sourceTable.selectedInstance.objectProperties) {
-					show = false;
-					for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
-						var objectProperty = sourceTable.selectedInstance.objectProperties[j];
-						if (objectProperty.property.property == lineLayout.property.property) {
-							if (objectProperty.objectUri.uri == instance.uri.uri) {
-								show = true;
+				if (lineLayout.toType.type == instance.type.type) {
+					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType.type);
+					if (sourceTable && sourceTable.selectedInstance && sourceTable.selectedInstance.objectProperties) {
+						show = false;
+						for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
+							var objectProperty = sourceTable.selectedInstance.objectProperties[j];
+							if (objectProperty.property.property == lineLayout.property.property) {
+								if (!objectProperty.objectUri || !instance.uri) {
+									continue;
+								}
+								if (objectProperty.objectUri.uri == instance.uri.uri) {
+									show = true;
+								}
+							}
+						}
+					}
+				} else if (lineLayout.fromType.type == instance.type.type) {
+					var targetTable = getTableByType($scope.dataModel, lineLayout.toType.type);
+					if (targetTable && targetTable.selectedInstance && targetTable.selectedInstance.objectProperties) {
+						show = false;
+						for (var j = 0; j < instance.objectProperties.length; j++) {
+							var objectProperty = instance.objectProperties[j];
+							if (objectProperty.property.property == lineLayout.property.property) {
+								if (!objectProperty.objectUri || !targetTable.selectedInstance.uri) {
+									continue;
+								}
+								if (objectProperty.objectUri.uri == targetTable.selectedInstance.uri.uri) {
+									show = true;
+								}
 							}
 						}
 					}
 				}
-				
-//				var targetTable = getTableByType($scope.dataModel, lineLayout.toType.type);
-//				if (targetTable && targetTable.selectedInstance && targetTable.selectedInstance.objectProperties) {
-//					show = false;
-//					for (var j = 0; j < targetTable.selectedInstance.objectProperties.length; j++) {
-//						var objectProperty = targetTable.selectedInstance.objectProperties[j];
-//						if (objectProperty.property.property == lineLayout.property.property) {
-//							if (objectProperty.objectUri && instance.uri && objectProperty.objectUri.uri == instance.uri.uri) {
-//								show = true;
-//							}
-//						}
-//					}
-//				}
 			}
 		}
 		
@@ -601,59 +677,8 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		return show;
 	};
 	
-	$scope.filterChanged = function(sourceTable) {
-		
-		var filter = {
-			limit: 40,
-			uriFilters: {},
-			columnFilters: {}				
-		};
-		
-		var tableFilters = $scope.filters[sourceTable.type.type];
-		if (tableFilters) {
-			for (var i = 0; i < sourceTable.columns.length; i++) {
-				var property = sourceTable.columns[i];
-				var propertyFilter = tableFilters[property.property];
-				filter.columnFilters[property.property] = propertyFilter;
-			}
-		}
-		
-		var endpoint = $scope.endpoint;
-		var type = $scope.endpointType;
-		var layoutUri = $scope.screenLayout.uri.uri;
-		var tableType = sourceTable.type.type;
-		
-		var request = {
-			tableType: tableType,
-			filter: filter,
-			endpoint: endpoint,
-			type: type,
-			layoutUri: layoutUri
-		};
-		
-		$http.post('http://localhost:8090/data/table', request)
-			.success(function (data, status, headers, config) {
-				var newInstances = data;
-				for (var i = 0; i < $scope.dataModel.tables.length; i++) {
-					if ($scope.dataModel.tables[i].type.type == tableType) {
-						for (var j = 0; j < newInstances.length; j++) {
-							if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
-								$scope.dataModel.tables[i].instances.push(newInstances[j]);
-								$scope.originalDataModel.tables[i].instances.push(newInstances[j]);
-							}
-						}
-					}
-				}
-			})
-			.error(function (data, status, header, config) {
-				var message = {
-						caption: data.error,
-						text: data.message,
-						type: 'danger'
-			    	};
-				$scope.messages.push(message);
-			});
-		
+	$scope.isNumeric = function(value) {
+		return angular.isNumber(value);
 	};
 });
 

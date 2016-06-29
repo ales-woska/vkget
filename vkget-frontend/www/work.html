@@ -70,7 +70,8 @@
 				</tr>
 				<tr>
 					<th ng-repeat="property in table.columns" style="width: {{layouts[table.type.type].width / table.columns.length}}px;">
-						<input type="text" style="width: 100px;" ng-model="filters[table.type.type][property.property]" ng-change="filterChanged(table);" />
+						<input type="text" class="filter" placeholder="search..."
+							ng-model="filters[table.type.type][property.property]" ng-change="filterChanged(table);" />
 					</th>
 				</tr>
 			</thead>
@@ -81,7 +82,7 @@
 					ng-class="instance == table.selectedInstance ? 'selectedInstance' : ''">
 					<td ng-repeat="property in instance.literalProperties" 
 						ng-right-click="contextMenu(table, instance, property)"
-						style="width: {{layouts[table.type.type].width / instance.literalProperties.length}}px;">
+						style="width: {{layouts[table.type.type].width / instance.literalProperties.length}}px; {{isNumeric(property.value) ? 'text-align: right;' : ''}}">
 						{{property.value}}
 					</td>
 				</tr>
