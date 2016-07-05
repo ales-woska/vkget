@@ -394,7 +394,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		}
 	};
 	
-	$scope.filterChanged = function(sourceTable) {
+	$scope.filterChanged = function(sourceTable, propertyName) {
 		
 		var filter = {
 			limit: 40,
@@ -407,6 +407,9 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			for (var i = 0; i < sourceTable.columns.length; i++) {
 				var property = sourceTable.columns[i];
 				var propertyFilter = tableFilters[property.property];
+				if (propertyName == property.property && propertyFilter.length < 2) {
+					return;
+				}
 				filter.columnFilters[property.property] = propertyFilter;
 			}
 		}

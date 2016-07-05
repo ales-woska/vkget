@@ -71,7 +71,7 @@
 				<tr>
 					<th ng-repeat="property in table.columns" style="width: {{layouts[table.type.type].width / table.columns.length}}px;">
 						<input type="text" class="filter" placeholder="search..."
-							ng-model="filters[table.type.type][property.property]" ng-change="filterChanged(table);" />
+							ng-model="filters[table.type.type][property.property]" ng-change="filterChanged(table, property.property);" />
 					</th>
 				</tr>
 			</thead>

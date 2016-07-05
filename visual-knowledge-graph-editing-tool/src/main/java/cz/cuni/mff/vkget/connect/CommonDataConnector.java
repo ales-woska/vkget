@@ -56,7 +56,13 @@ public class CommonDataConnector implements DataConnector {
 		dataModel.setTables(new ArrayList<RdfTable>());
 		
 		for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
-			RdfTable rdfTable = this.loadRdfTable(screenLayout, null, blockLayout);
+			RdfTable rdfTable = new RdfTable();
+			rdfTable.setType(blockLayout.getForType());
+			rdfTable.setInstances(new ArrayList<RdfInstance>());
+			rdfTable.setColumns(new ArrayList<Property>());
+			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
+				rdfTable.getColumns().add(columnLayout.getProperty());
+			}
 			dataModel.getTables().add(rdfTable);
 		}
 		return dataModel;
@@ -85,16 +91,15 @@ public class CommonDataConnector implements DataConnector {
 	 */
 	protected RdfTable loadRdfTable(ScreenLayout screenLayout, RdfFilter filter, BlockLayout blockLayout) {
 		RdfTable rdfTable = new RdfTable();
-		String query = this.constructTableQuery(blockLayout, screenLayout.getNamespaces(), screenLayout.getLineLayouts(), filter);
-		ResultSet results = this.connector.query(query);
 		rdfTable.setType(blockLayout.getForType());
 		rdfTable.setInstances(new ArrayList<RdfInstance>());
-		
 		rdfTable.setColumns(new ArrayList<Property>());
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 			rdfTable.getColumns().add(columnLayout.getProperty());
 		}
-		
+
+		String query = this.constructTableQuery(blockLayout, screenLayout.getNamespaces(), screenLayout.getLineLayouts(), filter);
+		ResultSet results = this.connector.query(query);
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
 			RdfInstance instance = new RdfInstance(); 
