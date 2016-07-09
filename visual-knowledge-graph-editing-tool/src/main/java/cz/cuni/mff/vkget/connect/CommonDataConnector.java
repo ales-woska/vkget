@@ -219,26 +219,46 @@ public class CommonDataConnector implements DataConnector {
 		}
 		
 		for (LineLayout lineLayout: lineLayouts) {
-			if (!(lineLayout.getFromType().equals(blockLayout.getForType()))) {
-				continue;
-			}
-			String varTo = "y" + j;
-			sb.append(" OPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . } ");
-		}
-
-		if (filter != null && filter.getUriFilters() != null && filter.getUriFilters().size() > 0) {
-			for (Property uriProperty: filter.getUriFilters().keySet()) {
-				Uri uriValue = filter.getUriFilters().get(uriProperty);
-				if (uriValue == null) {
-					continue;
+			// include all properties
+			if (lineLayout.getFromType().equals(blockLayout.getForType())) {
+				
+				String varTo = "y" + j;
+				sb.append(" OPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . } ");
+				
+				// filter out not selected instances
+				if (filter != null && filter.getUriFilters() != null) {
+					for (Property uriProperty: filter.getUriFilters().keySet()) {
+						if (uriProperty.equals(lineLayout.getProperty())) {
+							Uri uriValue = filter.getUriFilters().get(uriProperty);
+							if (uriValue == null) {
+								continue;
+							}
+							sb.append(" ?uri ").append(uriProperty.getProperty()).append(" <").append(uriValue.getUri()).append("> . ");
+						}
+					}
 				}
-				sb.append("<").append(uriValue.getUri()).append("> ").append(uriProperty.getProperty()).append(" ?uri . ");
+			}
+			
+			if (lineLayout.getToType().equals(blockLayout.getForType())) {
+
+				// filter out not selected instances
+				if (filter != null && filter.getUriFilters() != null) {
+					for (Property uriProperty: filter.getUriFilters().keySet()) {
+						if (uriProperty.equals(lineLayout.getProperty())) {
+							Uri uriValue = filter.getUriFilters().get(uriProperty);
+							if (uriValue == null) {
+								continue;
+							}
+							sb.append("<").append(uriValue.getUri()).append("> ").append(uriProperty.getProperty()).append(" ?uri . ");
+						}
+					}
+				}
 			}
 		}
 		
 		sb.append("} FILTER (lang(?typeLabel) = 'en'");
 		
-		if (filter != null && filter.getColumnFilters() != null && filter.getColumnFilters().size() > 0) {
+		if (filter != null && filter.getColumnFilters() != null) {
 			for (Property property: filter.getColumnFilters().keySet()) {
 				if (property == null) {
 					continue;

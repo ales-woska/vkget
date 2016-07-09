@@ -361,7 +361,8 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				$scope.loadTableData(request);
 			} else if (lineLayout.toType.type == instanceTable.type.type) {
 				tableType = lineLayout.fromType.type;
-				if (!tableType) {
+				var property = lineLayout.property.property;
+				if (!tableType || !property) {
 					return;
 				}
 				
@@ -370,12 +371,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					uriFilters: {},
 					columnFilters: {}				
 				};
-				for (var i = 0; i < instance.objectProperties.length; i++) {
-					var objectProperty = instance.objectProperties[i];
-					var uri = objectProperty.subjectUri.uri;
-					var property = objectProperty.property.property;
-					filter.uriFilters[property] = uri;
-				}
+				filter.uriFilters[property] = instance.uri.uri;
 				
 				var endpoint = $scope.endpoint;
 				var type = $scope.endpointType;
