@@ -116,13 +116,6 @@ public class CommonDataConnector implements DataConnector {
 			instance.setType(blockLayout.getForType());
 
 			instance.setLiteralProperties(new ArrayList<RdfLiteralProperty>());
-			if (blockLayout.getLabel().getType() == LabelType.PROPERTY) {
-				RdfLiteralProperty rdfProperty = new RdfLiteralProperty();
-				RDFNode rdfNode = solution.get("labelProperty");
-				rdfProperty.setProperty(new Property(blockLayout.getLabel().getLabelSource()));
-				rdfProperty.setValue(rdfNode.asLiteral().getString());
-				instance.getLiteralProperties().add(rdfProperty);
-			}
 			int j = 0;
 			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 				String propertyName = "";
@@ -205,9 +198,6 @@ public class CommonDataConnector implements DataConnector {
 		
 		sb.append(" ?uri rdf:type ").append(blockLayout.getForType()).append(" . ");
 		sb.append(" ?uri ").append(Constants.RDFS_LABEL).append(" ?typeLabel . ");
-		if (blockLayout.getLabel().getType() == LabelType.PROPERTY) {
-			sb.append(" OPTIONAL { ?uri ").append(blockLayout.getLabel().getType()).append(" ?labelProperty . } ");
-		}
 		
 		Map<Property, String> propertyVarMap = new HashMap<Property, String>();
 		
