@@ -126,12 +126,8 @@ public class CommonDataConnector implements DataConnector {
 					instance.getLiteralProperties().add(rdfProperty);
 					continue;
 				}
-				if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
-					propertyName = "typeLabel";
-				} else {
-					propertyName = "y" + j;
-					j++;
-				}
+				propertyName = "y" + j;
+				j++;
 				
 				RDFNode rdfNode = solution.get(propertyName);
 				Object value = null;
@@ -197,17 +193,12 @@ public class CommonDataConnector implements DataConnector {
 		sb.append("SELECT DISTINCT * WHERE {{ ");
 		
 		sb.append(" ?uri rdf:type ").append(blockLayout.getForType()).append(" . ");
-		sb.append(" ?uri ").append(Constants.RDFS_LABEL).append(" ?typeLabel . ");
 		
 		Map<Property, String> propertyVarMap = new HashMap<Property, String>();
 		
 		int j = 0;
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 			if (columnLayout.isUriColumn()) {
-				continue;
-			}
-			if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
-				propertyVarMap.put(Constants.RDFS_LABEL, "typeLabel");
 				continue;
 			}
 			String property = "y" + j;
@@ -254,7 +245,13 @@ public class CommonDataConnector implements DataConnector {
 			}
 		}
 		
-		sb.append("} FILTER (lang(?typeLabel) = 'en'");
+		sb.append("} FILTER (1=1 ");
+		
+		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
+			if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
+				sb.append(" && (lang(?").append(propertyVarMap.get(columnLayout.getProperty())).append(") = '").append(columnLayout.getLabel().getLang()).append("') ");
+			}
+		}
 		
 		if (filter != null && filter.getColumnFilters() != null) {
 			for (Property property: filter.getColumnFilters().keySet()) {
