@@ -58,14 +58,14 @@
 			<thead>
 				<tr>
 					<th class="caption" colspan="{{table.columns.length}}">
-						{{layouts[table.type.type].label.labelSource}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})
+						{{table.label}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})
 					</th>
 				</tr>
 				<tr>
 					<th class="columnCaption" ng-repeat="property in table.columns" 
 						style="width: {{layouts[table.type.type].width / table.columns.length}}px;"
 						ng-click="order(this, $index);">
-						{{getTitleForProperty(layouts[table.type.type], property);}}
+						{{property.label}}
 					</th>
 				</tr>
 				<tr>

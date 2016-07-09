@@ -14,19 +14,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="title" class="col-sm-2 control-label">Label source</label>
-						<div class="col-sm-4">
-							<input type="text" class="form-control" placeholder="Title" ng-model="currBlock.label.labelSource">
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="title" class="col-sm-2 control-label">Label language</label>
-						<div class="col-sm-4">
-							<input type="text" class="form-control" laceholder="lang" ng-model="currBlock.label.lang" />
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="labelTypes" class="col-sm-2 control-label">Label type</label>
+						<label for="labelTypes" class="col-sm-2 control-label">Table label</label>
 						<div class="col-sm-4">
 						    <select class="form-control" ng-model="currBlock.label.type">
 								<option value="URI">URI</option>
@@ -36,12 +24,24 @@
 							</select>
 						</div>
 					</div>
+					<div class="form-group" ng-show="currBlock.label.type != 'URI' && currBlock.label.type != 'LABEL'">
+						<label class="col-sm-2 control-label">Label source</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" placeholder="Label" ng-model="currBlock.label.labelSource">
+						</div>
+					</div>
+					<div class="form-group" ng-show="currBlock.label.type == 'LABEL' || currBlock.label.type == 'PROPERTY'">
+						<label class="col-sm-2 control-label">Label language</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" laceholder="lang" ng-model="currBlock.label.lang" />
+						</div>
+					</div>
 					<div class="form-group">
 						<label for="labelTypes" class="col-sm-2 control-label">Columns</label>
 						<div class="col-sm-10">
 							<table>
 								<thead>
-									<tr><th>Property</th><th>Label type</th><th>Title source</th><th>Language</th><th>Aggr function</th><th></th></tr>
+									<tr><th>Property</th><th>Caption type</th><th>Caption</th><th>Language</th><th>Aggr function</th><th></th></tr>
 								</thead>
 								<tbody>
 									<tr ng-repeat="columnLayout in currBlock.properties">
@@ -54,12 +54,14 @@
 											<select class="form-control" ng-model="columnLayout.label.type">
 												<option value="URI">URI</option>
 												<option value="CONSTANT">Constant</option>
-												<option value="LABEL">Label</option>
-												<option value="PROPERTY">Property</option>
 											</select>
 										</td>
-										<td><input type="text" class="form-control" placeholder="Title" ng-model="columnLayout.label.labelSource" /></td>
-										<td><input type="text" class="form-control" placeholder="Language" ng-model="columnLayout.label.lang" /></td>
+										<td>
+											<input type="text" class="form-control" placeholder="Label" ng-model="columnLayout.label.labelSource" ng-show="columnLayout.label.type != 'URI' && columnLayout.label.type != 'LABEL'" />
+										</td>
+										<td>
+											<input type="text" class="form-control" placeholder="Language" ng-model="columnLayout.label.lang" ng-show="columnLayout.property.property == 'rdfs:label'" />
+										</td>
 										<td>
 											<select class="form-control" ng-model="columnLayout.aggregateFunction">
 												<option value="NOTHING">None</option>
@@ -80,7 +82,7 @@
 												<option value="LABEL">Label</option>
 												<option value="CUSTOM">Custom</option>
 											</select>
-											<span id="customTypeColumnTd" style="display: none;">
+											<span ng-show="currBlock.toAddProperty.columnType == 'CUSTOM'">
 												<input type="text" class="form-control" placeholder="Property" ng-model="currBlock.toAddProperty.property.property" />
 											</span>
 										</td>
@@ -88,12 +90,10 @@
 											<select class="form-control" ng-model="currBlock.toAddProperty.label.type">
 												<option value="URI">URI</option>
 												<option value="CONSTANT">Constant</option>
-												<option value="LABEL">Label</option>
-												<option value="PROPERTY">Property</option>
 											</select>
 										</td>
-										<td><input type="text" class="form-control" placeholder="Title" ng-model="currBlock.toAddProperty.label.labelSource" /></td>
-										<td><input type="text" class="form-control" placeholder="en" ng-model="currBlock.toAddProperty.label.lang" /></td>
+										<td><input type="text" class="form-control" placeholder="Label" ng-model="currBlock.toAddProperty.label.labelSource" ng-show="currBlock.toAddProperty.label.type == 'CONSTANT'" /></td>
+										<td><input type="text" class="form-control" placeholder="en" ng-model="currBlock.toAddProperty.label.lang" ng-show="currBlock.toAddProperty.columnType == 'LABEL'" /></td>
 										<td>
 											<select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction">
 												<option value="NOTHING">None</option>

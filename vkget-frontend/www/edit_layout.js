@@ -72,8 +72,7 @@ app.directive('blockForm', function () {
     directive.scope = {
         currBlock: '=block',
         addProperty: "&addProperty",
-        removeProperty: "&removeProperty",
-        columnTypeChanged: "&columnTypeChanged"
+        removeProperty: "&removeProperty"
     };
 	return directive;
 });
@@ -133,14 +132,6 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.offsetLeft = 0;
 	$scope.parentWidth = 0;
 	$scope.parentHeight = 0;
-	
-	$scope.columnTypeChanged = function(blockLayout) {
-		if (blockLayout.toAddProperty.columnType == 'CUSTOM') {
-			$('#customTypeColumnTd').show();
-		} else {
-			$('#customTypeColumnTd').hide();
-		}
-	};
 	
 	$scope.addNamespace = function() {
 		var key = $scope.newKey;

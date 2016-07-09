@@ -18,6 +18,8 @@ public class RdfTable implements Serializable {
 	 */
 	private Type type;
 	
+	private String label;
+	
 	/**
 	 * table instances - rows
 	 */
@@ -50,6 +52,14 @@ public class RdfTable implements Serializable {
 
 	public void setColumns(List<Property> columns) {
 		this.columns = columns;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 }

@@ -5,16 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.springframework.stereotype.Service;
 
+import cz.cuni.mff.vkget.data.common.LabeledProperty;
 import cz.cuni.mff.vkget.data.common.Property;
 import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.layout.BlockLayout;
 import cz.cuni.mff.vkget.data.layout.ColumnLayout;
+import cz.cuni.mff.vkget.data.layout.Label;
 import cz.cuni.mff.vkget.data.layout.LabelType;
 import cz.cuni.mff.vkget.data.layout.LineLayout;
 import cz.cuni.mff.vkget.data.layout.ScreenLayout;
@@ -58,10 +61,15 @@ public class CommonDataConnector implements DataConnector {
 		for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
 			RdfTable rdfTable = new RdfTable();
 			rdfTable.setType(blockLayout.getForType());
+			rdfTable.setLabel(this.getLabel(blockLayout.getLabel(), blockLayout.getForType().getType(), screenLayout));
 			rdfTable.setInstances(new ArrayList<RdfInstance>());
 			rdfTable.setColumns(new ArrayList<Property>());
 			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
-				rdfTable.getColumns().add(columnLayout.getProperty());
+				String label = columnLayout.getProperty().getProperty();
+				if (columnLayout.getLabel().getType().equals(LabelType.CONSTANT)) {
+					label = columnLayout.getLabel().getLabelSource();
+				}
+				rdfTable.getColumns().add(new LabeledProperty(columnLayout.getProperty(), label));
 			}
 			dataModel.getTables().add(rdfTable);
 		}
@@ -279,6 +287,38 @@ public class CommonDataConnector implements DataConnector {
 		}
 		sb.append("} ORDER BY ?uri LIMIT ").append(limit);
 		return sb.toString();
+	}
+	
+	protected String getLabel(Label label, String type, ScreenLayout screenLayout) {
+		switch (label.getType()) {
+			case CONSTANT: return label.getLabelSource();
+			case LABEL: return loadLabel(type, Constants.RDFS_LABEL.getProperty(), screenLayout, label.getLang());
+			case PROPERTY: return loadLabel(type, label.getLabelSource(), screenLayout, label.getLang());
+			case URI: return type;
+			default: return null;
+		}
+	}
+	
+	private String loadLabel(String type, String property, ScreenLayout screenLayout, String lang) {
+		StringBuilder sb = new StringBuilder();
+		for (String prefix: screenLayout.getNamespaces().keySet()) {
+			String namespace = screenLayout.getNamespaces().get(prefix);
+			sb.append("PREFIX ").append(prefix).append(": <").append(namespace).append("> ");
+		}
+		sb.append("SELECT ?label WHERE { ").append(type).append(" ").append(property).append(" ?label . ");
+		if (StringUtils.isNotEmpty(lang)) {
+			sb.append("FILTER (lang(?label) = '").append(lang).append("')");
+		}
+		sb.append("} ");
+		String query = sb.toString();
+		
+		ResultSet results = this.connector.query(query);
+		String label = null;
+		while (results.hasNext()) {
+			QuerySolution solution = results.next();
+			label = solution.get("?label").asLiteral().getString();
+		}
+		return label;
 	}
 	
 }

@@ -12,9 +12,9 @@ import cz.cuni.mff.vkget.utils.PropertyJsonDeserializer;
  */
 @JsonDeserialize(using = PropertyJsonDeserializer.class)
 public class Property {
-	private String property;
-	private String prefix;
-	private String name;
+	protected String property;
+	protected String prefix;
+	protected String name;
 	
 	public Property() {}
 	

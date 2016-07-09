@@ -511,18 +511,6 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	        });
 	};
 	
-	$scope.getTitleForProperty = function(layout, property) {
-		if (!layout) {
-			return "";
-		}
-    	for (var j = 0; j < layout.properties.length; j++) {
-    		var rl = layout.properties[j];
-    		if (rl.property.property == property.property) {
-    			return rl.label.labelSource;
-    		}
-    	}
-	};
-	
 	$scope.getObjectPropertyTitle = function(property) {
 		var title = property;
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
@@ -573,6 +561,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			$scope.messages.splice(index, 1);
 		}
 	};
+	
 	$scope.order = function(scope, index) {
 		$scope.sort.column = index;
 		$scope.sort.reverse = !$scope.sort.reverse; 
