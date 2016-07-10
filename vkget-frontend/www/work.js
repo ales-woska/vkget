@@ -135,6 +135,9 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				objectProperties: []
 			};
 		for (var key in addRowObject) {
+			if (key == 'uri') {
+				continue;
+			}
 			var change = {
 				uri: addRowUri,
 				property: key,
@@ -213,7 +216,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				$scope.removeLinkedPropertyObject = {};
 				for (var i = 0; i < instance.objectProperties.length; i++) {
 					var objectProperty = instance.objectProperties[i];
-					if (objectProperty.property == property) {
+					if (objectProperty.property.property == property) {
 						instance.objectProperties.splice(i, 1);
 					}
 				}
@@ -611,7 +614,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				if (lineLayout.toType.type == instance.type.type) {
 					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType.type);
 					if (sourceTable && sourceTable.selectedInstance && sourceTable.selectedInstance.objectProperties) {
-						show = false;
+						var partShow = false;
 						for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
 							var objectProperty = sourceTable.selectedInstance.objectProperties[j];
 							if (objectProperty.property.property == lineLayout.property.property) {
@@ -619,15 +622,16 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 									continue;
 								}
 								if (objectProperty.objectUri.uri == instance.uri.uri) {
-									show = true;
+									partShow = true;
 								}
 							}
 						}
+						show = show && partShow;
 					}
 				} else if (lineLayout.fromType.type == instance.type.type) {
 					var targetTable = getTableByType($scope.dataModel, lineLayout.toType.type);
 					if (targetTable && targetTable.selectedInstance && targetTable.selectedInstance.objectProperties) {
-						show = false;
+						var partShow = false;
 						for (var j = 0; j < instance.objectProperties.length; j++) {
 							var objectProperty = instance.objectProperties[j];
 							if (objectProperty.property.property == lineLayout.property.property) {
@@ -635,10 +639,11 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 									continue;
 								}
 								if (objectProperty.objectUri.uri == targetTable.selectedInstance.uri.uri) {
-									show = true;
+									partShow = true;
 								}
 							}
 						}
+						show = show && partShow;
 					}
 				}
 			}
