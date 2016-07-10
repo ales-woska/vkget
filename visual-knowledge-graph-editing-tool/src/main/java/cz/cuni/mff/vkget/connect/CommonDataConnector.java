@@ -126,8 +126,7 @@ public class CommonDataConnector implements DataConnector {
 					instance.getLiteralProperties().add(rdfProperty);
 					continue;
 				}
-				propertyName = "y" + j;
-				j++;
+				propertyName = "y" + j++;
 				
 				RDFNode rdfNode = solution.get(propertyName);
 				Object value = null;
@@ -157,7 +156,7 @@ public class CommonDataConnector implements DataConnector {
 					continue;
 				}
 
-				String varTo = "y" + j;
+				String varTo = "y" + j++;
 				
 				RDFNode rdfNode = solution.get(varTo);
 				Uri uri = null;
@@ -201,9 +200,8 @@ public class CommonDataConnector implements DataConnector {
 			if (columnLayout.isUriColumn()) {
 				continue;
 			}
-			String property = "y" + j;
+			String property = "y" + j++;
 			propertyVarMap.put(columnLayout.getProperty(), property);
-			j++;
 			sb.append(" OPTIONAL { ?uri ").append(columnLayout.getProperty()).append(" ?").append(property).append(" . } ");
 		}
 		
@@ -211,7 +209,7 @@ public class CommonDataConnector implements DataConnector {
 			// include all properties
 			if (lineLayout.getFromType().equals(blockLayout.getForType())) {
 				
-				String varTo = "y" + j;
+				String varTo = "y" + j++;
 				sb.append(" OPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . } ");
 				
 				// filter out not selected instances
@@ -263,6 +261,7 @@ public class CommonDataConnector implements DataConnector {
 					continue;
 				}
 				sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), \"").append(filterValue).append("\")) ");
+				appendContainsFunction(sb, propertyVarMap, property, filterValue);
 			}
 		}
 		
@@ -274,6 +273,10 @@ public class CommonDataConnector implements DataConnector {
 		}
 		sb.append("} ORDER BY ?uri LIMIT ").append(limit);
 		return sb.toString();
+	}
+	
+	protected void appendContainsFunction(StringBuilder sb, Map<Property, String> propertyVarMap, Property property, String filterValue) {
+		sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), \"").append(filterValue).append("\")) ");
 	}
 	
 	protected String getLabel(Label label, String type, ScreenLayout screenLayout) {

@@ -33,7 +33,9 @@
 					<div class="form-group" ng-show="currBlock.label.type == 'LABEL' || currBlock.label.type == 'PROPERTY'">
 						<label class="col-sm-2 control-label">Label language</label>
 						<div class="col-sm-4">
-							<input type="text" class="form-control" laceholder="lang" ng-model="currBlock.label.lang" />
+							<select class="form-control" ng-options="l.value as l.label for l in langs" ng-model="currBlock.label.lang">
+								<option value="">Choose language</option>
+							</select>
 						</div>
 					</div>
 					<div class="form-group">
@@ -60,7 +62,9 @@
 											<input type="text" class="form-control" placeholder="Label" ng-model="columnLayout.label.labelSource" ng-show="columnLayout.label.type != 'URI' && columnLayout.label.type != 'LABEL'" />
 										</td>
 										<td>
-											<input type="text" class="form-control" placeholder="Language" ng-model="columnLayout.label.lang" ng-show="columnLayout.property.property == 'rdfs:label'" />
+											<select class="form-control" ng-options="l.value as l.label for l in langs" ng-model="columnLayout.label.lang" ng-show="columnLayout.property.property == 'rdfs:label'">
+												<option value="">Choose language</option>
+											</select>
 										</td>
 										<td>
 											<select class="form-control" ng-model="columnLayout.aggregateFunction">
@@ -93,7 +97,11 @@
 											</select>
 										</td>
 										<td><input type="text" class="form-control" placeholder="Label" ng-model="currBlock.toAddProperty.label.labelSource" ng-show="currBlock.toAddProperty.label.type == 'CONSTANT'" /></td>
-										<td><input type="text" class="form-control" placeholder="en" ng-model="currBlock.toAddProperty.label.lang" ng-show="currBlock.toAddProperty.columnType == 'LABEL'" /></td>
+										<td>
+											<select class="form-control" ng-options="l.value as l.label for l in langs" ng-model="currBlock.toAddProperty.label.lang" ng-show="currBlock.toAddProperty.columnType == 'LABEL'">
+												<option value="">Choose language</option>
+											</select>
+										</td>
 										<td>
 											<select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction">
 												<option value="NOTHING">None</option>

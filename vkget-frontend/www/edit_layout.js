@@ -71,6 +71,7 @@ app.directive('blockForm', function () {
     directive.templateUrl = 'block_form.html';
     directive.scope = {
         currBlock: '=block',
+        langs: '=langs',
         addProperty: "&addProperty",
         removeProperty: "&removeProperty"
     };
@@ -132,6 +133,13 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.offsetLeft = 0;
 	$scope.parentWidth = 0;
 	$scope.parentHeight = 0;
+	$scope.langs = [
+        {value: 'cz', label: 'Czech'},
+        {value: 'de', label: 'Deutch'},
+        {value: 'en', label: 'English'},
+        {value: 'fr', label: 'French'},
+        {value: 'es', label: 'Spanish'},
+    ];
 	
 	$scope.addNamespace = function() {
 		var key = $scope.newKey;
