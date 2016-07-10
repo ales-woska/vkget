@@ -204,24 +204,26 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		var instance = $scope.selectedTd.instance;
 		
 		for (var property in removeLinkedPropertyObject) {
-			for (value in removeLinkedPropertyObject[property]) {
-				var change = {
-					uri: instance.uri,
-					property: property,
-					oldValue: value,
-					newValue: null
-				};
-				$scope.changes.push(change);
-				
-				$scope.removeLinkedPropertyObject = {};
+			var removeMap = removeLinkedPropertyObject[property];
+			for (value in removeMap) {
 				for (var i = 0; i < instance.objectProperties.length; i++) {
 					var objectProperty = instance.objectProperties[i];
-					if (objectProperty.property.property == property) {
+					var valueMatch = removeMap[objectProperty.objectUri.uri];
+					if (objectProperty.property.property == property && valueMatch) {
+						var change = {
+							uri: instance.uri,
+							property: property,
+							oldValue: value,
+							newValue: null
+						};
+						$scope.changes.push(change);
 						instance.objectProperties.splice(i, 1);
 					}
 				}
 			}
 		}
+
+		$scope.removeLinkedPropertyObject = {};
 		$('#removeLinkedPropertyModal').modal('hide');
 		$scope.hideContextMenu();
 	};
