@@ -630,52 +630,77 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		}
 	};
 	
-	$scope.filterInstances = function(instance) {
-		var show = true;
-		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
-			for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
-				var lineLayout = $scope.screenLayout.lineLayouts[i];
-				
-				if (lineLayout.toType.type == instance.type.type) {
-					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType.type);
-					if (sourceTable && sourceTable.selectedInstance && sourceTable.selectedInstance.objectProperties) {
-						var partShow = false;
-						for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
-							var objectProperty = sourceTable.selectedInstance.objectProperties[j];
-							if (objectProperty.property.property == lineLayout.property.property) {
-								if (!objectProperty.objectUri || !instance.uri) {
-									continue;
-								}
-								if (objectProperty.objectUri.uri == instance.uri.uri) {
-									partShow = true;
-								}
-							}
-						}
-						show = show && partShow;
-					}
-				} else if (lineLayout.fromType.type == instance.type.type) {
-					var targetTable = getTableByType($scope.dataModel, lineLayout.toType.type);
-					if (targetTable && targetTable.selectedInstance && targetTable.selectedInstance.objectProperties) {
-						var partShow = false;
-						for (var j = 0; j < instance.objectProperties.length; j++) {
-							var objectProperty = instance.objectProperties[j];
-							if (objectProperty.property.property == lineLayout.property.property) {
-								if (!objectProperty.objectUri || !targetTable.selectedInstance.uri) {
-									continue;
-								}
-								if (objectProperty.objectUri.uri == targetTable.selectedInstance.uri.uri) {
-									partShow = true;
-								}
-							}
-						}
-						show = show && partShow;
-					}
+	$scope.matchSourceTableSelectedInstance = function(sourceTable, property, instance) {
+		if (!sourceTable || !sourceTable.selectedInstance || !sourceTable.selectedInstance.objectProperties) {
+			return true;
+		}
+		var partShow = false;
+		// Cycle over object properties and find one matching property from argument. Then comapre their uris.
+		for (var j = 0; j < sourceTable.selectedInstance.objectProperties.length; j++) {
+			var objectProperty = sourceTable.selectedInstance.objectProperties[j];
+			if (objectProperty.property.property == property) {
+				if (!objectProperty.objectUri || !instance.uri) {
+					continue;
+				}
+				if (objectProperty.objectUri.uri == instance.uri.uri) {
+					partShow = true;
 				}
 			}
 		}
+		return partShow;
+	};
+	
+	$scope.matchTargetTableSelectedInstance = function(targetTable, property, instance) {
+		if (!targetTable || !targetTable.selectedInstance || !targetTable.selectedInstance.objectProperties) {
+			return true;
+		}
+		var partShow = false;
 		
-		if ($scope.screenLayout.filterPropagation == 'ALL') {
+		// Cycle over object properties and find one matching property from argument. Then comapre their uris.
+		for (var j = 0; j < instance.objectProperties.length; j++) {
+			var objectProperty = instance.objectProperties[j];
+			if (objectProperty.property.property == property) {
+				if (!objectProperty.objectUri || !targetTable.selectedInstance.uri) {
+					continue;
+				}
+				if (objectProperty.objectUri.uri == targetTable.selectedInstance.uri.uri) {
+					partShow = true;
+				}
+			}
+		}
+		return partShow;
+	};
+	
+	$scope.matchSelectedInstance = function(instance) {
+		var show = true;
+		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
+			var lineLayout = $scope.screenLayout.lineLayouts[i];
+			var currentInstanceType = instance.type.type;
+			var targetTableType = lineLayout.toType.type;
+			var sourceTableType = lineLayout.fromType.type;
+			var property = lineLayout.property.property;
 			
+			// examining source table
+			if (targetTableType == currentInstanceType) {
+				var sourceTable = $scope.getTableByType(sourceTableType);
+				var partShow = $scope.matchSourceTableSelectedInstance(sourceTable, property, instance);
+				show = show && partShow;
+				
+			// examining target table
+			} else if (sourceTableType == currentInstanceType) {
+				var targetTable = $scope.getTableByType(targetTableType);
+				var partShow = $scope.matchTargetTableSelectedInstance(targetTable, property, instance);
+				show = show && partShow;
+			}
+		}
+		return show;
+	};
+	
+	$scope.filterInstances = function(instance) {
+		var show = true;
+		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
+			var matchSelectedInstance = $scope.matchSelectedInstance(instance);
+			show = show && matchSelectedInstance;
 		}
 		
 		var tableFilters = $scope.filters[instance.type.type];
@@ -702,6 +727,18 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.isNumeric = function(value) {
 		return angular.isNumber(value);
 	};
+
+
+	$scope.getTableByType = function(type) {
+		for (var i = 0; i < $scope.dataModel.tables.length; i++) {
+			var table = $scope.dataModel.tables[i];
+			var tableType = $scope.dataModel.tables[i].type.type;
+			if (tableType == type) {
+				return table;
+			}
+		}
+		return null;
+	}
 });
 
 function polyline(lineLayout) {
@@ -727,15 +764,4 @@ function containsInstance(table, instance) {
 		}
 	}
 	return false;
-}
-
-function getTableByType(dataModel, type) {
-	for (var i = 0; i < dataModel.tables.length; i++) {
-		var table = dataModel.tables[i];
-		var tableType = dataModel.tables[i].type.type;
-		if (tableType == type) {
-			return table;
-		}
-	}
-	return null;
 }
