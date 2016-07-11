@@ -12,7 +12,7 @@ import cz.cuni.mff.vkget.data.common.Property;
  *
  */
 @Service
-public class VirtuosoDataConnector extends CommonDataConnector {
+public class VirtuosoDataConnector extends DefaultDataConnector {
 	
 	public VirtuosoDataConnector() {}
 	

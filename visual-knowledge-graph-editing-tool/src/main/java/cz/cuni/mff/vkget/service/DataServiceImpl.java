@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cz.cuni.mff.vkget.connect.CommonDataConnector;
+import cz.cuni.mff.vkget.connect.DefaultDataConnector;
 import cz.cuni.mff.vkget.connect.ConnectionInfo;
 import cz.cuni.mff.vkget.connect.DataConnector;
 import cz.cuni.mff.vkget.connect.VirtuosoDataConnector;
@@ -120,8 +120,8 @@ public class DataServiceImpl implements DataService {
 	private DataConnector getConnector(ConnectionInfo connectionInfo) {
 		switch (connectionInfo.getType()) {
 			case virtuoso: return new VirtuosoDataConnector(connectionInfo);
-			case jena: return new CommonDataConnector(connectionInfo);
-			default: return new CommonDataConnector(connectionInfo);
+			case jena: return new DefaultDataConnector(connectionInfo);
+			default: return new DefaultDataConnector(connectionInfo);
 		}
 	}
 	

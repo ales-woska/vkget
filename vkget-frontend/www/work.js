@@ -635,6 +635,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		if ($scope.screenLayout && $scope.screenLayout.lineLayouts) {
 			for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 				var lineLayout = $scope.screenLayout.lineLayouts[i];
+				
 				if (lineLayout.toType.type == instance.type.type) {
 					var sourceTable = getTableByType($scope.dataModel, lineLayout.fromType.type);
 					if (sourceTable && sourceTable.selectedInstance && sourceTable.selectedInstance.objectProperties) {

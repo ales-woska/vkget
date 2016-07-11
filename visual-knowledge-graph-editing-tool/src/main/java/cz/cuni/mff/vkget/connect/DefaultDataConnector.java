@@ -35,7 +35,7 @@ import cz.cuni.mff.vkget.sparql.Constants;
  *
  */
 @Service
-public class CommonDataConnector implements DataConnector {
+public class DefaultDataConnector implements DataConnector {
 	
 	protected SparqlConnector connector;
 	
@@ -44,9 +44,9 @@ public class CommonDataConnector implements DataConnector {
 	 */
 	protected static final int LIMIT = 40;
 	
-	public CommonDataConnector() {}
+	public DefaultDataConnector() {}
 	
-	public CommonDataConnector(ConnectionInfo connectionInfo) {
+	public DefaultDataConnector(ConnectionInfo connectionInfo) {
 		connector = new SparqlConnector(connectionInfo);
 	}
 	
@@ -190,7 +190,13 @@ public class CommonDataConnector implements DataConnector {
 			String namespace = namespaces.get(prefix);
 			sb.append("PREFIX ").append(prefix).append(": <").append(namespace).append("> ");
 		}
-		sb.append("SELECT DISTINCT * WHERE {{ ");
+		sb.append("SELECT DISTINCT * ");
+		
+		if (StringUtils.isNotEmpty(namedGraph)) {
+			sb.append(" FROM NAMED <").append(namedGraph).append("> WHERE {{ GRAPH <").append(namedGraph).append("> {");
+		} else {
+			sb.append(" WHERE {{ ");
+		}
 		
 		sb.append(" ?uri rdf:type ").append(blockLayout.getForType()).append(" . ");
 		
@@ -244,6 +250,7 @@ public class CommonDataConnector implements DataConnector {
 			}
 		}
 		
+		
 		sb.append("} FILTER (1=1 ");
 		
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
@@ -271,6 +278,9 @@ public class CommonDataConnector implements DataConnector {
 		int limit = LIMIT;
 		if (filter != null && filter.getLimit() > 0) {
 			limit = filter.getLimit();
+		}
+		if (StringUtils.isNotEmpty(namedGraph)) {
+			sb.append(" } ");
 		}
 		sb.append("} ORDER BY ?uri LIMIT ").append(limit);
 		return sb.toString();
