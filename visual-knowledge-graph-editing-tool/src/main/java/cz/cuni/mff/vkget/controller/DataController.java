@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import cz.cuni.mff.vkget.connect.ConnectionInfo;
 import cz.cuni.mff.vkget.connect.EndpointType;
 import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.model.DataModel;
@@ -38,8 +39,21 @@ public class DataController {
 	public DataModel loadData(
 			@RequestParam("endpoint") String endpoint,
 			@RequestParam("type") EndpointType type,
+			@RequestParam("useNamedGraph") String useNamedGraph,
+			@RequestParam("useAuthorization") String useAutorization,
+			@RequestParam("namedGraph") String namedGraph,
+			@RequestParam("username") String username,
+			@RequestParam("password") String password,
 			@RequestParam("layoutUri") Uri layoutUri) {
-		DataModel dataModel = dataService.loadDataModel(endpoint, type, layoutUri);
+		ConnectionInfo connectionInfo = new ConnectionInfo();
+		connectionInfo.setEndpoint(endpoint);
+		connectionInfo.setNamedGraph(namedGraph);
+		connectionInfo.setPassword(password);
+		connectionInfo.setType(type);
+		connectionInfo.setUseAutorization(Boolean.valueOf(useAutorization));
+		connectionInfo.setUseNamedGraph(Boolean.valueOf(useNamedGraph));
+		connectionInfo.setUsername(username);
+		DataModel dataModel = dataService.loadDataModel(connectionInfo, layoutUri);
 		return dataModel;
 	}
 
@@ -49,7 +63,7 @@ public class DataController {
 	@ResponseBody
 	@RequestMapping(value = "/data/table", method = RequestMethod.POST)
 	public List<RdfInstance> loadTableData(@RequestBody LoadTableData loadTableData) {
-		List<RdfInstance> instances = dataService.loadTableData(loadTableData.getTableType(), loadTableData.getFilter(), loadTableData.getEndpoint(), loadTableData.getType(), loadTableData.getLayoutUri());
+		List<RdfInstance> instances = dataService.loadTableData(loadTableData.getTableType(), loadTableData.getFilter(), loadTableData.getConnectionInfo(), loadTableData.getLayoutUri());
 		return instances;
 	}
 

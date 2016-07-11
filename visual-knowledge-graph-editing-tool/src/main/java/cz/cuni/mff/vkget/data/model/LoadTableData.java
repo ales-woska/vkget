@@ -2,7 +2,7 @@ package cz.cuni.mff.vkget.data.model;
 
 import java.io.Serializable;
 
-import cz.cuni.mff.vkget.connect.EndpointType;
+import cz.cuni.mff.vkget.connect.ConnectionInfo;
 import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.common.Uri;
 
@@ -22,15 +22,7 @@ public class LoadTableData implements Serializable {
 	 */
 	private RdfFilter filter;
 	
-	/**
-	 * data source
-	 */
-	private String endpoint;
-	
-	/**
-	 * data source type
-	 */
-	private EndpointType type;
+	private ConnectionInfo connectionInfo;
 	
 	/**
 	 * layout definition
@@ -53,28 +45,20 @@ public class LoadTableData implements Serializable {
 		this.filter = filter;
 	}
 
-	public String getEndpoint() {
-		return endpoint;
-	}
-
-	public void setEndpoint(String endpoint) {
-		this.endpoint = endpoint;
-	}
-
-	public EndpointType getType() {
-		return type;
-	}
-
-	public void setType(EndpointType type) {
-		this.type = type;
-	}
-
 	public Uri getLayoutUri() {
 		return layoutUri;
 	}
 
 	public void setLayoutUri(Uri layoutUri) {
 		this.layoutUri = layoutUri;
+	}
+
+	public ConnectionInfo getConnectionInfo() {
+		return connectionInfo;
+	}
+
+	public void setConnectionInfo(ConnectionInfo connectionInfo) {
+		this.connectionInfo = connectionInfo;
 	}
 
 }

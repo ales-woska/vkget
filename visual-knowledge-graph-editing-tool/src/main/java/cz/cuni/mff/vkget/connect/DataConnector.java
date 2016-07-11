@@ -18,7 +18,7 @@ public interface DataConnector {
 	 * @param screenLayout Layout definition.
 	 * @return
 	 */
-	DataModel loadDataModel(ScreenLayout screenLayout);
+	DataModel loadDataModel(String namedGraph, ScreenLayout screenLayout);
 
 	/**
 	 * Loads data model just for on RDF Type - one "table"
@@ -27,5 +27,5 @@ public interface DataConnector {
 	 * @param screenLayout Layout definition
 	 * @return
 	 */
-	RdfTable loadTableData(Type tableType, RdfFilter filter, ScreenLayout screenLayout);
+	RdfTable loadTableData(String namedGraph, Type tableType, RdfFilter filter, ScreenLayout screenLayout);
 }

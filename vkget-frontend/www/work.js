@@ -32,8 +32,15 @@ app.directive('ngRightClick', function($parse) {
 });
 
 app.controller('dataController', function($scope, $http, $filter, $window, $location) {
-	$scope.endpoint = 'http://dbpedia.org/sparql';
-	$scope.endpointType = 'other';
+	$scope.connectionInfo = {
+		endpoint: 'http://dbpedia.org/sparql',
+		type: 'other',
+		useNamedGraph: false,
+		useAutorization: false,
+		namedGraph: '',
+		username: '',
+		password: ''
+	};
 	$scope.changes = [];
 	$scope.updateScript = '';
 	$scope.selectedTd = {};
@@ -48,11 +55,29 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.messages = [];
 	
 	if ($location.search()['endpoint']) {
-		$scope.endpoint = $location.search()['endpoint'];
+		$scope.connectionInfo.endpoint = $location.search()['endpoint'];
 	}
 	
 	if ($location.search()['type']) {
-		$scope.endpointType = $location.search()['type'];
+		$scope.connectionInfo.type = $location.search()['type'];
+	}
+	
+	if ($location.search()['namedGraph']) {
+		$scope.connectionInfo.type = $location.search()['namedGraph'];
+		if ($scope.connectionInfo.type) {
+			$scope.connectionInfo.useNamedGraph = true;
+		}
+	}
+	
+	if ($location.search()['username']) {
+		$scope.connectionInfo.username = $location.search()['username'];
+		if ($scope.connectionInfo.username) {
+			$scope.connectionInfo.useAuthorization = true;
+		}
+	}
+	
+	if ($location.search()['password']) {
+		$scope.connectionInfo.password = $location.search()['password'];
 	}
 	
 	$scope.editCell = function() {
@@ -351,15 +376,12 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					filter.uriFilters[property] = uri;
 				}
 				
-				var endpoint = $scope.endpoint;
-				var type = $scope.endpointType;
 				var layoutUri = $scope.screenLayout.uri.uri;
 				
 				var request = {
 					tableType: tableType,
 					filter: filter,
-					endpoint: endpoint,
-					type: type,
+					connectionInfo: $scope.connectionInfo,
 					layoutUri: layoutUri
 				};
 
@@ -378,15 +400,12 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				};
 				filter.uriFilters[property] = instance.uri.uri;
 				
-				var endpoint = $scope.endpoint;
-				var type = $scope.endpointType;
 				var layoutUri = $scope.screenLayout.uri.uri;
 				
 				var request = {
 					tableType: tableType,
 					filter: filter,
-					endpoint: endpoint,
-					type: type,
+					connectionInfo: $scope.connectionInfo,
 					layoutUri: layoutUri
 				};
 				
@@ -415,16 +434,13 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			}
 		}
 		
-		var endpoint = $scope.endpoint;
-		var type = $scope.endpointType;
 		var layoutUri = $scope.screenLayout.uri.uri;
 		var tableType = sourceTable.type.type;
 		
 		var request = {
 			tableType: tableType,
 			filter: filter,
-			endpoint: endpoint,
-			type: type,
+			connectionInfo: $scope.connectionInfo,
 			layoutUri: layoutUri
 		};
 		
@@ -460,12 +476,18 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.run = function() {
 		$('#dataSourceModal').modal('hide');
 		$('#loading').show();
-		
-		var endpoint = $scope.endpoint;
-		var type = $scope.endpointType;
+
+		var endpoint = $scope.connectionInfo.endpoint;
+		var type = $scope.connectionInfo.type;
+		var useNamedGraph = $scope.connectionInfo.useNamedGraph;
+		var useAuthorization = $scope.connectionInfo.useAuthorization;
+		var namedGraph = $scope.connectionInfo.namedGraph;
+		var username = $scope.connectionInfo.username;
+		var password = $scope.connectionInfo.password;
 		var layoutUri = $scope.layout;
 	
-		$http.get("http://localhost:8090/data?endpoint=" + endpoint + "&type=" + type + "&layoutUri=" + layoutUri)
+		$http.get("http://localhost:8090/data?endpoint="+endpoint+"&type="+type+"&useNamedGraph="+useNamedGraph+
+				"&useAuthorization="+useAuthorization+"&namedGraph="+namedGraph+"&username="+username+"&password="+password+"&layoutUri=" + layoutUri)
 		    .success(function(response) {
 		    	var dataModel = response;
 				for (var i = 0; i < dataModel.tables.length; i++) {
@@ -649,6 +671,10 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					}
 				}
 			}
+		}
+		
+		if ($scope.screenLayout.filterPropagation == 'ALL') {
+			
 		}
 		
 		var tableFilters = $scope.filters[instance.type.type];

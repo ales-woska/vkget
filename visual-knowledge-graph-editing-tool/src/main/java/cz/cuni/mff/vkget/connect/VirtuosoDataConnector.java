@@ -16,8 +16,8 @@ public class VirtuosoDataConnector extends CommonDataConnector {
 	
 	public VirtuosoDataConnector() {}
 	
-	public VirtuosoDataConnector(String endpoint) {
-		super(endpoint);
+	public VirtuosoDataConnector(ConnectionInfo connectionInfo) {
+		super(connectionInfo);
 	}
 
 	

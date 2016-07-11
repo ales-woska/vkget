@@ -46,15 +46,15 @@ public class CommonDataConnector implements DataConnector {
 	
 	public CommonDataConnector() {}
 	
-	public CommonDataConnector(String endpoint) {
-		connector = new SparqlConnector(endpoint);
+	public CommonDataConnector(ConnectionInfo connectionInfo) {
+		connector = new SparqlConnector(connectionInfo);
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	@Override
-	public DataModel loadDataModel(ScreenLayout screenLayout) {
+	public DataModel loadDataModel(String namedGraph, ScreenLayout screenLayout) {
 		DataModel dataModel = new DataModel();
 		dataModel.setTables(new ArrayList<RdfTable>());
 		
@@ -80,10 +80,10 @@ public class CommonDataConnector implements DataConnector {
 	 * @inheritDoc
 	 */
 	@Override
-	public RdfTable loadTableData(Type tableType, RdfFilter filter, ScreenLayout screenLayout) {
+	public RdfTable loadTableData(String namedGraph, Type tableType, RdfFilter filter, ScreenLayout screenLayout) {
 		for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
 			if (blockLayout.getForType().equals(tableType)) {
-				RdfTable rdfTable = this.loadRdfTable(screenLayout, filter, blockLayout);
+				RdfTable rdfTable = this.loadRdfTable(namedGraph, screenLayout, filter, blockLayout);
 				return rdfTable;
 			}
 		}
@@ -97,7 +97,7 @@ public class CommonDataConnector implements DataConnector {
 	 * @param blockLayout
 	 * @return Null if doesn't satisfy filter parameters.
 	 */
-	protected RdfTable loadRdfTable(ScreenLayout screenLayout, RdfFilter filter, BlockLayout blockLayout) {
+	protected RdfTable loadRdfTable(String namedGraph, ScreenLayout screenLayout, RdfFilter filter, BlockLayout blockLayout) {
 		RdfTable rdfTable = new RdfTable();
 		rdfTable.setType(blockLayout.getForType());
 		rdfTable.setInstances(new ArrayList<RdfInstance>());
@@ -106,7 +106,7 @@ public class CommonDataConnector implements DataConnector {
 			rdfTable.getColumns().add(columnLayout.getProperty());
 		}
 
-		String query = this.constructTableQuery(blockLayout, screenLayout.getNamespaces(), screenLayout.getLineLayouts(), filter);
+		String query = this.constructTableQuery(namedGraph, blockLayout, screenLayout.getNamespaces(), screenLayout.getLineLayouts(), filter);
 		ResultSet results = this.connector.query(query);
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
@@ -183,7 +183,8 @@ public class CommonDataConnector implements DataConnector {
 	 * @param filter
 	 * @return
 	 */
-	protected String constructTableQuery(BlockLayout blockLayout, Map<String, String> namespaces, List<LineLayout> lineLayouts, RdfFilter filter) {
+	protected String constructTableQuery(String namedGraph, BlockLayout blockLayout, Map<String, String> namespaces, List<LineLayout> lineLayouts, RdfFilter filter) {
+		// TODO named graph
 		StringBuilder sb = new StringBuilder();
 		for (String prefix: namespaces.keySet()) {
 			String namespace = namespaces.get(prefix);

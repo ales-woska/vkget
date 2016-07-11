@@ -9,6 +9,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import cz.cuni.mff.vkget.connect.ConnectionInfo;
 import cz.cuni.mff.vkget.connect.EndpointType;
 import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.common.Uri;
@@ -33,16 +34,23 @@ public class DataControllerTest {
 	
 	@Test
 	public void loadDataTest() {
+		ConnectionInfo connectionInfo = new ConnectionInfo();
 		String endpoint = "http://some-endpoint.com:123";
 		EndpointType type = EndpointType.jena;
 		Uri layoutUri = new Uri("http://some-uri#aaa");
 		
 		DataModel model = new DataModel();
 
-		EasyMock.expect(serviceMock.loadDataModel(endpoint, type, layoutUri)).andReturn(model);
+		EasyMock.expect(serviceMock.loadDataModel(connectionInfo, layoutUri)).andReturn(model);
 		EasyMock.replay(serviceMock);
 		
-		DataModel result = controller.loadData(endpoint, type, layoutUri);
+		String useNamedGraph = null;
+		String useAutorization = null;
+		String namedGraph = null;
+		String username = null;
+		String password = null;
+		DataModel result = controller.loadData(endpoint, type, useNamedGraph, useAutorization, namedGraph, username, password, layoutUri);
+				
 		assertEquals(model, result);
 		
 		EasyMock.verify(serviceMock);
@@ -50,6 +58,7 @@ public class DataControllerTest {
 	
 	@Test
 	public void loadTableDataTest() {
+		ConnectionInfo connectionInfo = new ConnectionInfo();
 		LoadTableData loadTableData = new LoadTableData();
 		Type tableType = new Type("", "");
 		RdfFilter filter = new RdfFilter();
@@ -58,13 +67,12 @@ public class DataControllerTest {
 		Uri layoutUri = new Uri("http://some-uri#aaa");
 		loadTableData.setTableType(tableType);
 		loadTableData.setFilter(filter);
-		loadTableData.setEndpoint(endpoint);
-		loadTableData.setType(type);
+		loadTableData.setConnectionInfo(connectionInfo);
 		loadTableData.setLayoutUri(layoutUri);
 		
 		List<RdfInstance> instances = new ArrayList<RdfInstance>();
 		
-		EasyMock.expect(serviceMock.loadTableData(tableType, filter, endpoint,type, layoutUri)).andReturn(instances);
+		EasyMock.expect(serviceMock.loadTableData(tableType, filter, connectionInfo, layoutUri)).andReturn(instances);
 		EasyMock.replay(serviceMock);
 		
 		List<RdfInstance> result = controller.loadTableData(loadTableData);

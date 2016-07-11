@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cz.cuni.mff.vkget.connect.CommonDataConnector;
+import cz.cuni.mff.vkget.connect.ConnectionInfo;
 import cz.cuni.mff.vkget.connect.DataConnector;
-import cz.cuni.mff.vkget.connect.EndpointType;
 import cz.cuni.mff.vkget.connect.VirtuosoDataConnector;
 import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.common.Uri;
@@ -94,12 +94,10 @@ public class DataServiceImpl implements DataService {
 	 * @inheritDoc
 	 */
 	@Override
-	public DataModel loadDataModel(String endpoint, EndpointType endpointType, Uri layoutUri) {
+	public DataModel loadDataModel(ConnectionInfo connectionInfo, Uri layoutUri) {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
-		
-		DataConnector connector = getConnector(endpoint, endpointType);
-		
-		DataModel dataModel = connector.loadDataModel(screenLayout);
+		DataConnector connector = getConnector(connectionInfo);
+		DataModel dataModel = connector.loadDataModel(connectionInfo.getNamedGraph(), screenLayout);
 		return dataModel;
 	}
 	
@@ -107,10 +105,10 @@ public class DataServiceImpl implements DataService {
 	 * @inheritDoc
 	 */
 	@Override
-	public List<RdfInstance> loadTableData(Type tableType, RdfFilter filter, String endpoint, EndpointType endpointType, Uri layoutUri) {
+	public List<RdfInstance> loadTableData(Type tableType, RdfFilter filter, ConnectionInfo connectionInfo, Uri layoutUri) {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
-		DataConnector connector = getConnector(endpoint, endpointType);
-		RdfTable table = connector.loadTableData(tableType, filter, screenLayout);
+		DataConnector connector = getConnector(connectionInfo);
+		RdfTable table = connector.loadTableData(connectionInfo.getNamedGraph(), tableType, filter, screenLayout);
 		if (table == null) {
 			return new ArrayList<RdfInstance>();
 		} else {
@@ -119,11 +117,11 @@ public class DataServiceImpl implements DataService {
 		}
 	}
 	
-	private DataConnector getConnector(String endpoint, EndpointType type) {
-		switch (type) {
-			case virtuoso: return new VirtuosoDataConnector(endpoint);
-			case jena: return new CommonDataConnector(endpoint);
-			default: return new CommonDataConnector(endpoint);
+	private DataConnector getConnector(ConnectionInfo connectionInfo) {
+		switch (connectionInfo.getType()) {
+			case virtuoso: return new VirtuosoDataConnector(connectionInfo);
+			case jena: return new CommonDataConnector(connectionInfo);
+			default: return new CommonDataConnector(connectionInfo);
 		}
 	}
 	

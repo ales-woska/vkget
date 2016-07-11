@@ -2,7 +2,7 @@ package cz.cuni.mff.vkget.service;
 
 import java.util.List;
 
-import cz.cuni.mff.vkget.connect.EndpointType;
+import cz.cuni.mff.vkget.connect.ConnectionInfo;
 import cz.cuni.mff.vkget.data.common.Type;
 import cz.cuni.mff.vkget.data.common.Uri;
 import cz.cuni.mff.vkget.data.model.DataModel;
@@ -19,12 +19,11 @@ public interface DataService {
 
 	/**
 	 * Loads whole data model.
-	 * @param endpoint
-	 * @param type
+	 * @param connectionInfo
 	 * @param layoutUri
 	 * @return
 	 */
-	DataModel loadDataModel(String endpoint, EndpointType type, Uri layoutUri);
+	DataModel loadDataModel(ConnectionInfo connectionInfo, Uri layoutUri);
 
 	/**
 	 * Generates SPARQL update script from changes.
@@ -37,10 +36,9 @@ public interface DataService {
 	 * Load concrete table.
 	 * @param tableType
 	 * @param filter
-	 * @param endpoint
-	 * @param endpointType
+	 * @param connectionInfo
 	 * @param layoutUri
 	 * @return
 	 */
-	List<RdfInstance> loadTableData(Type tableType, RdfFilter filter, String endpoint, EndpointType endpointType, Uri layoutUri);
+	List<RdfInstance> loadTableData(Type tableType, RdfFilter filter, ConnectionInfo connectionInfo, Uri layoutUri);
 }

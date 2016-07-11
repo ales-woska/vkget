@@ -125,17 +125,36 @@
 						<div class="form-group">
 							<label for="forType" class="col-sm-2 control-label">SPARQL Endpoint</label>
 							<div class="col-sm-6">
-								<input type="text" required ng-model="endpoint" class="form-control" placeholder="http://" name="endpoint" />
+								<input type="text" required ng-model="connectionInfo.endpoint" class="form-control" placeholder="http://" name="endpoint" />
 							</div>
 						</div>
 						<div class="form-group">
 							<label for="forType" class="col-sm-2 control-label">Endpoint type</label>
 							<div class="col-sm-6">
-								<select class="form-control" required ng-model="endpointType">
+								<select class="form-control" required ng-model="connectionInfo.type">
 									<option value="virtuoso">Virtuoso</option>
 									<option value="jena">Jena</option>
 									<option value="other">Other</option>
 								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="forType" class="col-sm-2 control-label">Use named graph</label>
+							<div class="col-sm-1">
+								<input type="checkbox" ng-model="connectionInfo.useNamedGraph" />
+							</div>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" ng-show="connectionInfo.useNamedGraph == true" ng-required="connectionInfo.useNamedGraph == true" ng-model="connectionInfo.namedGraph" placeholder="Named graph" />
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="forType" class="col-sm-2 control-label">Use authorization</label>
+							<div class="col-sm-1">
+								<input type="checkbox" ng-model="connectionInfo.useAuthorization" />
+							</div>
+							<div class="col-sm-4">
+								<input type="text" class="form-control" ng-show="connectionInfo.useAuthorization == true" ng-required="connectionInfo.useAuthorization == true" ng-model="connectionInfo.username" placeholder="Username" />
+								<input type="text" class="form-control" ng-show="connectionInfo.useAuthorization == true" ng-required="connectionInfo.useAuthorization == true" ng-model="connectionInfo.password" placeholder="Password" />
 							</div>
 						</div>
 						<div class="form-group">
