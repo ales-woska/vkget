@@ -390,15 +390,20 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		
 		$http.post($scope.layoutServiceUri + '/save', $scope.screenLayout)
         .success(function (data, status, headers, config) {
-			$window.location.href = "layout.html?saved=" + $scope.screenLayout.name;
+			var message = {
+				caption: 'Saved',
+				text: 'The layout was saved successfuly.',
+				type: 'success'
+	    	};
+	    	$scope.messages.push(message);
         })
         .error(function (data, status, header, config) {
         	var message = {
-    				caption: data.error,
-    				text: data.message,
-    				type: 'danger'
-    	    	};
-    	    	$scope.messages.push(message);
+				caption: data.error,
+				text: data.message,
+				type: 'danger'
+	    	};
+	    	$scope.messages.push(message);
         });
 	};
 	

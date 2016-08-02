@@ -28,9 +28,12 @@
 	<div ng-app="vkgmt" ng-controller="layoutController">
 		<div ng-include="'menu.html'"></div>
 		
-		<div class="alert alert-danger alert-dismissible" role="alert" ng-show="showErrorMessage">
-			<button type="button" class="close" ng-click="cancelErrorMessage"><span>&times;</span></button>
-			<strong>Error!</strong> {{errorMessage}}
+		<!-- MESSAGES -->
+		<div class="messages" ng-show="messages.length > 0">
+			<div ng-repeat="message in messages" class="alert alert-{{message.type}} fade in">
+			    <button type="button" class="close" ng-click="cancelErrorMessage(message);"><span>&times;</span></button>
+			    <strong>{{message.caption}}</strong> {{message.text}}
+			</div>
 		</div>
 		
 		<div class="container">
