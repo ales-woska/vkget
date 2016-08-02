@@ -103,7 +103,7 @@
 											</select>
 										</td>
 										<td>
-											<select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction">
+											<select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction" ng-init="currBlock.toAddProperty.aggregateFunction = 'NOTHING'">
 												<option value="NOTHING">None</option>
 												<option value="MIN">Minimum</option>
 												<option value="MAX">Maximum</option>
