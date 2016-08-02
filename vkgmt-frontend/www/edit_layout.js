@@ -429,10 +429,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		screenLayout.name = '';
 		screenLayout.blockLayouts = [];
 		screenLayout.lineLayouts = [];
-		screenLayout.namespaces = {
-           "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-           "rdfs": "http://www.w3.org/2000/01/rdf-schema#"
-		};
+		screenLayout.namespaces = predefinedNamespaces;
 		return screenLayout;
 	}
 	
