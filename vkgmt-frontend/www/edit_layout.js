@@ -86,7 +86,7 @@ app.directive('lineForm', function () {
     directive.scope = {
 		screenLayout: '=screenLayout',
         lineLayout: '=lineLayout',
-        addLine: "&addLine",
+        saveLine: "&saveLine",
         removeLine: "&removeLine",
     };
 	return directive;
@@ -186,10 +186,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			}
 		}
 		
-		if (!error && lineLayout) {
-			if (!lineLayout.points) {
-				lineLayout.points = [];
-			}
+		if (!error && lineLayout && lineLayout.points.length == 0) {
 			var b1 = null;
 			var b2 = null;
 			for (var j in $scope.screenLayout.blockLayouts) {
