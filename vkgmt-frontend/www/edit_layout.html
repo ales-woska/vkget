@@ -112,7 +112,7 @@
 				ng-repeat="blockLayout in screenLayout.blockLayouts"></block-form>
 				
 			<line-form ng-repeat="lineLayout in screenLayout.lineLayouts"
-				line-layout="lineLayout" screen-layout="screenLayout" add-line="saveLine(lineLayout)"></line-form>
+				line-layout="lineLayout" screen-layout="screenLayout" add-line="saveLine(lineLayout)" remove-line="removeLine(lineLayout)"></line-form>
 
 			<div id="namespacesModal" class="modal bs-example-modal-lg" tabindex="-1" role="dialog">
 				<div class="modal-dialog modal-lg">

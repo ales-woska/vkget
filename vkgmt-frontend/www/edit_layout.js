@@ -87,6 +87,7 @@ app.directive('lineForm', function () {
 		screenLayout: '=screenLayout',
         lineLayout: '=lineLayout',
         addLine: "&addLine",
+        removeLine: "&removeLine",
     };
 	return directive;
 });
@@ -225,6 +226,18 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		}
 		
 		$scope.toggleLineModal(lineLayout);
+	};
+	
+	$scope.removeLine = function(lineLayout) {
+		if (!lineLayout) {
+			return;
+		}
+		if (confirm('Are you sure to remove line?')) {
+			$scope.toggleLineModal(lineLayout);
+			$('.modal-backdrop').hide();
+			var index = $scope.screenLayout.lineLayouts.indexOf(lineLayout);
+			$scope.screenLayout.lineLayouts.splice(index, 1);
+		}
 	};
 	
 	$scope.toggleLineModal = function(lineLayout) {
