@@ -8,6 +8,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkgmt.connect.SparqlConnector;
@@ -44,7 +45,9 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 	private final Property LEFT = new Property(Constants.VKGMT_Prefix, "left");
 	private final Property TOP = new Property(Constants.VKGMT_Prefix, "top");
 
-	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
+	@Autowired
+	@Qualifier("settingsConnector")
+	private SparqlConnector sparql;
 	
 	@Override
 	protected SparqlConnector getSparqlConnector() {

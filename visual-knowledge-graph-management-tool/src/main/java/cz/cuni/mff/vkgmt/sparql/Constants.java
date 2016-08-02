@@ -44,11 +44,6 @@ public class Constants {
 	public static final Type ColumnLayoutType = new Type(VKGMT_Prefix, "ColumnLayout");
 	
 	/**
-	 * RDF property 
-	 */
-	public static final Property ScreenLayoutProperty = new Property(VKGMT_Prefix, "screenLayout");
-	
-	/**
 	 * Contain BlockLayout property
 	 */
 	public static final Property BlockLayoutProperty = new Property(VKGMT_Prefix, "blockLayout");

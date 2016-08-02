@@ -32,6 +32,11 @@ app.directive('ngRightClick', function($parse) {
 });
 
 app.controller('dataController', function($scope, $http, $filter, $window, $location) {
+	$scope.changesServiceUrl = serverAddress + '/changes';
+	$scope.dataServiceUrl = serverAddress + '/data';
+	$scope.layoutsServiceUrl = serverAddress + '/layouts';
+	$scope.layoutServiceUrl = serverAddress + '/layout';
+	
 	$scope.connectionInfo = {
 		endpoint: 'http://dbpedia.org/sparql',
 		type: 'other',
@@ -312,7 +317,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.confirmChanges = function() {
 		var changes = $scope.changes;
 		$http({
-            url : 'http://localhost:8090/changes',
+            url : $scope.changesServiceUrl,
             method : "POST",
             data : changes
         }).then(function(response) {
@@ -346,7 +351,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		downloadLink[0].click();
 	};
 	
-	$http.get("http://localhost:8090/layouts")
+	$http.get($scope.layoutsServiceUrl)
 	    .then(function(response) {
 	        $scope.layouts = response.data;
 			$('#layoutLoading').hide();
@@ -453,7 +458,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		
 		$scope.loadingStack.push(request.tableType);
 		
-		$http.post('http://localhost:8090/data/table', request)
+		$http.post($scope.dataServiceUrl + '/table', request)
         .success(function (data, status, headers, config) {
         	var newInstances = data;
 			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
@@ -490,7 +495,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		var password = $scope.connectionInfo.password;
 		var layoutUri = $scope.layout;
 	
-		$http.get("http://localhost:8090/data?endpoint="+endpoint+"&type="+type+"&useNamedGraph="+useNamedGraph+
+		$http.get($scope.dataServiceUrl + "?endpoint="+endpoint+"&type="+type+"&useNamedGraph="+useNamedGraph+
 				"&useAuthorization="+useAuthorization+"&namedGraph="+namedGraph+"&username="+username+"&password="+password+"&layoutUri=" + layoutUri)
 		    .success(function(response) {
 		    	var dataModel = response;
@@ -503,7 +508,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				$scope.dataModel = dataModel;
 				$scope.originalDataModel = JSON.parse(JSON.stringify(dataModel));
 				
-				$http.get("http://localhost:8090/layout?uri=" + layoutUri)
+				$http.get($scope.layoutServiceUrl + "?uri=" + layoutUri)
 				    .success(function(response) {
 				        var layout = response;
 				        $scope.screenLayout = layout;

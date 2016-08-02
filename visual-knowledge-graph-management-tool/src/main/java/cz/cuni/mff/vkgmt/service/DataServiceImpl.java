@@ -35,7 +35,6 @@ public class DataServiceImpl implements DataService {
 	 */
 	@Override
 	public String generateUpdateScript(List<RdfChange> changes) {
-		StringBuilder updates = new StringBuilder("MODIFY {\n");
 		StringBuilder inserts = new StringBuilder("INSERT DATA {\n");
 		StringBuilder deletes = new StringBuilder("DELETE DATA {\n");
 		
@@ -64,23 +63,24 @@ public class DataServiceImpl implements DataService {
 					deletes.append(" '").append(change.getOldValue()).append("' .\n");
 				}
 			} else {
-				updatesCount++;
-				updates.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				deletes.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
-					updates.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+					deletes.append(" <").append((Uri)change.getNewValue()).append("> .\n");
 				} else {
-					updates.append(" '").append(change.getNewValue()).append("' .\n");
+					deletes.append(" '").append(change.getNewValue()).append("' .\n");
+				}
+				inserts.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				if (change.getNewValue() instanceof Uri) {
+					inserts.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+				} else {
+					inserts.append(" '").append(change.getNewValue()).append("' .\n");
 				}
 			}
 		}
-		updates.append("}\n");
 		inserts.append("}\n");
 		deletes.append("}\n");
 		
 		StringBuilder result = new StringBuilder();
-		if (updatesCount > 0) {
-			result.append(updates.toString());
-		}
 		if (insertsCount > 0) {
 			result.append(inserts.toString());
 		}

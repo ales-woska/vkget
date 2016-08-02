@@ -15,6 +15,8 @@ app.filter('urlencode', function() {
 
 app.controller('layoutController', function($scope, $http, $location) {
 	$scope.messages = [];
+	$scope.layoutsServiceUri = serverAddress + '/layouts';
+	$scope.layoutServiceUri = serverAddress + '/layout';
 	
 	var saved = $location.search()['saved'];
 	if (saved) {
@@ -24,14 +26,14 @@ app.controller('layoutController', function($scope, $http, $location) {
 		$scope.show = 'hidden';
 	}
 	
-	$http.get("http://localhost:8090/layouts")
+	$http.get($scope.layoutsServiceUri)
     .then(function(response) {
         $scope.layouts = response.data;
     });
 	
 	$scope.removeLayout = function(screenLayout) {
 		if (confirm('Are you sure to remove layout "' + screenLayout.name + '"?')) {
-			$http.post('http://localhost:8090/layout/remove', screenLayout)
+			$http.post($scope.layoutServiceUri + '/remove', screenLayout)
 	        .success(function (data, status, headers, config) {
 	        	var message = {
 	    			caption: 'Removed!',

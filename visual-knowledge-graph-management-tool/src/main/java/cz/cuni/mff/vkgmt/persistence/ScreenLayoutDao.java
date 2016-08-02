@@ -9,6 +9,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkgmt.connect.SparqlConnector;
@@ -30,8 +31,10 @@ import cz.cuni.mff.vkgmt.sparql.Constants;
 public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 	private static final Property NAMESPACES = new Property(Constants.VKGMT_Prefix, "namespaces");
 	private static final Property FILTER_PROPAGATION = new Property(Constants.VKGMT_Prefix, "filterPropagation");
-	
-	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
+
+	@Autowired
+	@Qualifier("settingsConnector")
+	private SparqlConnector sparql;
 	
 	@Override
 	protected SparqlConnector getSparqlConnector() {

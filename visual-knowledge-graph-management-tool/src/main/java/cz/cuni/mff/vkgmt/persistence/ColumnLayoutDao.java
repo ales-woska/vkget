@@ -6,6 +6,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkgmt.connect.SparqlConnector;
@@ -30,8 +32,10 @@ public class ColumnLayoutDao extends AbstractDao<ColumnLayout> {
 	private final Property LABEL_LANG = new Property(Constants.VKGMT_Prefix, "labelLang");
 	private final Property PROPERTY = new Property(Constants.VKGMT_Prefix, "property");
 	private final Property AGGREGATE_FUNCTIONS = new Property(Constants.VKGMT_Prefix, "aggregateFunctions");
-	
-	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
+
+	@Autowired
+	@Qualifier("settingsConnector")
+	private SparqlConnector sparql;
 	
 	@Override
 	protected SparqlConnector getSparqlConnector() {

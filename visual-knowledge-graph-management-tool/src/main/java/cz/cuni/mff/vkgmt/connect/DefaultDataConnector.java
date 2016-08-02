@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import cz.cuni.mff.vkgmt.data.common.LabeledProperty;
@@ -42,7 +43,8 @@ public class DefaultDataConnector implements DataConnector {
 	/**
 	 * Default row limit.
 	 */
-	protected static final int LIMIT = 40;
+	@Value("${rdf.query.limit}")
+	protected int limit = 40;
 	
 	public DefaultDataConnector() {}
 	
@@ -275,7 +277,7 @@ public class DefaultDataConnector implements DataConnector {
 		
 		sb.append(") ");
 		
-		int limit = LIMIT;
+		int limit = this.limit;
 		if (filter != null && filter.getLimit() > 0) {
 			limit = filter.getLimit();
 		}
@@ -320,6 +322,14 @@ public class DefaultDataConnector implements DataConnector {
 			label = solution.get("?label").asLiteral().getString();
 		}
 		return label;
+	}
+
+	public void setConnector(SparqlConnector connector) {
+		this.connector = connector;
+	}
+
+	public void setLimit(int limit) {
+		this.limit = limit;
 	}
 	
 }

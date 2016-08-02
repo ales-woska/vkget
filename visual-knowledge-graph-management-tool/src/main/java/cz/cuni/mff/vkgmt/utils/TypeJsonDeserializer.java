@@ -12,6 +12,10 @@ import cz.cuni.mff.vkgmt.data.common.Type;
 
 public class TypeJsonDeserializer extends JsonDeserializer<Type> {
 
+	private static final String NAME = "name";
+	private static final String PREFIX = "prefix";
+	private static final String TYPE = "type";
+
 	@Override
     public Type deserialize(JsonParser jp, DeserializationContext ctx) throws IOException, JsonProcessingException {
         
@@ -21,12 +25,12 @@ public class TypeJsonDeserializer extends JsonDeserializer<Type> {
         if (node.isTextual()) {
         	stringType = node.asText();
         	type = new Type(stringType);
-        } else if (node.has("type")) {
-        	stringType = node.get("type").asText();
+        } else if (node.has(TYPE)) {
+        	stringType = node.get(TYPE).asText();
         	type = new Type(stringType);
         } else {
-        	String prefix = node.get("prefix").asText();
-        	String name = node.get("name").asText();
+        	String prefix = node.get(PREFIX).asText();
+        	String name = node.get(NAME).asText();
         	type = new Type(prefix, name);
         }
         return type;

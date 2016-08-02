@@ -94,11 +94,12 @@ app.directive('lineForm', function () {
 app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.screenLayout = newScreenLayout();
 	$scope.messages = [];
+	$scope.layoutServiceUri = serverAddress + "/layout";
 	
 	var uri = $location.search()['uri'];
 	if (uri) {
 		uri = window.encodeURIComponent(uri);
-		$http.get("http://localhost:8090/layout?uri=" + uri).then(
+		$http.get($scope.layoutServiceUri + "?uri=" + uri).then(
 				function(response) {
 					$scope.uri = uri;
 					var screenLayout = response.data;
@@ -133,13 +134,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.offsetLeft = 0;
 	$scope.parentWidth = 0;
 	$scope.parentHeight = 0;
-	$scope.langs = [
-        {value: 'cz', label: 'Czech'},
-        {value: 'de', label: 'Deutch'},
-        {value: 'en', label: 'English'},
-        {value: 'fr', label: 'French'},
-        {value: 'es', label: 'Spanish'},
-    ];
+	$scope.langs = predefinedLangs;
 	
 	$scope.addNamespace = function() {
 		var key = $scope.newKey;
@@ -393,7 +388,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			}
 		}
 		
-		$http.post('http://localhost:8090/layout/save', $scope.screenLayout)
+		$http.post($scope.layoutServiceUri + '/save', $scope.screenLayout)
         .success(function (data, status, headers, config) {
 			$window.location.href = "layout.html?saved=" + $scope.screenLayout.name;
         })

@@ -6,6 +6,8 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import cz.cuni.mff.vkgmt.connect.SparqlConnector;
@@ -39,8 +41,9 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 	private final Property LABEL_LANG = new Property(Constants.VKGMT_Prefix, "labelLang");
 	private final Property POINTS = new Property(Constants.VKGMT_Prefix, "points");
 
-	
-	private SparqlConnector sparql = SparqlConnector.getLocalFusekiConnector();
+	@Autowired
+	@Qualifier("settingsConnector")
+	private SparqlConnector sparql;
 	
 	@Override
 	protected SparqlConnector getSparqlConnector() {

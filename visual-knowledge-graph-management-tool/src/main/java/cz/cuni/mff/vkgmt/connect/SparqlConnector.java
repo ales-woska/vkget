@@ -11,42 +11,33 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Connection to SPARQL endpoint on the lowest level.
  * @author Ales Woska
  *
  */
+@Component(value = "settingsConnector")
 public class SparqlConnector {
-	private static SparqlConnector fusekiInstance = new SparqlConnector(new ConnectionInfo("http://localhost:3030/vkgmt", "", ""));
 	
+	@Value("${sparql.endpoint.url}")
+	private String endpoint = "";
+	
+	@Value("${sparql.endpoint.user}")
 	private String user = "";
+	
+	@Value("${sparql.endpoint.pass}")
 	private String password = "";
 	
-	/**
-	 * Endpoint address.
-	 */
-	private String endpoint;
-	
-	public String getEndpoint() {
-		return endpoint;
-	}
-
-	public void setEndpoint(String endpoint) {
-		this.endpoint = endpoint;
-	}
-
 	public SparqlConnector() {
 	}
-
+	
 	public SparqlConnector(ConnectionInfo connectionInfo) {
 		this.endpoint = connectionInfo.getEndpoint();
 		this.user = connectionInfo.getUsername();
 		this.password = connectionInfo.getPassword();
-	}
-	
-	public static SparqlConnector getLocalFusekiConnector() {
-		return fusekiInstance;
 	}
 
 	public ResultSet query(String sparqlQuery) {
@@ -74,5 +65,31 @@ public class SparqlConnector {
 		}
 		ue.execute();
 	}
+
+	public String getEndpoint() {
+		return endpoint;
+	}
+
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	
 
 }

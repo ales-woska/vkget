@@ -12,6 +12,10 @@ import cz.cuni.mff.vkgmt.data.common.Property;
 
 public class PropertyJsonDeserializer extends JsonDeserializer<Property> {
 
+	private static final String NAME = "name";
+	private static final String PREFIX = "prefix";
+	private static final String PROPERTY = "property";
+
 	@Override
     public Property deserialize(JsonParser jp, DeserializationContext ctx) throws IOException, JsonProcessingException {
         
@@ -21,12 +25,12 @@ public class PropertyJsonDeserializer extends JsonDeserializer<Property> {
         if (node.isTextual()) {
         	stringProperty = node.asText();
         	property = new Property(stringProperty);
-        } else if (node.has("property")) {
-        	stringProperty = node.get("property").asText();
+        } else if (node.has(PROPERTY)) {
+        	stringProperty = node.get(PROPERTY).asText();
         	property = new Property(stringProperty);
         } else {
-        	String prefix = node.get("prefix").asText();
-        	String name = node.get("name").asText();
+        	String prefix = node.get(PREFIX).asText();
+        	String name = node.get(NAME).asText();
         	property = new Property(prefix, name);
         }
         return property;
