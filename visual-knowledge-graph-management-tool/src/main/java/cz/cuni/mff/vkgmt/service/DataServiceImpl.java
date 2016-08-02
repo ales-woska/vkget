@@ -35,57 +35,44 @@ public class DataServiceImpl implements DataService {
 	 */
 	@Override
 	public String generateUpdateScript(List<RdfChange> changes) {
-		StringBuilder inserts = new StringBuilder("INSERT DATA {\n");
-		StringBuilder deletes = new StringBuilder("DELETE DATA {\n");
-		
-		int insertsCount = 0;
-		int updatesCount = 0;
-		int deletesCount = 0;
+		StringBuilder result = new StringBuilder();
 		
 		for (RdfChange change: changes) {
 			boolean oldValueEmpty = change.getOldValue() == null;
 			boolean newValueEmpty = change.getNewValue() == null;
 			
 			if (oldValueEmpty && !newValueEmpty) {
-				insertsCount++;
-				inserts.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("INSERT DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
-					inserts.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+					result.append(" <").append((Uri)change.getNewValue()).append("> .\n");
 				} else {
-					inserts.append(" '").append(change.getNewValue()).append("' .\n");
+					result.append(" '").append(change.getNewValue()).append("' .\n");
 				}
+				result.append("}\n");
 			} else if (newValueEmpty && !oldValueEmpty) {
-				deletesCount++;
-				deletes.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("DELETE DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
 				if (change.getOldValue() instanceof Uri) {
-					deletes.append(" <").append((Uri)change.getOldValue()).append("> .\n");
+					result.append(" <").append((Uri)change.getOldValue()).append("> .\n");
 				} else {
-					deletes.append(" '").append(change.getOldValue()).append("' .\n");
+					result.append(" '").append(change.getOldValue()).append("' .\n");
 				}
+				result.append("}\n");
 			} else {
-				deletes.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("DELETE DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
-					deletes.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+					result.append(" <").append((Uri)change.getNewValue()).append("> .\n");
 				} else {
-					deletes.append(" '").append(change.getNewValue()).append("' .\n");
+					result.append(" '").append(change.getNewValue()).append("' .\n");
 				}
-				inserts.append("\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("}\n");
+				result.append("INSERT DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
-					inserts.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+					result.append(" <").append((Uri)change.getNewValue()).append("> .\n");
 				} else {
-					inserts.append(" '").append(change.getNewValue()).append("' .\n");
+					result.append(" '").append(change.getNewValue()).append("' .\n");
 				}
+				result.append("}\n");
 			}
-		}
-		inserts.append("}\n");
-		deletes.append("}\n");
-		
-		StringBuilder result = new StringBuilder();
-		if (insertsCount > 0) {
-			result.append(inserts.toString());
-		}
-		if (deletesCount > 0) {
-			result.append(deletes.toString());
 		}
 		return result.toString();
 	}
