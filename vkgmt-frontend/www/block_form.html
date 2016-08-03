@@ -16,7 +16,7 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="labelTypes" class="col-sm-2 control-label">Table label</label>
+						<label for="labelTypes" class="col-sm-2 control-label">Table header</label>
 						<div class="col-sm-4">
 						    <select class="form-control" ng-model="currBlock.label.type">
 								<option value="URI">URI</option>
@@ -64,7 +64,9 @@
 											<input type="text" class="form-control" placeholder="Label" ng-model="columnLayout.label.labelSource" ng-show="columnLayout.label.type != 'URI' && columnLayout.label.type != 'LABEL'" />
 										</td>
 										<td>
-											<select class="form-control" ng-options="l.value as l.label for l in langs" ng-model="columnLayout.label.lang" ng-show="columnLayout.property.property != 'URI'">
+											<select class="form-control" ng-options="l.value as l.label for l in langs" 
+												ng-model="columnLayout.label.lang"
+												ng-show="columnLayout.property.property != 'URI' && columnLayout.property.property">
 												<option value="">Choose language</option>
 											</select>
 										</td>
@@ -79,8 +81,18 @@
 										</td>
 										<td><a type="button" ng-click="removeProperty({blockLayout: currBlock, property: columnLayout})"><span class="glyphicon glyphicon-remove"></span></a></td>
 									</tr>
-									<tr><td>&nbsp;</td></tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label for="labelTypes" class="col-sm-2 control-label">Add a new column</label>
+						<div class="col-sm-10">
+							<table>
+								<tbody>
 									<tr>
+										<td>Property</td>
 										<td>
 											<select class="form-control" ng-model="currBlock.toAddProperty.columnType">
 												<option value="">Choose new column type</option>
@@ -88,6 +100,8 @@
 												<option value="LABEL">Label</option>
 												<option value="CUSTOM">Custom</option>
 											</select>
+										</td>
+										<td>
 											<span ng-show="currBlock.toAddProperty.columnType == 'CUSTOM'">
 												<input type="text" class="form-control" placeholder="Property" ng-model="currBlock.toAddProperty.property.property" />
 											</span>
@@ -100,17 +114,25 @@
 											</span>
 										</td>
 										<td>
-											<select class="form-control" ng-model="currBlock.toAddProperty.label.type">
+											<select class="form-control" ng-options="l.value as l.label for l in langs" 
+												ng-model="currBlock.toAddProperty.label.lang" 
+												ng-show="currBlock.toAddProperty.columnType != 'URI' && currBlock.toAddProperty.columnType">
+												<option value="">Choose language</option>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td>Header</td>
+										<td>
+											<select class="form-control" ng-model="currBlock.toAddProperty.label.type" ng-init="currBlock.toAddProperty.label.type = 'URI'">
 												<option value="URI">URI</option>
 												<option value="CONSTANT">Constant</option>
 											</select>
 										</td>
 										<td><input type="text" class="form-control" placeholder="Label" ng-model="currBlock.toAddProperty.label.labelSource" ng-show="currBlock.toAddProperty.label.type == 'CONSTANT'" /></td>
-										<td>
-											<select class="form-control" ng-options="l.value as l.label for l in langs" ng-model="currBlock.toAddProperty.label.lang" ng-show="currBlock.toAddProperty.columnType != 'URI'">
-												<option value="">Choose language</option>
-											</select>
-										</td>
+									</tr>
+									<tr>
+										<td>Aggregate function</td>
 										<td>
 											<select class="form-control" ng-model="currBlock.toAddProperty.aggregateFunction" ng-init="currBlock.toAddProperty.aggregateFunction = 'NOTHING'">
 												<option value="NOTHING">None</option>
@@ -120,8 +142,11 @@
 												<option value="MEDIAN">Mean</option>
 											</select>
 										</td>
+									</tr>
+									<tr>
+										<td></td>
 										<td>
-											<a type="button" ng-click="addProperty({blockLayout: currBlock})"><span class="glyphicon glyphicon-plus"></span></a>
+											<button type="button" class="btn btn-default" ng-click="addProperty({blockLayout: currBlock})">Add</button>
 										</td>
 									</tr>
 								</tbody>

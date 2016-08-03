@@ -325,7 +325,12 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			aggregateFunction: newColumn.aggregateFunction
 		};
 		blockLayout.properties.push(columnLayout);
-		blockLayout.toAddProperty = {};
+		blockLayout.toAddProperty = {
+			aggregateFunction: 'NOTHING',
+			label: {
+				type: 'URI'
+			}
+		};
 	};
 	
 	$scope.removeProperty = function(blockLayout, property) {
