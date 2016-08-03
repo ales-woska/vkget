@@ -189,17 +189,18 @@ public class DefaultDataConnector implements DataConnector {
 		StringBuilder sb = new StringBuilder();
 		for (String prefix: namespaces.keySet()) {
 			String namespace = namespaces.get(prefix);
-			sb.append("PREFIX ").append(prefix).append(": <").append(namespace).append("> ");
+			sb.append("PREFIX ").append(prefix).append(": <").append(namespace).append(">\n");
 		}
+		sb.append("\n");
 		sb.append("SELECT DISTINCT * ");
 		
 		if (StringUtils.isNotEmpty(namedGraph)) {
-			sb.append(" FROM NAMED <").append(namedGraph).append("> WHERE {{ GRAPH <").append(namedGraph).append("> {");
+			sb.append(" FROM NAMED <").append(namedGraph).append("> WHERE {{ GRAPH <").append(namedGraph).append("> {\n");
 		} else {
-			sb.append(" WHERE {{ ");
+			sb.append(" WHERE {{\n");
 		}
 		
-		sb.append(" ?uri rdf:type ").append(blockLayout.getForType()).append(" . ");
+		sb.append("\t?uri rdf:type ").append(blockLayout.getForType()).append(" .\n");
 		
 		Map<Property, String> propertyVarMap = new HashMap<Property, String>();
 		
@@ -210,7 +211,7 @@ public class DefaultDataConnector implements DataConnector {
 			}
 			String property = "y" + j++;
 			propertyVarMap.put(columnLayout.getProperty(), property);
-			sb.append(" OPTIONAL { ?uri ").append(columnLayout.getProperty()).append(" ?").append(property).append(" . } ");
+			sb.append("\tOPTIONAL { ?uri ").append(columnLayout.getProperty()).append(" ?").append(property).append(" . }\n");
 		}
 		
 		for (LineLayout lineLayout: lineLayouts) {
@@ -218,7 +219,7 @@ public class DefaultDataConnector implements DataConnector {
 			if (lineLayout.getFromType().equals(blockLayout.getForType())) {
 				
 				String varTo = "y" + j++;
-				sb.append(" OPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . } ");
+				sb.append("\tOPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . }\n");
 				
 				// filter out not selected instances
 				if (filter != null && filter.getUriFilters() != null) {
@@ -228,7 +229,7 @@ public class DefaultDataConnector implements DataConnector {
 							if (uriValue == null) {
 								continue;
 							}
-							sb.append(" ?uri ").append(uriProperty.getProperty()).append(" <").append(uriValue.getUri()).append("> . ");
+							sb.append("\t?uri ").append(uriProperty.getProperty()).append(" <").append(uriValue.getUri()).append("> .\n");
 						}
 					}
 				}
@@ -244,7 +245,7 @@ public class DefaultDataConnector implements DataConnector {
 							if (uriValue == null) {
 								continue;
 							}
-							sb.append("<").append(uriValue.getUri()).append("> ").append(uriProperty.getProperty()).append(" ?uri . ");
+							sb.append("\t<").append(uriValue.getUri()).append("> ").append(uriProperty.getProperty()).append(" ?uri .\n");
 						}
 					}
 				}
@@ -274,7 +275,7 @@ public class DefaultDataConnector implements DataConnector {
 				if (filterValue.isEmpty()) {
 					continue;
 				}
-				sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), \"").append(filterValue).append("\")) ");
+				sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), '").append(filterValue).append("', 'i')) ");
 				appendContainsFunction(sb, propertyVarMap, property, filterValue);
 			}
 		}
@@ -286,14 +287,14 @@ public class DefaultDataConnector implements DataConnector {
 			limit = filter.getLimit();
 		}
 		if (StringUtils.isNotEmpty(namedGraph)) {
-			sb.append(" } ");
+			sb.append(" }\n");
 		}
-		sb.append("} ORDER BY ?uri LIMIT ").append(limit);
+		sb.append("\n} ORDER BY ?uri LIMIT ").append(limit);
 		return sb.toString();
 	}
 	
 	protected void appendContainsFunction(StringBuilder sb, Map<Property, String> propertyVarMap, Property property, String filterValue) {
-		sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), \"").append(filterValue).append("\")) ");
+		sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), '").append(filterValue).append("', 'i')) ");
 	}
 	
 	protected String getLabel(Label label, String type, ScreenLayout screenLayout) {
