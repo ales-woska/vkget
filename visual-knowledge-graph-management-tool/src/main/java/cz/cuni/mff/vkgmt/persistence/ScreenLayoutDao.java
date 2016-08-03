@@ -173,7 +173,7 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
     }
     
     /**
-     * @inheritDoc
+     * WARNING no inner sublayouts are loaded!!!
      */
     @Override
     public List<ScreenLayout> getAll() {
@@ -190,10 +190,6 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 			
 			layouts.add(layout);
 			
-		}
-		for (ScreenLayout layout: layouts) {
-			layout.setBlockLayouts(this.loadBlockLayouts(layout.getUri()));
-			layout.setLineLayouts(this.loadLineLayouts(layout.getUri()));
 		}
 		return layouts;
     }

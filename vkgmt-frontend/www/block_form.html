@@ -49,7 +49,7 @@
 									<tr ng-repeat="columnLayout in currBlock.properties">
 										<td>
 											<input type="text" class="form-control" placeholder="Property" 
-												ng-disabled="columnLayout.property.property == 'URI' || columnLayout.property.property == 'rdfs:label'" 
+												ng-disabled="columnLayout.property.property == 'URI' || columnLayout.property.property == 'rdfs:label' || columnLayout.property.property == 'skos:prefLabel' || columnLayout.property.property == 'dc:title'" 
 												ng-model="columnLayout.property.property" />
 										</td>
 										<td>
@@ -80,7 +80,7 @@
 									<tr><td>&nbsp;</td></tr>
 									<tr>
 										<td>
-											<select class="form-control" ng-model="currBlock.toAddProperty.columnType" ng-change="columnTypeChanged({blockLayout: currBlock});">
+											<select class="form-control" ng-model="currBlock.toAddProperty.columnType">
 												<option value="">Choose new column type</option>
 												<option value="URI" selected>URI</option>
 												<option value="LABEL">Label</option>
@@ -88,6 +88,13 @@
 											</select>
 											<span ng-show="currBlock.toAddProperty.columnType == 'CUSTOM'">
 												<input type="text" class="form-control" placeholder="Property" ng-model="currBlock.toAddProperty.property.property" />
+											</span>
+											<span ng-show="currBlock.toAddProperty.columnType == 'LABEL'">
+												<select class="form-control" ng-model="currBlock.toAddProperty.labelType" ng-init="currBlock.toAddProperty.labelType = 'rdfs:label'">
+													<option value="rdfs:label">rdfs:label</option>
+													<option value="dc:title">dc:title</option>
+													<option value="skos:prefLabel">skos:prefLabel</option>
+												</select>
 											</span>
 										</td>
 										<td>

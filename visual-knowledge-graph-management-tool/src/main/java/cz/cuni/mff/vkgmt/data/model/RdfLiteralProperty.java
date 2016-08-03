@@ -10,9 +10,7 @@ import cz.cuni.mff.vkgmt.data.common.Property;
  *
  */
 public class RdfLiteralProperty implements Serializable {
-	/**
-	 * identifier of the property. e.g. rdfs:label or dbpedia-owl:length
-	 */
+	
 	private Property property;
 	
 	/**

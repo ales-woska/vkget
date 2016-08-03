@@ -66,7 +66,10 @@ public class Constants {
 	/**
 	 * RDF Label property
 	 */
+	public static final Property URI = new Property("", "URI");
 	public static final Property RDFS_LABEL = new Property("rdfs", "label");
+	public static final Property DC_TITLE = new Property("dc", "title");
+	public static final Property SKOS_PREFLABEL = new Property("skos", "prefLabel");
 	
 	/**
 	 * Common namespace definition for SPARQL query

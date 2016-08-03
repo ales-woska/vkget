@@ -28,7 +28,6 @@ import cz.cuni.mff.vkgmt.data.model.RdfInstance;
 import cz.cuni.mff.vkgmt.data.model.RdfLiteralProperty;
 import cz.cuni.mff.vkgmt.data.model.RdfObjectProperty;
 import cz.cuni.mff.vkgmt.data.model.RdfTable;
-import cz.cuni.mff.vkgmt.sparql.Constants;
 
 /**
  * Implementation of @see DataConnector for common types of endpoints.
@@ -256,8 +255,13 @@ public class DefaultDataConnector implements DataConnector {
 		sb.append("} FILTER (1=1 ");
 		
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
-			if (columnLayout.getProperty().equals(Constants.RDFS_LABEL)) {
-				sb.append(" && (lang(?").append(propertyVarMap.get(columnLayout.getProperty())).append(") = '").append(columnLayout.getLabel().getLang()).append("') ");
+			if (columnLayout.isUriColumn()) {
+				continue;
+			}
+			if (StringUtils.isNotEmpty(columnLayout.getLabel().getLang()) && !columnLayout.getLabel().getLang().equals("null")) {
+				String varName = propertyVarMap.get(columnLayout.getProperty());
+				String lang = columnLayout.getLabel().getLang();
+				sb.append(" && (lang(?").append(varName).append(") = '' || lang(?").append(varName).append(") = '").append(lang).append("') ");
 			}
 		}
 		
@@ -295,7 +299,7 @@ public class DefaultDataConnector implements DataConnector {
 	protected String getLabel(Label label, String type, ScreenLayout screenLayout) {
 		switch (label.getType()) {
 			case CONSTANT: return label.getLabelSource();
-			case LABEL: return loadLabel(type, Constants.RDFS_LABEL.getProperty(), screenLayout, label.getLang());
+			case LABEL: return loadLabel(type, label.getLabelSource(), screenLayout, label.getLang());
 			case PROPERTY: return loadLabel(type, label.getLabelSource(), screenLayout, label.getLang());
 			case URI: return type;
 			default: return null;

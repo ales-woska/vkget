@@ -257,7 +257,7 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			};
 		} else if (columnType == 'LABEL') {
 			property = {
-				property: 'rdfs:label'
+				property: newColumn.labelType
 			};
 		} else {
 			if (newColumn.property) {
