@@ -108,7 +108,7 @@
 		
 		<div id="modals">
 			<block-form block="blockLayout" langs="langs"
-				add-property="addProperty(blockLayout)" remove-property="removeProperty(blockLayout, property)"
+				add-property="addProperty(blockLayout)" remove-property="removeProperty(blockLayout, property)" update-for-type="updateForType(forType)"
 				ng-repeat="blockLayout in screenLayout.blockLayouts"></block-form>
 				
 			<line-form ng-repeat="lineLayout in screenLayout.lineLayouts"

@@ -10,7 +10,9 @@
 					<div class="form-group">
 						<label for="forType" class="col-sm-2 control-label">For rdf:type</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" placeholder="Class" ng-model="currBlock.forType.type">
+							<input type="text" class="form-control" placeholder="Class" ng-model="currBlock.forType.type"
+								ng-focus="currBlock.forType.oldValue = currBlock.forType.type"
+								ng-change="updateForType({forType: currBlock.forType})">
 						</div>
 					</div>
 					<div class="form-group">

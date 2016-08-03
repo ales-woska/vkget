@@ -73,7 +73,8 @@ app.directive('blockForm', function () {
         currBlock: '=block',
         langs: '=langs',
         addProperty: "&addProperty",
-        removeProperty: "&removeProperty"
+        removeProperty: "&removeProperty",
+        updateForType: "&updateForType"
     };
 	return directive;
 });
@@ -143,6 +144,21 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.parentHeight = 0;
 	$scope.langs = predefinedLangs;
 	
+	$scope.updateForType = function(forType) {
+		var oldValue = forType.oldValue;
+		var newValue = forType.type;
+		
+		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
+			var lineLayout = $scope.screenLayout.lineLayouts[i];
+			if (lineLayout.fromType.type == oldValue) {
+				lineLayout.fromType.type = newValue;
+			}
+			if (lineLayout.toType.type == oldValue) {
+				lineLayout.toType.type = newValue;
+			}
+		}
+	};
+	
 	$scope.addNamespace = function() {
 		var key = $scope.newKey;
 		var value = $scope.newValue;
@@ -182,13 +198,16 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			if (i != index && curr.fromType.type == lineLayout.fromType.type && curr.toType.type == lineLayout.toType.type) {
 				alert('Connection between types already exists, canceling.');
 				error = true;
+				break;
 			}
 			if (i != index && curr.fromType.type == lineLayout.toType.type && curr.toType.type == lineLayout.fromType.type) {
 				alert('WARNING: connection in opposite direction already exists.');
+				break;
 			}
 			if (lineLayout.fromType.type == lineLayout.toType.type) {
 				alert('Connection can\'t be targeted to the same type, canceling.');
 				error = true;
+				break;
 			}
 		}
 		
