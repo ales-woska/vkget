@@ -31,6 +31,8 @@ import cz.cuni.mff.vkgmt.sparql.Constants;
 public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 	private static final Property NAMESPACES = new Property(Constants.VKGMT_Prefix, "namespaces");
 	private static final Property FILTER_PROPAGATION = new Property(Constants.VKGMT_Prefix, "filterPropagation");
+	private static final Property HEIGHT = new Property(Constants.VKGMT_Prefix, "height");
+	private static final Property WIDTH = new Property(Constants.VKGMT_Prefix, "width");
 
 	@Autowired
 	@Qualifier("settingsConnector")
@@ -86,7 +88,9 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append("; ");
 		insertQuery.append(" ").append(Constants.RDFS_LABEL).append(" '").append(layout.getName()).append("'; ");
 		insertQuery.append(" ").append(NAMESPACES).append(" '").append(layout.getNamespacesAsString()).append("'; ");
-		insertQuery.append(" ").append(FILTER_PROPAGATION).append(" '").append(layout.getFilterPropagation()).append("'. ");
+		insertQuery.append(" ").append(FILTER_PROPAGATION).append(" '").append(layout.getFilterPropagation()).append("'; ");
+		insertQuery.append(" ").append(HEIGHT).append(" '").append(layout.getHeight()).append("'; ");
+		insertQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'. ");
     	
         for (BlockLayout block: layout.getBlockLayouts()) {
             blockDao.insertOrUpdate(block, layout);
@@ -132,7 +136,9 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append(" ; ");
 		updateQuery.append(" ").append(Constants.RDFS_LABEL).append(" '").append(layout.getName()).append("' ; ");
 		updateQuery.append(NAMESPACES).append(" '").append(layout.getNamespacesAsString()).append("' ; ");
-		updateQuery.append(FILTER_PROPAGATION).append(" '").append(layout.getFilterPropagation().name()).append("' . ");
+		updateQuery.append(FILTER_PROPAGATION).append(" '").append(layout.getFilterPropagation().name()).append("' ; ");
+		updateQuery.append(WIDTH).append(" '").append(layout.getWidth()).append("' ; ");
+		updateQuery.append(HEIGHT).append(" '").append(layout.getHeight()).append("' . ");
     	
         for (BlockLayout block: layout.getBlockLayouts()) {
             blockDao.insertOrUpdate(block, layout);
@@ -229,7 +235,13 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 			} else if (property.equals(NAMESPACES)) {
 				layout.setNamespacesFromString(value);
 			} else if (property.equals(FILTER_PROPAGATION)) {
-				layout.setFilterPropagation(PropagationType.valueOf(value));
+				if (value != null && !value.equals("null")) {
+					layout.setFilterPropagation(PropagationType.valueOf(value));
+				}
+			} else if (property.equals(WIDTH)) {
+				layout.setWidth(Integer.valueOf(value));
+			} else if (property.equals(HEIGHT)) {
+				layout.setHeight(Integer.valueOf(value));
 			}
 		}
 		layout.setBlockLayouts(this.loadBlockLayouts(layout.getUri()));

@@ -109,6 +109,13 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 						polyline(screenLayout.lineLayouts[i]);
 					}
 					$scope.screenLayout = screenLayout;
+					
+					if ($scope.screenLayout.width < minWorkspaceWidth) {
+						$scope.screenLayout.width = minWorkspaceWidth;
+					}
+					if ($scope.screenLayout.height < minWorkspaceHeight) {
+						$scope.screenLayout.height = minWorkspaceHeight;
+					}
 				});
 	}
 	
@@ -396,6 +403,25 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			if (!lineLayout.fromType.type || !lineLayout.toType.type) {
 				$scope.screenLayout.lineLayouts.splice(i, 1);
 			}
+		}
+		
+		if ($scope.screenLayout.width < minWorkspaceWidth) {
+			$scope.screenLayout.width = minWorkspaceWidth;
+			var message = {
+				caption: 'Warning',
+				text: 'Minimal width of workspace is ' + minWorkspaceWidth + 'px - your value was changed to the minimum.',
+				type: 'warning'
+	    	};
+	    	$scope.messages.push(message);
+		}
+		if ($scope.screenLayout.height < minWorkspaceHeight) {
+			$scope.screenLayout.height = minWorkspaceHeight;
+			var message = {
+				caption: 'Warning',
+				text: 'Minimal height of workspace is ' + minWorkspaceHeight + 'px - your value was changed to the minimum.',
+				type: 'warning'
+	    	};
+	    	$scope.messages.push(message);
 		}
 		
 		$http.post($scope.layoutServiceUri + '/save', $scope.screenLayout)

@@ -512,6 +512,14 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				    .success(function(response) {
 				        var layout = response;
 				        $scope.screenLayout = layout;
+				        
+				        if ($scope.screenLayout.width < minWorkspaceWidth) {
+							$scope.screenLayout.width = minWorkspaceWidth;
+						}
+						if ($scope.screenLayout.height < minWorkspaceHeight) {
+							$scope.screenLayout.height = minWorkspaceHeight;
+						}
+				        
 				        var layouts = {};
 				        for (var key = 0; key < layout.blockLayouts.length; key++) {
 				        	var bl = layout.blockLayouts[key];
@@ -524,6 +532,8 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 						
 						$('#loading').hide();
 						$('#workspace').show();
+						$('#workspace').width($scope.screenLayout.width);
+						$('#workspace').height($scope.screenLayout.height);
 				    })
 			        .error(function (data, status, header, config) {
 			        	var message = {

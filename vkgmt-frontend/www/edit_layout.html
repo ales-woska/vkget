@@ -73,7 +73,7 @@
 		</div>
 	
 		<div>
-			<div id="myholder">
+			<div id="myholder" style="width: {{screenLayout.width}}px; height: {{screenLayout.height}}px;">
 				<div ng-repeat="blockLayout in screenLayout.blockLayouts" 
 					ng-dblclick="openModal(blockLayout);"
 					ng-mousedown="onMouseDown($event, blockLayout);"
@@ -180,6 +180,18 @@
 											<option value="NEIGHBOURS">Neighbours</option>
 											<option value="ALL">All</option>
 										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="forType" class="col-sm-3 control-label">Workspace width</label>
+									<div class="col-sm-2">
+										<input class="form-control" type="number" ng-model="screenLayout.width" />
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="forType" class="col-sm-3 control-label">Workspace height</label>
+									<div class="col-sm-2">
+										<input class="form-control" type="number" ng-model="screenLayout.height" />
 									</div>
 								</div>
 							</div>

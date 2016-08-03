@@ -30,20 +30,20 @@ import cz.cuni.mff.vkgmt.sparql.Constants;
  */
 @Repository
 public class BlockLayoutDao extends AbstractDao<BlockLayout> {
-	private final Property FONT_COLOR = new Property(Constants.VKGMT_Prefix, "fontColor");
-	private final Property FONT_SIZE = new Property(Constants.VKGMT_Prefix, "fontSize");
-	private final Property LINE_COLOR = new Property(Constants.VKGMT_Prefix, "lineColor");
-	private final Property LINE_TYPE = new Property(Constants.VKGMT_Prefix, "lineType");
-	private final Property LINE_THICKNESS = new Property(Constants.VKGMT_Prefix, "lineThickness");
-	private final Property LABEL_SOURCE = new Property(Constants.VKGMT_Prefix, "labelSource");
-	private final Property LABEL_TYPE = new Property(Constants.VKGMT_Prefix, "labelType");
-	private final Property LABEL_LANG = new Property(Constants.VKGMT_Prefix, "labelLang");
-	private final Property FOR_TYPE = new Property(Constants.VKGMT_Prefix, "forType");
-	private final Property BACKGROUND = new Property(Constants.VKGMT_Prefix, "background");
-	private final Property HEIGHT = new Property(Constants.VKGMT_Prefix, "height");
-	private final Property WIDTH = new Property(Constants.VKGMT_Prefix, "width");
-	private final Property LEFT = new Property(Constants.VKGMT_Prefix, "left");
-	private final Property TOP = new Property(Constants.VKGMT_Prefix, "top");
+	private final static Property FONT_COLOR = new Property(Constants.VKGMT_Prefix, "fontColor");
+	private final static Property FONT_SIZE = new Property(Constants.VKGMT_Prefix, "fontSize");
+	private final static Property LINE_COLOR = new Property(Constants.VKGMT_Prefix, "lineColor");
+	private final static Property LINE_TYPE = new Property(Constants.VKGMT_Prefix, "lineType");
+	private final static Property LINE_THICKNESS = new Property(Constants.VKGMT_Prefix, "lineThickness");
+	private final static Property LABEL_SOURCE = new Property(Constants.VKGMT_Prefix, "labelSource");
+	private final static Property LABEL_TYPE = new Property(Constants.VKGMT_Prefix, "labelType");
+	private final static Property LABEL_LANG = new Property(Constants.VKGMT_Prefix, "labelLang");
+	private final static Property FOR_TYPE = new Property(Constants.VKGMT_Prefix, "forType");
+	private final static Property BACKGROUND = new Property(Constants.VKGMT_Prefix, "background");
+	private final static Property HEIGHT = new Property(Constants.VKGMT_Prefix, "height");
+	private final static Property WIDTH = new Property(Constants.VKGMT_Prefix, "width");
+	private final static Property LEFT = new Property(Constants.VKGMT_Prefix, "left");
+	private final static Property TOP = new Property(Constants.VKGMT_Prefix, "top");
 
 	@Autowired
 	@Qualifier("settingsConnector")

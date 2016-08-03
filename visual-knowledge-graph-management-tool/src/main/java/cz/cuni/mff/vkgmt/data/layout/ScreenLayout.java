@@ -33,6 +33,9 @@ public class ScreenLayout extends RdfEntity {
 	 */
 	private List<BlockLayout> blockLayouts;
 	
+	private int width;
+	private int height;
+	
 	/**
 	 * Definitions of properties connecting tables @see RdfObjectProperty
 	 */
@@ -119,6 +122,22 @@ public class ScreenLayout extends RdfEntity {
 			map.put(pairArray[0], pairArray[1]);
 		}
 		this.namespaces = map;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 
 }
