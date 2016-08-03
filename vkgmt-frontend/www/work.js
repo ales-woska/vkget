@@ -36,9 +36,10 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.dataServiceUrl = serverAddress + '/data';
 	$scope.layoutsServiceUrl = serverAddress + '/layouts';
 	$scope.layoutServiceUrl = serverAddress + '/layout';
+	$scope.storedEndpoints = endpointList;
 	
 	$scope.connectionInfo = {
-		endpoint: 'http://dbpedia.org/sparql',
+		endpoint: '',
 		type: 'other',
 		useNamedGraph: false,
 		useAutorization: false,

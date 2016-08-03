@@ -1,4 +1,8 @@
 var serverAddress = 'http://localhost:8090';
+var endpointList = [
+    'http://linked.opendata.cz/sparql',
+    'http://dbpedia.org/sparql'
+];
 var predefinedLangs = [
      {value: 'cz', label: 'Czech'},
      {value: 'de', label: 'Deutch'},
