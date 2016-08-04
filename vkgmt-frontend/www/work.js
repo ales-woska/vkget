@@ -453,6 +453,66 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		
 	};
 	
+	$scope.loadMoreData = function(sourceTable) {
+		if (!sourceTable || !sourceTable.instances) {
+			return;
+		}
+		
+		var filter = {
+			offset: sourceTable.instances.length,
+			limit: 40,
+			uriFilters: {},
+			columnFilters: {}				
+		};
+		
+		//column filters
+		var tableFilters = $scope.filters[sourceTable.type.type];
+		if (tableFilters) {
+			for (var i = 0; i < sourceTable.columns.length; i++) {
+				var property = sourceTable.columns[i];
+				var propertyFilter = tableFilters[property.property];
+				if (propertyFilter && propertyFilter.length < 2) {
+					continue;
+				}
+				filter.columnFilters[property.property] = propertyFilter;
+			}
+		}
+		
+		// uri filters
+		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
+			var lineLayout = $scope.screenLayout.lineLayouts[i];
+			var property = lineLayout.property.property;
+			
+			// source table is FROM table
+			if (lineLayout.fromType.type == sourceTable.type.type) {
+				var otherTable = $scope.getTableByType(lineLayout.toType.type);
+				if (otherTable.selectedInstance) {
+					filter.uriFilters[property] = otherTable.selectedInstance.uri.uri;
+				}
+				
+			// source table is TO table
+			} else if (lineLayout.toType.type == sourceTable.type.type) {
+				var otherTable = $scope.getTableByType(lineLayout.fromType.type);
+				if (otherTable.selectedInstance) {
+					filter.uriFilters[property] = otherTable.selectedInstance.uri.uri;
+				}
+			}
+		}
+		
+		var layoutUri = $scope.screenLayout.uri.uri;
+		var tableType = sourceTable.type.type;
+		
+		var request = {
+			tableType: tableType,
+			filter: filter,
+			connectionInfo: $scope.connectionInfo,
+			layoutUri: layoutUri
+		};
+		
+		$scope.loadTableData(request, null);
+		
+	};
+	
 	$scope.loadingStack = [];
 	
 	$scope.loadTableData = function(request, instance) {
@@ -462,16 +522,21 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		$http.post($scope.dataServiceUrl + '/table', request)
         .success(function (data, status, headers, config) {
         	var newInstances = data;
+        	var added = 0;
 			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
 				if ($scope.dataModel.tables[i].type.type == request.tableType) {
 					for (var j = 0; j < newInstances.length; j++) {
 						if (!containsInstance($scope.dataModel.tables[i], newInstances[j])) {
 							$scope.dataModel.tables[i].instances.push(newInstances[j]);
 							$scope.originalDataModel.tables[i].instances.push(newInstances[j]);
+							added++;
 						}
 					}
 				}
 			}
+        	if (added == 0 && request.filter.offset > 0) {
+        		alert("No more data satisfying filters.");
+        	}
         })
         .error(function (data, status, header, config) {
         	var message = {

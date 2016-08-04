@@ -25,6 +25,7 @@ public class RdfFilter {
 	 * Max limit of loaded isntances.
 	 */
 	private int limit;
+	private int offset = 0;
 
 	public Map<Property, String> getColumnFilters() {
 		return columnFilters;
@@ -48,6 +49,14 @@ public class RdfFilter {
 
 	public void setLimit(int limit) {
 		this.limit = limit;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
 	}
 
 }

@@ -60,6 +60,8 @@
 				<tr>
 					<th class="caption" colspan="{{table.columns.length}}">
 						{{table.label}} ({{(table.instances | filter : filterInstances).length}}/{{table.instances.length}})
+						
+						<button class="load-more" ng-hide="table.instances.length == 0" ng-click="loadMoreData(table);">load more</button>
 					</th>
 				</tr>
 				<tr>

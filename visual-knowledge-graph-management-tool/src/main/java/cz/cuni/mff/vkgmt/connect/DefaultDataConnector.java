@@ -289,7 +289,7 @@ public class DefaultDataConnector implements DataConnector {
 		if (StringUtils.isNotEmpty(namedGraph)) {
 			sb.append(" }\n");
 		}
-		sb.append("\n} ORDER BY ?uri LIMIT ").append(limit);
+		sb.append("\n} ORDER BY ?uri LIMIT ").append(limit).append(" OFFSET ").append(filter.getOffset());
 		String query = sb.toString();
 		logger.debug(query);
 		return query;

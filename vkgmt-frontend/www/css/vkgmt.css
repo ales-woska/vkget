@@ -188,3 +188,9 @@ input.filter {
 	width: 90%;
 	font-weight: normal;
 }
+
+.load-more {
+	font-size: 8px;
+    position: absolute;
+    right: 5px;
+}
