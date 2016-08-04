@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +37,8 @@ import cz.cuni.mff.vkgmt.data.model.RdfTable;
  */
 @Service
 public class DefaultDataConnector implements DataConnector {
-	
 	protected SparqlConnector connector;
+	private Logger logger = Logger.getLogger(getClass());
 	
 	/**
 	 * Default row limit.
@@ -62,7 +63,7 @@ public class DefaultDataConnector implements DataConnector {
 		for (BlockLayout blockLayout: screenLayout.getBlockLayouts()) {
 			RdfTable rdfTable = new RdfTable();
 			rdfTable.setType(blockLayout.getForType());
-			rdfTable.setLabel(this.getLabel(blockLayout.getLabel(), blockLayout.getForType().getType(), screenLayout));
+			rdfTable.setLabel(this.getLabel(blockLayout.getLabel(), blockLayout.getForType().getType()));
 			rdfTable.setInstances(new ArrayList<RdfInstance>());
 			rdfTable.setColumns(new ArrayList<Property>());
 			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
@@ -275,7 +276,6 @@ public class DefaultDataConnector implements DataConnector {
 				if (filterValue.isEmpty()) {
 					continue;
 				}
-				sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), '").append(filterValue).append("', 'i')) ");
 				appendContainsFunction(sb, propertyVarMap, property, filterValue);
 			}
 		}
@@ -290,45 +290,24 @@ public class DefaultDataConnector implements DataConnector {
 			sb.append(" }\n");
 		}
 		sb.append("\n} ORDER BY ?uri LIMIT ").append(limit);
-		return sb.toString();
+		String query = sb.toString();
+		logger.debug(query);
+		return query;
 	}
 	
 	protected void appendContainsFunction(StringBuilder sb, Map<Property, String> propertyVarMap, Property property, String filterValue) {
-		sb.append(" && (regex(str(?").append(propertyVarMap.get(property)).append("), '").append(filterValue).append("', 'i')) ");
+		String varName = propertyVarMap.get(property);
+		sb.append(" && (regex(str(?").append(varName).append("), '").append(filterValue).append("', 'i')) ");
 	}
 	
-	protected String getLabel(Label label, String type, ScreenLayout screenLayout) {
-		switch (label.getType()) {
-			case CONSTANT: return label.getLabelSource();
-			case LABEL: return loadLabel(type, label.getLabelSource(), screenLayout, label.getLang());
-			case PROPERTY: return loadLabel(type, label.getLabelSource(), screenLayout, label.getLang());
-			case URI: return type;
-			default: return null;
+	protected String getLabel(Label label, String type) {
+		if (label.getType().equals(LabelType.CONSTANT)) {
+			return label.getLabelSource();
+		} else {
+			return type;
 		}
 	}
 	
-	private String loadLabel(String type, String property, ScreenLayout screenLayout, String lang) {
-		StringBuilder sb = new StringBuilder();
-		for (String prefix: screenLayout.getNamespaces().keySet()) {
-			String namespace = screenLayout.getNamespaces().get(prefix);
-			sb.append("PREFIX ").append(prefix).append(": <").append(namespace).append("> ");
-		}
-		sb.append("SELECT ?label WHERE { ").append(type).append(" ").append(property).append(" ?label . ");
-		if (StringUtils.isNotEmpty(lang)) {
-			sb.append("FILTER (lang(?label) = '").append(lang).append("')");
-		}
-		sb.append("} ");
-		String query = sb.toString();
-		
-		ResultSet results = this.connector.query(query);
-		String label = null;
-		while (results.hasNext()) {
-			QuerySolution solution = results.next();
-			label = solution.get("?label").asLiteral().getString();
-		}
-		return label;
-	}
-
 	public void setConnector(SparqlConnector connector) {
 		this.connector = connector;
 	}

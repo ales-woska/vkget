@@ -26,6 +26,7 @@ public class VirtuosoDataConnector extends DefaultDataConnector {
 	 */
 	@Override
 	protected void appendContainsFunction(StringBuilder sb, Map<Property, String> propertyVarMap, Property property, String filterValue) {
-		sb.append(" && (?").append(propertyVarMap.get(property)).append(" bif:contains '").append(filterValue).append("') ");
+		String varName = propertyVarMap.get(property);
+		sb.append(" && (contains(lcase(?").append(varName).append("), '").append(filterValue.toLowerCase()).append("')) ");
 	}	
 }
