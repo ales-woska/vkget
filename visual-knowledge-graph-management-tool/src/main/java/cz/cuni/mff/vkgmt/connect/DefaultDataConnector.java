@@ -112,12 +112,18 @@ public class DefaultDataConnector implements DataConnector {
 		ResultSet results = this.connector.query(query);
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
-			RdfInstance instance = new RdfInstance(); 
 			Uri subjectUri = new Uri(solution.get("?uri").asResource().getURI());
-			instance.setUri(subjectUri);
-			instance.setType(blockLayout.getForType());
 
-			instance.setLiteralProperties(new ArrayList<RdfLiteralProperty>());
+			RdfInstance instance = getExistingInstance(rdfTable, subjectUri);
+			boolean exists = true;
+			
+			if (instance == null) {
+				instance = new RdfInstance();
+				instance.setUri(subjectUri);
+				instance.setType(blockLayout.getForType());
+				exists = false;
+			}
+
 			int j = 0;
 			for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 				String propertyName = "";
@@ -125,7 +131,7 @@ public class DefaultDataConnector implements DataConnector {
 					RdfLiteralProperty rdfProperty = new RdfLiteralProperty();
 					rdfProperty.setProperty(columnLayout.getProperty());
 					rdfProperty.setValue(subjectUri.getUri());
-					instance.getLiteralProperties().add(rdfProperty);
+					instance.addPropertyIfNotPresent(rdfProperty);
 					continue;
 				}
 				propertyName = "y" + j++;
@@ -149,10 +155,9 @@ public class DefaultDataConnector implements DataConnector {
 				RdfLiteralProperty rdfProperty = new RdfLiteralProperty();
 				rdfProperty.setProperty(property);
 				rdfProperty.setValue(value);
-				instance.getLiteralProperties().add(rdfProperty);
+				instance.addPropertyIfNotPresent(rdfProperty);
 			}
 
-			instance.setObjectProperties(new ArrayList<RdfObjectProperty>());
 			for (LineLayout lineLayout: screenLayout.getLineLayouts()) {
 				if (!lineLayout.getFromType().equals(blockLayout.getForType())) {
 					continue;
@@ -170,11 +175,23 @@ public class DefaultDataConnector implements DataConnector {
 				rdfObjectProperty.setSubjectUri(subjectUri);
 				rdfObjectProperty.setProperty(lineLayout.getProperty());
 				rdfObjectProperty.setObjectUri(uri);
-				instance.getObjectProperties().add(rdfObjectProperty);
+				instance.addPropertyIfNotPresent(rdfObjectProperty);
 			}
-			rdfTable.getInstances().add(instance);
+			
+			if (!exists) {
+				rdfTable.getInstances().add(instance);
+			}
 		}
 		return rdfTable;
+	}
+	
+	private RdfInstance getExistingInstance(RdfTable table, Uri uri) {
+		for (RdfInstance instance: table.getInstances()) {
+			if (instance.getUri().equals(uri)) {
+				return instance;
+			}
+		}
+		return null;
 	}
 	
 	/**

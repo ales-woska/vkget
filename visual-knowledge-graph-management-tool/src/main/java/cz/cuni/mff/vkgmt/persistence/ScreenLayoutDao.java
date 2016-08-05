@@ -169,12 +169,17 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
     	deleteQuery.append(" } WHERE { <").append(layout.getUri()).append("> ?p ?o . }");
     	
     	sparql.executeQuery(deleteQuery.toString());
-    	
-    	for (BlockLayout block: layout.getBlockLayouts()) {
-    		blockDao.delete(block);
+
+    	if (layout.getBlockLayouts() != null) {
+	    	for (BlockLayout block: layout.getBlockLayouts()) {
+	    		blockDao.delete(block);
+	    	}
     	}
-    	for (LineLayout line: layout.getLineLayouts()) {
-    		lineDao.delete(line);
+    	
+    	if (layout.getLineLayouts() != null) {
+	    	for (LineLayout line: layout.getLineLayouts()) {
+	    		lineDao.delete(line);
+	    	}
     	}
     }
     

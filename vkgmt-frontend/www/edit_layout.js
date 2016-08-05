@@ -1,4 +1,4 @@
-function escapeUri(uri) {
+/function escapeUri(uri) {
 	var result = uri;
 	if (uri.uri) {
 		result = uri.uri;
@@ -405,8 +405,8 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 			for (var i = 0; i < points.length; i++) {
 				points[i].x = $scope.mouseDownBL.left + diffPointXs[i];
 				points[i].y = $scope.mouseDownBL.top + diffPointYs[i];
-			}
-		}
+			};
+		};
 	};
 	
 	$scope.onMouseUp = function(event) {

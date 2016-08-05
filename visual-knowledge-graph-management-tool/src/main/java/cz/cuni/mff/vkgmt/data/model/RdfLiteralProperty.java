@@ -33,5 +33,15 @@ public class RdfLiteralProperty implements Serializable {
 	public void setValue(Object value) {
 		this.value = value;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof RdfLiteralProperty)) {
+			return false;
+		} else {
+			RdfLiteralProperty p = (RdfLiteralProperty) o;
+			return p.getProperty().equals(property) && p.getValue().equals(value);
+		}
+	}
 
 }

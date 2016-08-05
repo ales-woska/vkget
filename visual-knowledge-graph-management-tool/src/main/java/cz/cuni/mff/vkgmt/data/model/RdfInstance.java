@@ -1,6 +1,7 @@
 package cz.cuni.mff.vkgmt.data.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.cuni.mff.vkgmt.data.common.Type;
@@ -26,12 +27,12 @@ public class RdfInstance implements Serializable {
 	/**
 	 * properties leading to other table
 	 */
-	private List<RdfObjectProperty> objectProperties;
+	private List<RdfObjectProperty> objectProperties = new ArrayList<>();
 	
 	/**
 	 * instance properties ~ table cells
 	 */
-	private List<RdfLiteralProperty> literalProperties;
+	private List<RdfLiteralProperty> literalProperties = new ArrayList<>();
 
 	public Uri getUri() {
 		return uri;
@@ -72,6 +73,32 @@ public class RdfInstance implements Serializable {
 			}
 		}
 		return null;
+	}
+	
+	public void addPropertyIfNotPresent(RdfLiteralProperty property) {
+		boolean exists = false;
+		for (RdfLiteralProperty p: this.literalProperties) {
+			if (p.equals(property)) {
+				exists = true;
+				break;
+			}
+		}
+		if (!exists) {
+			literalProperties.add(property);
+		}
+	}
+	
+	public void addPropertyIfNotPresent(RdfObjectProperty property) {
+		boolean exists = false;
+		for (RdfObjectProperty p: this.objectProperties) {
+			if (p.equals(property)) {
+				exists = true;
+				break;
+			}
+		}
+		if (!exists) {
+			objectProperties.add(property);
+		}
 	}
 
 }

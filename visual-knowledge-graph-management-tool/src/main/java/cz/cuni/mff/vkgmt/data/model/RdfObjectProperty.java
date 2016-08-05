@@ -51,5 +51,15 @@ public class RdfObjectProperty implements Serializable {
 	public void setObjectUri(Uri objectUri) {
 		this.objectUri = objectUri;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof RdfObjectProperty)) {
+			return false;
+		} else {
+			RdfObjectProperty p = (RdfObjectProperty) o;
+			return p.getProperty().equals(property) && p.getObjectUri().equals(objectUri) && p.getSubjectUri().equals(subjectUri);
+		}
+	}
 
 }
