@@ -30,7 +30,7 @@ public class RdfChange implements Serializable {
 	private Object oldValue;
 
 	/**
-	 * Value adter change. If is empty then the property is deleted.
+	 * Value after change. If is empty then the property is deleted.
 	 */
 	private Object newValue;
 

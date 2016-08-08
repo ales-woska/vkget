@@ -39,11 +39,11 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.storedEndpoints = endpointList;
 	
 	$scope.connectionInfo = {
-		endpoint: '',
-		type: 'other',
-		useNamedGraph: false,
+		endpoint: 'http://localhost:3030/data',
+		type: 'virtuoso',
+		useNamedGraph: true,
 		useAutorization: false,
-		namedGraph: '',
+		namedGraph: 'http://mff.cuni.cz/testGraph',
 		username: '',
 		password: ''
 	};
@@ -277,6 +277,9 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				$scope.selectedTd.element.css({
 					'background-color': ""
 				});
+			}
+			while (e.target.localName != 'td') {
+				e.target = e.target.parentElement;
 			}
 			$scope.selectedTd = {
 				element: $(e.target),
@@ -834,6 +837,33 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		return null;
 	};
 	
+	$scope.getLiteralErrorClass = function(error) {
+		var style = getCommonErrorStyle(error);
+		return style;
+	};
+	
+	$scope.getObjectErrorClass = function(error) {
+		var style = getCommonErrorStyle(error);
+		return style;
+	};
+	
+	$scope.errorClicked = function(error, property) {
+		if (confirm("Are you sure to resolve the error?")) {
+			for (var i = 0; i < property.errors.length; i++) {
+				if (property.errors[i] == error) {
+					property.errors.splice(i, 1);
+					var change = {
+						uri: error.uri,
+						property: null,
+						oldValue: null,
+						newValue: null
+					};
+					$scope.changes.push(change);
+				}
+			}
+		}
+	};
+	
 });
 
 function polyline(lineLayout) {
@@ -859,4 +889,31 @@ function containsInstance(table, instance) {
 		}
 	}
 	return false;
+}
+
+function getCommonErrorStyle(error) {
+	var style = {};
+	var color = '#5cb85c';
+	if (error.value <= 0.5) {
+		color = '#d9534f';
+	} else if (error.value <= 0.75) {
+		color = '#f0ad4e';
+	} else if (error.value <= 0.9) {
+		color = '#f0ad4e';
+	}
+	
+	if (error.severity == 'ERROR') {
+		style['background'] = color;
+	} else if (error.severity == 'WARNING') {
+		style['-moz-border-radius'] = '10px';
+		style['-webkit-border-radius'] = '10px';
+        style['border-radius'] = '10px';
+		style['background'] = color;
+	} else if (error.severity == 'INFO') {
+		style['border-left'] = '10px solid transparent';
+        style['border-right'] = '10px solid transparent';
+        style['border-bottom'] = '20px solid ' + color;
+	}
+	
+	return style;
 }

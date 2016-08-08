@@ -41,7 +41,12 @@ public class DataServiceImpl implements DataService {
 			boolean oldValueEmpty = change.getOldValue() == null;
 			boolean newValueEmpty = change.getNewValue() == null;
 			
-			if (oldValueEmpty && !newValueEmpty) {
+			if (change.getProperty() == null && change.getNewValue() == null && change.getOldValue() == null) {
+				result.append("DELETE WHERE {\n");
+				result.append("<").append(change.getUri().getUri()).append("> ?p ?o .\n");
+				result.append("}\n");
+				
+			} else if (oldValueEmpty && !newValueEmpty) {
 				result.append("INSERT DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
 					result.append(" <").append((Uri)change.getNewValue()).append("> .\n");
@@ -96,6 +101,8 @@ public class DataServiceImpl implements DataService {
 		ScreenLayout screenLayout = layoutService.getLayout(layoutUri);
 		DataConnector connector = getConnector(connectionInfo);
 		RdfTable table = connector.loadTableData(connectionInfo.getNamedGraph(), tableType, filter, screenLayout);
+		connector.loadErrors(table, connectionInfo.getNamedGraph(), screenLayout.getNamespaces());
+		
 		if (table == null) {
 			return new ArrayList<RdfInstance>();
 		} else {

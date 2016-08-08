@@ -1,6 +1,8 @@
 package cz.cuni.mff.vkgmt.data.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import cz.cuni.mff.vkgmt.data.common.Property;
 
@@ -17,6 +19,8 @@ public class RdfLiteralProperty implements Serializable {
 	 * value ~ table cell
 	 */
 	private Object value;
+	
+	private List<RdfError> errors = new ArrayList<>();
 
 	public Property getProperty() {
 		return property;
@@ -42,6 +46,14 @@ public class RdfLiteralProperty implements Serializable {
 			RdfLiteralProperty p = (RdfLiteralProperty) o;
 			return p.getProperty().equals(property) && p.getValue().equals(value);
 		}
+	}
+
+	public List<RdfError> getErrors() {
+		return errors;
+	}
+
+	public void setErrors(List<RdfError> errors) {
+		this.errors = errors;
 	}
 
 }

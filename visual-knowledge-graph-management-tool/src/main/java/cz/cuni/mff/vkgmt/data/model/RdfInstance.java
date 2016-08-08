@@ -33,7 +33,7 @@ public class RdfInstance implements Serializable {
 	 * instance properties ~ table cells
 	 */
 	private List<RdfLiteralProperty> literalProperties = new ArrayList<>();
-
+	
 	public Uri getUri() {
 		return uri;
 	}
@@ -100,5 +100,5 @@ public class RdfInstance implements Serializable {
 			objectProperties.add(property);
 		}
 	}
-
+	
 }

@@ -1,5 +1,7 @@
 package cz.cuni.mff.vkgmt.connect;
 
+import java.util.Map;
+
 import cz.cuni.mff.vkgmt.data.common.Type;
 import cz.cuni.mff.vkgmt.data.layout.ScreenLayout;
 import cz.cuni.mff.vkgmt.data.model.DataModel;
@@ -28,4 +30,6 @@ public interface DataConnector {
 	 * @return
 	 */
 	RdfTable loadTableData(String namedGraph, Type tableType, RdfFilter filter, ScreenLayout screenLayout);
+
+	void loadErrors(RdfTable table, String namedGraph, Map<String, String> namespaces);
 }

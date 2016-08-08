@@ -24,6 +24,8 @@ import cz.cuni.mff.vkgmt.data.layout.LabelType;
 import cz.cuni.mff.vkgmt.data.layout.LineLayout;
 import cz.cuni.mff.vkgmt.data.layout.ScreenLayout;
 import cz.cuni.mff.vkgmt.data.model.DataModel;
+import cz.cuni.mff.vkgmt.data.model.RdfError;
+import cz.cuni.mff.vkgmt.data.model.RdfErrorSeverity;
 import cz.cuni.mff.vkgmt.data.model.RdfFilter;
 import cz.cuni.mff.vkgmt.data.model.RdfInstance;
 import cz.cuni.mff.vkgmt.data.model.RdfLiteralProperty;
@@ -90,6 +92,115 @@ public class DefaultDataConnector implements DataConnector {
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public void loadErrors(RdfTable table, String namedGraph, Map<String, String> namespaces) {
+		String query = this.getErrorsQuery(table, namedGraph, namespaces);
+		ResultSet results = this.connector.query(query);
+		List<RdfError> errors = new ArrayList<RdfError>();
+		while (results.hasNext()) {
+			QuerySolution solution = results.next();
+			RdfError error = new RdfError();
+			error.setUri(new Uri(solution.get("?uri").asResource().getURI()));
+			error.setDescription(solution.get("?desc").asLiteral().getString());
+			
+			RDFNode objekt = solution.get("?object");
+			Object objektValue = null;
+			if (objekt != null) {
+				if (objekt.isResource()) {
+					objektValue = new Uri(objekt.asResource().getURI());
+				} else if (objekt.isLiteral()) {
+					objektValue = objekt.asLiteral().getValue();
+				}
+			}
+			error.setObject(objektValue);
+			
+			String property = solution.get("?property").asResource().getURI();
+			error.setProperty(new Property(property));
+			
+			String severity = solution.get("?severity").asResource().getURI();
+			if (StringUtils.isNotEmpty(severity)) {
+				error.setSeverity(RdfErrorSeverity.fromString(severity));
+			}
+			
+			String subject = solution.get("?subject").asResource().getURI();
+			error.setSubject(new Uri(subject));
+			error.setValue(solution.get("?value").asLiteral().getFloat());
+			errors.add(error);
+
+		}
+		fillErrorsIntoInstances(table, errors, namespaces);
+	}
+	
+	private void fillErrorsIntoInstances(RdfTable table, List<RdfError> errors, Map<String, String> namespaces) {
+		for (RdfInstance instance: table.getInstances()) {
+			for (RdfError error: errors) {
+				
+				// not an error
+				if (error.getValue() == 1f) {
+					continue;
+				}
+				
+				if (instance.getUri().equals(error.getSubject())) {
+					for (RdfLiteralProperty lp: instance.getLiteralProperties()) {
+						String propName = namespaces.get(lp.getProperty().getPrefix()) + lp.getProperty().getName();
+						if (propName.equals(error.getProperty().getProperty())) {
+							lp.getErrors().add(error);
+						}
+					}
+					for (RdfObjectProperty op: instance.getObjectProperties()) {
+						String propName = namespaces.get(op.getProperty().getPrefix()) + op.getProperty().getName();
+						if (propName.equals(error.getProperty().getProperty())) {
+							op.getErrors().add(error);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private String getErrorsQuery(RdfTable table, String namedGraph, Map<String, String> namespaces) {
+		StringBuilder query = new StringBuilder("PREFIX daq: <http://purl.org/eis/vocab/daq#>\n");
+		query.append("PREFIX dc: <http://purl.org/dc/elements/1.1/>\n");
+		query.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
+		for (String prefix: namespaces.keySet()) {
+			String namespace = namespaces.get(prefix);
+			query.append("PREFIX ").append(prefix).append(": <").append(namespace).append(">\n");
+		}
+		query.append("SELECT ?uri ?subject ?property ?object ?value ?severity ?desc ");
+		
+
+		if (StringUtils.isNotEmpty(namedGraph)) {
+			query.append(" FROM NAMED <").append(namedGraph).append("> WHERE { GRAPH <").append(namedGraph).append("> {\n");
+		} else {
+			query.append(" WHERE {\n");
+		}
+		
+		query.append("?uri a daq:Observation .\n");
+		query.append("?uri dc:description ?desc .\n");
+		query.append("?uri daq:problemDescription _:node1 .\n");
+		query.append(" _:node1 a rdf:Statement .\n");
+		query.append(" _:node1 rdf:subject ?subject .\n");
+		query.append(" _:node1 rdf:predicate ?property .\n");
+		query.append(" _:node1 rdf:object ?object .\n");
+		query.append("?uri daq:value ?value .\n");
+		query.append("?uri daq:severity ?severity .\n");
+		query.append("?subject a ").append(table.getType().getType()).append(" .\n");
+	
+		if (table.getInstances() != null && table.getInstances().size() > 0) {
+			query.append("VALUES ?subject {\n");
+			for (RdfInstance instance: table.getInstances()) {
+				query.append("<").append(instance.getUri().getUri()).append("> ");
+			}
+			query.append("\n}\n");
+		}
+		
+		if (StringUtils.isNotEmpty(namedGraph)) {
+			query.append("}\n");
+		}
+		query.append("}\n");
+		return query.toString();
 	}
 	
 	/**
@@ -203,7 +314,6 @@ public class DefaultDataConnector implements DataConnector {
 	 * @return
 	 */
 	protected String constructTableQuery(String namedGraph, BlockLayout blockLayout, Map<String, String> namespaces, List<LineLayout> lineLayouts, RdfFilter filter) {
-		// TODO named graph
 		StringBuilder sb = new StringBuilder();
 		for (String prefix: namespaces.keySet()) {
 			String namespace = namespaces.get(prefix);

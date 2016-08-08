@@ -85,8 +85,21 @@
 					ng-class="instance == table.selectedInstance ? 'selectedInstance' : ''">
 					<td ng-repeat="property in instance.literalProperties" 
 						ng-right-click="contextMenu(table, instance, property)"
-						style="width: {{layouts[table.type.type].width / instance.literalProperties.length}}px; {{isNumeric(property.value) ? 'text-align: right;' : ''}}">
+						style="width: {{layouts[table.type.type].width / instance.literalProperties.length}}px; 
+							{{isNumeric(property.value) ? 'text-align: right;' : ''}}">
 						{{property.value}}
+						
+						<span class="error" ng-repeat="error in property.errors" 
+							ng-click="errorClicked(error, property); $event.stopPropagation();"
+							ng-style="getLiteralErrorClass(error);">!</span>
+							
+						<div ng-if="$last">
+							<div ng-repeat="op in instance.objectProperties">
+								<div class="error" ng-repeat="error in op.errors" 
+									ng-click="errorClicked(error, op); $event.stopPropagation();"
+									ng-style="getObjectErrorClass(error);">!</div>
+							</div>
+						</div>
 					</td>
 				</tr>
 			</tbody>

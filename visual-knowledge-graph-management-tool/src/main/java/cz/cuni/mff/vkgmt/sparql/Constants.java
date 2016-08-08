@@ -17,6 +17,7 @@ public class Constants {
 	 * Whole URI of application namespace
 	 */
 	public static final String VKGMT_Namespace = "http://mff.cuni.cz/vkgmt#";
+	public static final String daqNamespace = "http://purl.org/eis/vocab/daq#";
 	
 	/**
 	 * Prefix of application namespace.
