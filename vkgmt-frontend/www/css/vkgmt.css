@@ -43,6 +43,10 @@ table.vkgmt_table tbody td:hover {
 	background-color: #F5DA81;
 }
 
+table.vkgmt_table td {
+	padding: 5px;
+}
+
 
 table.vkgmt_table td .error {
 	width: 20px;

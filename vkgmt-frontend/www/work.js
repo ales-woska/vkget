@@ -844,6 +844,9 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	
 	$scope.getObjectErrorClass = function(error) {
 		var style = getCommonErrorStyle(error);
+		style['position'] = 'absolute';
+		style['margin-top'] = '-15px';
+		style['left'] = '-15px';
 		return style;
 	};
 	
