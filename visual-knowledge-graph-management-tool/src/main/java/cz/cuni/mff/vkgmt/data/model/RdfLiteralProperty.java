@@ -44,7 +44,9 @@ public class RdfLiteralProperty implements Serializable {
 			return false;
 		} else {
 			RdfLiteralProperty p = (RdfLiteralProperty) o;
-			return p.getProperty().equals(property) && p.getValue().equals(value);
+			Property pp = p.getProperty();
+			Object pv = p.getValue();
+			return pp != null && pv != null && property.equals(p.getProperty()) && value.equals(p.getValue());
 		}
 	}
 

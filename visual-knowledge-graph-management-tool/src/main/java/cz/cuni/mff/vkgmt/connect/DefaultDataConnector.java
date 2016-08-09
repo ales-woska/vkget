@@ -97,7 +97,13 @@ public class DefaultDataConnector implements DataConnector {
 	@Override
 	public void loadErrors(RdfTable table, String namedGraph, Map<String, String> namespaces) {
 		String query = this.getErrorsQuery(table, namedGraph, namespaces);
-		ResultSet results = this.connector.query(query);
+		ResultSet results = null;
+		try {
+			results = this.connector.query(query);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return;
+		}
 		List<RdfError> errors = new ArrayList<RdfError>();
 		while (results.hasNext()) {
 			QuerySolution solution = results.next();
