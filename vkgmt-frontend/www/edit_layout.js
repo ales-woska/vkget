@@ -1,4 +1,4 @@
-/function escapeUri(uri) {
+function escapeUri(uri) {
 	var result = uri;
 	if (uri.uri) {
 		result = uri.uri;
