@@ -1,0 +1,267 @@
+.pull-right {
+  float: right !important;
+}
+.pull-left {
+  float: left !important;
+}
+.organogram .chartContainer svg {
+  display: block;
+  background: #f6f8f9 url('data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiCiAgICAgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIyNXB4IiBoZWlnaHQ9IjI1cHgiIHZpZXdCb3g9IjAgMCAyNSAyNSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgMjUgMjUiPgogIDxnIG9wYWNpdHk9IjAuMiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMUUxRTFDIj4KICAgIDxnIHN0cm9rZS13aWR0aD0iMC4yIj4KICAgICAgPGxpbmUgeDE9IjIuMTU1IiB5MT0iMCIgeDI9IjIuMTU1IiB5Mj0iMjUiLz4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSIyLjE1NSIgeDI9IjI1IiB5Mj0iMi4xNTUiLz4KICAgIDwvZz4KICAgIDxnIHN0cm9rZS13aWR0aD0iMC4xIj4KICAgICAgPGxpbmUgeDE9IjIuMTU1IiB5MT0iMCIgeDI9IjIuMTU1IiB5Mj0iMjUiLz4KICAgICAgPGxpbmUgeDE9IjEwLjQzMiIgeTE9IjAiIHgyPSIxMC40MzIiIHkyPSIyNSIvPgogICAgICA8bGluZSB4MT0iMTguNzA3IiB5MT0iMCIgeDI9IjE4LjcwNyIgeTI9IjI1Ii8+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iMjIuODQ1IiB4Mj0iMjUiIHkyPSIyMi44NDUiLz4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSIxNC41NjgiIHgyPSIyNSIgeTI9IjE0LjU2OCIvPgogICAgICA8bGluZSB4MT0iMCIgeTE9IjYuMjkzIiB4Mj0iMjUiIHkyPSI2LjI5MyIvPgogICAgICA8bGluZSB4MT0iMCIgeTE9IjE4LjcwNyIgeDI9IjI1IiB5Mj0iMTguNzA3Ii8+CiAgICAgIDxsaW5lIHgxPSIwIiB5MT0iMTAuNDMyIiB4Mj0iMjUiIHkyPSIxMC40MzIiLz4KICAgICAgPGxpbmUgeDE9IjAiIHkxPSIyLjE1NSIgeDI9IjI1IiB5Mj0iMi4xNTUiLz4KICAgICAgPGxpbmUgeDE9IjYuMjkzIiB5MT0iMCIgeDI9IjYuMjkzIiB5Mj0iMjUiLz4KICAgICAgPGxpbmUgeDE9IjE0LjU2OCIgeTE9IjAiIHgyPSIxNC41NjgiIHkyPSIyNSIvPgogICAgICA8bGluZSB4MT0iMjIuODQ1IiB5MT0iMCIgeDI9IjIyLjg0NSIgeTI9IjI1Ii8+CiAgICA8L2c+CiAgPC9nPgo8L3N2Zz4K') -3px -3px;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+}
+.organogram .chartContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+.organogram .chartArea {
+  height: 100%;
+}
+.organogram .chartArea .element.html.highlighted {
+  outline: 0 solid #66ac3f;
+}
+.organogram .chartArea .element.html.highlighted rect {
+  stroke: #66ac3f;
+  stroke-width: 3;
+}
+.organogram .chartArea .element.html.highlighted.nolink rect {
+  stroke: #c4434b;
+}
+.organogram .chartArea .element.html.source-view rect {
+  stroke: #66ac3f;
+  stroke-width: 3;
+}
+.organogram .chartArea .element.html.source-view.nolink rect {
+  stroke: #c4434b;
+}
+.organogram .chartArea .element.html.selected rect {
+  stroke: #efbe2c;
+  stroke-width: 2;
+}
+.organogram .chartArea .link .connection {
+  stroke: #AAAAAA;
+  stroke-width: 1px;
+}
+.organogram .chartArea .link .marker-target {
+  stroke-width: 0;
+  fill: #AAAAAA;
+}
+.organogram .chartArea .link.forbidden .connection {
+  stroke: #c4434b;
+  stroke-width: 3px;
+}
+.organogram .chartArea .link.forbidden .marker-target {
+  stroke-width: 0;
+  fill: #c4434b;
+}
+.organogram .chartArea .link.allowed .connection {
+  stroke: #66ac3f;
+  stroke-width: 3px;
+}
+.organogram .chartArea .link.allowed .marker-target {
+  stroke-width: 0;
+  fill: #66ac3f;
+}
+.organogram .chartArea .link.selected .connection {
+  stroke: #efbe2c;
+  stroke-width: 2px;
+}
+.organogram .chartArea .link.selected .marker-target {
+  fill: #efbe2c;
+}
+.organogram .chartArea .link.selected .marker-vertices {
+  opacity: 1;
+}
+.organogram .chartArea .link.selected .marker-vertex {
+  fill: #efbe2c;
+}
+.organogram .chartArea .link.selected .link-tools {
+  opacity: 1.0;
+}
+.organogram .chartArea .link.selected .connection-wrap {
+  cursor: default;
+  opacity: 0;
+}
+.organogram .chartArea .link .label rect {
+  fill: #c4434b;
+  stroke: #c4434b;
+  stroke-width: 5;
+}
+.organogram .chartArea .link .label text {
+  fill: white;
+  font-weight: normal;
+}
+.organogram .chartArea .connection-wrap {
+  stroke-linecap: butt;
+  stroke-width: 10;
+  cursor: pointer;
+}
+.organogram .chartArea .connection-wrap:hover {
+  opacity: 0.1;
+}
+.organogram .chartArea .marker-vertex {
+  fill: #aaaaaa;
+}
+.organogram .chartArea .tool-remove circle {
+  fill: #c4434b;
+}
+.organogram .chartArea .marker-arrowheads {
+  display: none;
+}
+.graph-tools {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px 0 10px 10px;
+  max-height: 100%;
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  -webkit-flex-direction: column;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.graph-tools > * {
+  width: 220px;
+}
+.graph-tools .basic {
+  padding: 10px 20px;
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  border-bottom: 0;
+  flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+}
+.graph-tools .switch {
+  color: rgba(0, 0, 0, 0.33);
+  font-style: italic;
+  text-decoration: none;
+}
+.graph-tools .switch span {
+  font-style: normal;
+  opacity: 0.7;
+  float: right !important;
+}
+.graph-tools .switch span.down::before {
+  content: '\25BC';
+}
+.graph-tools .switch span.up::before {
+  content: '\25B2';
+}
+.graph-tools .switch-container {
+  flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+  padding: 5px 20px;
+  background: #ebebeb;
+  border: 1px solid #dddddd;
+  border-top: 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.graph-tools .switch-container:hover {
+  background: #e6e6e6;
+}
+.graph-tools .switch-container[extended="true"] {
+  border-bottom: 0;
+}
+.graph-tools .fabric {
+  margin-top: 10px;
+}
+.graph-tools .fabric .instance-template {
+  margin-bottom: 6px;
+  padding: 7px 5px;
+  border: 1px dotted #bbb;
+  cursor: move;
+  text-transform: uppercase;
+  color: #555;
+}
+.graph-tools .fabric .instance-template i {
+  float: left !important;
+  width: 30px;
+  text-align: center;
+  font-size: 16px;
+  color: #888;
+}
+.graph-tools .fabric .instance-template:before,
+.graph-tools .fabric .instance-template:after {
+  content: " ";
+  display: table;
+}
+.graph-tools .fabric .instance-template:after {
+  clear: both;
+}
+.graph-tools .fabric .instance-template:hover {
+  border-color: #3098d8;
+  color: #3098d8;
+  background: white;
+}
+.graph-tools .fabric .instance-template:hover i {
+  color: #3098d8;
+}
+.graph-tools .intro {
+  color: rgba(0, 0, 0, 0.33);
+  font-style: italic;
+}
+.graph-tools .listing {
+  padding: 10px;
+  background: white;
+  border: 1px solid #dddddd;
+  border-top: 0;
+  overflow-y: auto;
+}
+.graph-tools .listing ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.graph-tools .listing li {
+  padding: 5px 5px;
+  border: 1px dotted transparent;
+  margin-bottom: -3px;
+}
+.graph-tools .listing li i {
+  float: left !important;
+  width: 20px;
+  text-align: center;
+  margin-top: 2px;
+  color: #e5eaef;
+}
+.graph-tools .listing li .text {
+  margin-left: 20px;
+}
+.graph-tools .listing li:before,
+.graph-tools .listing li:after {
+  content: " ";
+  display: table;
+}
+.graph-tools .listing li:after {
+  clear: both;
+}
+.graph-tools .listing li:hover {
+  cursor: move;
+  border-color: #3098d8;
+  background: white;
+  color: #3098d8;
+}
+.graph-tools .listing li:hover i {
+  color: #3098d8;
+}
+.graph-tools .listing li:hover .remove-entity {
+  display: block;
+}
+.graph-tools .listing .remove-entity {
+  position: absolute;
+  right: 5px;
+  font-weight: bold;
+  font-size: 17px;
+  line-height: 15px;
+  cursor: pointer;
+  color: #c4434b;
+  display: none;
+}
+.graph-tools .listing .entity-item {
+  position: relative;
+}

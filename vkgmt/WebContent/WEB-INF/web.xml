@@ -14,8 +14,12 @@
   
   <servlet-mapping>
     <servlet-name>vkgmt</servlet-name>
-    <url-pattern>/welcome.jsp</url-pattern>
-    <url-pattern>/welcome.html</url-pattern>
+    <url-pattern>/work.jsp</url-pattern>
+    <url-pattern>/work.html</url-pattern>
+    <url-pattern>/layout.jsp</url-pattern>
+    <url-pattern>/layout.html</url-pattern>
+    <url-pattern>/edit_layout.jsp</url-pattern>
+    <url-pattern>/edit_layout.html</url-pattern>
     <url-pattern>*.html</url-pattern>
   </servlet-mapping>
   

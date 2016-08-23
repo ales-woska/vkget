@@ -1,0 +1,96 @@
+<div id="lineForm{{lineLayout.uri | colons}}" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="exampleModalLabel">Line layout</h4>
+</div>
+
+<form class="form-horizontal" ng-submit="saveLine({lineLayout: lineLayout});">
+<div class="modal-body">	
+	<div class="form-group">
+		<label for="fromType" class="col-sm-2 control-label">From type</label>
+		<div class="col-sm-4">
+			<select class="form-control" required ng-model="lineLayout.fromType.type" ng-options="blockLayout.forType.type as blockLayout.forType.type for blockLayout in screenLayout.blockLayouts">
+				<option value="">Select type</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="toType" class="col-sm-2 control-label">To type</label>
+		<div class="col-sm-4">
+			<select class="form-control" required ng-model="lineLayout.toType.type" ng-options="blockLayout.forType.type as blockLayout.forType.type for blockLayout in screenLayout.blockLayouts">
+				<option value="">Select type</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="title" class="col-sm-2 control-label">Property</label>
+		<div class="col-sm-4">
+			<input type="text" required ng-model="lineLayout.property.property" class="form-control" id="title" placeholder="Property">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="titleTypes" class="col-sm-2 control-label">Label type</label>
+		<div class="col-sm-4">
+			<select class="form-control" ng-model="lineLayout.label.type">
+				<option value="URI">URI</option>
+				<option value="CONSTANT">Constant</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group" ng-show="lineLayout.label.type == 'CONSTANT'">
+		<label for="title" class="col-sm-2 control-label">Label source</label>
+		<div class="col-sm-4">
+			<input type="text" ng-model="lineLayout.label.labelSource" class="form-control" id="title" placeholder="Title">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="lineType" class="col-sm-2 control-label">Line type</label>
+		<div class="col-sm-4">
+			<select class="form-control" id="lineType" ng-model="lineLayout.lineType">
+				<option value="SOLID">Solid</option>
+				<option value="DOTTED">Dotted</option>
+				<option value="DASHED">Dashed</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="fontColor" class="col-sm-2 control-label">Font color</label>
+		<div class="col-sm-10">
+			<input type="color" id="fontColor" ng-model="lineLayout.fontColor" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="lineColor" class="col-sm-2 control-label">Line color</label>
+		<div class="col-sm-10">
+			<input type="color" id="lineColor" ng-model="lineLayout.lineColor" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="fontSize" class="col-sm-2 control-label">Font size</label>
+		<div class="col-sm-2">
+			<input type="number" class="form-control" ng-model="lineLayout.fontSize" id="fontSize" placeholder="10" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="lineThickness" class="col-sm-2 control-label">Line Thickness</label>
+		<div class="col-sm-2">
+			<input type="number" class="form-control" id="lineThickness" ng-model="lineLayout.lineThickness" placeholder="1" />
+		</div>
+	</div>
+</div>
+
+<div class="modal-footer">
+	<input type="button" ng-click="removeLine({lineLayout: lineLayout})" class="btn btn-default btn-danger" value="Delete" />
+	<input type="submit" class="btn btn-default" value="Save" />
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
