@@ -1,4 +1,4 @@
-var serverAddress = 'http://localhost:8080';
+var serverAddress = 'http://localhost:8080/vkgmt';
 var endpointList = [
     'http://localhost:3030/data',
     'http://linked.opendata.cz/sparql',

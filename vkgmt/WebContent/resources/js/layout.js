@@ -15,8 +15,8 @@ app.filter('urlencode', function() {
 
 app.controller('layoutController', function($scope, $http, $location) {
 	$scope.messages = [];
-	$scope.layoutsServiceUri = serverAddress + '/layouts';
-	$scope.layoutServiceUri = serverAddress + '/layout';
+	$scope.layoutsServiceUri = serverAddress + '/rest/layouts';
+	$scope.layoutServiceUri = serverAddress + '/rest/layout';
 	
 	var saved = $location.search()['saved'];
 	if (saved) {
