@@ -90,7 +90,8 @@
 							{{isNumeric(property.value) ? 'text-align: right;' : ''}}">
 						{{property.value}}
 						
-						<span class="error" ng-repeat="error in property.errors" 
+						<span class="error" ng-repeat="error in property.errors"
+							ng-title="error.description"
 							ng-click="errorClicked(error, property); $event.stopPropagation();"
 							ng-style="getLiteralErrorClass(error);">!</span>
 							

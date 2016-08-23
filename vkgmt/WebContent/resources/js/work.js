@@ -32,18 +32,18 @@ app.directive('ngRightClick', function($parse) {
 });
 
 app.controller('dataController', function($scope, $http, $filter, $window, $location) {
-	$scope.changesServiceUrl = serverAddress + '/changes';
-	$scope.dataServiceUrl = serverAddress + '/data';
-	$scope.layoutsServiceUrl = serverAddress + '/layouts';
-	$scope.layoutServiceUrl = serverAddress + '/layout';
+	$scope.changesServiceUrl = serverAddress + '/rest/changes';
+	$scope.dataServiceUrl = serverAddress + '/rest/data';
+	$scope.layoutsServiceUrl = serverAddress + '/rest/layouts';
+	$scope.layoutServiceUrl = serverAddress + '/rest/layout';
 	$scope.storedEndpoints = endpointList;
 	
 	$scope.connectionInfo = {
-		endpoint: 'http://localhost:3030/data',
-		type: 'virtuoso',
-		useNamedGraph: true,
+		endpoint: '',
+		type: 'other',
+		useNamedGraph: false,
 		useAutorization: false,
-		namedGraph: 'http://mff.cuni.cz/testGraph',
+		namedGraph: '',
 		username: '',
 		password: ''
 	};

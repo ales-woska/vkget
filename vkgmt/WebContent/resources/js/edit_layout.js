@@ -96,7 +96,7 @@ app.directive('lineForm', function () {
 app.controller('layoutController', function($scope, $location, $window, $http) {
 	$scope.screenLayout = newScreenLayout();
 	$scope.messages = [];
-	$scope.layoutServiceUri = serverAddress + "/layout";
+	$scope.layoutServiceUri = serverAddress + "/rest/layout";
 	
 	var uri = $location.search()['uri'];
 	if (uri) {

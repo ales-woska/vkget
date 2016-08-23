@@ -8,17 +8,22 @@
         http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context.xsd">
- 
+
 	<context:component-scan base-package="cz.cuni.mff.vkgmt" />
-    <mvc:annotation-driven />
- 
+	<mvc:annotation-driven />
+
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
 		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
 		<property name="prefix" value="/WEB-INF/jsp/" />
 		<property name="suffix" value=".jsp" />
 	</bean>
 
-    <mvc:resources mapping="/resources/**" location="/resources/" cache-period="31556926" />
+	<mvc:resources mapping="/resources/**" location="/resources/" cache-period="31556926" />
 
- 
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="classpath:*.properties" />
+	</bean>
+
+	<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+
 </beans>
