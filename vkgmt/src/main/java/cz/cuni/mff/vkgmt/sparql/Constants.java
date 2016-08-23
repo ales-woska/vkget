@@ -74,9 +74,9 @@ public class Constants {
 	/**
 	 * Common namespace definition for SPARQL query
 	 */
-	public static final String PREFIX_PART = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-			+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-			+ "PREFIX "+VKGMT_Prefix+": <"+VKGMT_Namespace+"> ";
+	public static final String PREFIX_PART = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
+			+ "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
+			+ "PREFIX "+VKGMT_Prefix+": <"+VKGMT_Namespace+">\n";
 	
 	/**
 	 * NS prefix mapping to namespaces as pair prefix:namespace

@@ -459,9 +459,19 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	    	$scope.messages.push(message);
         })
         .error(function (data, status, header, config) {
+        	var caption = "ERROR!";
+        	var text = "";
+        	if (data.error) {
+        		caption = data.error;
+        	}
+        	if (data.message) {
+        		text = data.message;
+        	} else {
+        		text = data;
+        	}
         	var message = {
-				caption: data.error,
-				text: data.message,
+				caption: caption,
+				text: text,
 				type: 'danger'
 	    	};
 	    	$scope.messages.push(message);
@@ -493,6 +503,9 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		var screenLayout = {};
 		screenLayout.uri = {uri: ''};
 		screenLayout.name = '';
+		screenLayout.width = minWorkspaceWidth;
+		screenLayout.height = minWorkspaceHeight;
+		screenLayout.filterPropagation = 'NEIGHBOURS';
 		screenLayout.blockLayouts = [];
 		screenLayout.lineLayouts = [];
 		screenLayout.namespaces = predefinedNamespaces;

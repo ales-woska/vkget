@@ -1,7 +1,5 @@
 package cz.cuni.mff.vkgmt.connect;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.atlas.web.auth.HttpAuthenticator;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -12,6 +10,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.update.UpdateExecutionFactory;
+import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateProcessor;
 import com.hp.hpl.jena.update.UpdateRequest;
 
@@ -26,11 +25,17 @@ public class SparqlConnector {
 	@Value("${sparql.endpoint.url}")
 	private String endpoint = "";
 	
+	@Value("${sparql.endpoint.graph}")
+	private String graph = "";
+	
 	@Value("${sparql.endpoint.user}")
 	private String user = "";
 	
 	@Value("${sparql.endpoint.pass}")
 	private String password = "";
+	
+	@Value("${sparql.endpoint.db.port}")
+	private String dbPort = "";
 	
 	public SparqlConnector() {
 	}
@@ -39,32 +44,39 @@ public class SparqlConnector {
 		this.endpoint = connectionInfo.getEndpoint();
 		this.user = connectionInfo.getUsername();
 		this.password = connectionInfo.getPassword();
+		if (connectionInfo.isUseNamedGraph()) {
+			this.graph = connectionInfo.getNamedGraph();
+		}
 	}
 
 	public ResultSet query(String sparqlQuery) {
-        Query query = QueryFactory.create(sparqlQuery);
-        QueryExecution qExe = null;
-        if (StringUtils.isNotEmpty(user)) {
-        	HttpAuthenticator authenticator = new SimpleAuthenticator(user, password.toCharArray());
-        	qExe = QueryExecutionFactory.sparqlService(endpoint, query, authenticator);
-        } else {
-        	qExe = QueryExecutionFactory.sparqlService(endpoint, query);
-        }
-        ResultSet results = qExe.execSelect();
+		Query query = QueryFactory.create(sparqlQuery);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint + "/sparql", query);
+		ResultSet results = qexec.execSelect();
 		return results;
 	}
 	
 	public void executeQuery(String sparqlQuery) {
-		UpdateRequest update = new UpdateRequest();
-		update.add(sparqlQuery);
-		UpdateProcessor ue = null;
-		if (StringUtils.isNotEmpty(user)) {
-			HttpAuthenticator authenticator = new SimpleAuthenticator(user, password.toCharArray());
-			ue = UpdateExecutionFactory.createRemote(update, endpoint + "/update", authenticator);
-		} else {
-			ue = UpdateExecutionFactory.createRemote(update, endpoint + "/update");
+		String query = sparqlQuery;
+		if (sparqlQuery.contains("INSERT DATA {")) {
+			query = sparqlQuery.replace("INSERT DATA {", "INSERT DATA { GRAPH <" + graph + "> {") + "}";
+			
+		} else if (sparqlQuery.contains("DELETE {") && sparqlQuery.contains("INSERT {")) {
+			query = sparqlQuery
+					.replace("DELETE {", "DELETE { GRAPH <" + graph + "> {")
+					.replace("} INSERT {", "}} INSERT { GRAPH <" + graph + "> {")
+					.replace("} WHERE", "}} WHERE");
+			
+		} else if (sparqlQuery.contains("DELETE {")) {
+			query = sparqlQuery.replace("DELETE {", "DELETE { GRAPH <" + graph + "> {").replace("} WHERE", "}} WHERE");
+			
+		} else if (sparqlQuery.contains("INSERT {")) {
+			query = sparqlQuery.replace("INSERT {", "INSERT { GRAPH <" + graph + "> {").replace("} WHERE", "}} WHERE");
 		}
-		ue.execute();
+		UpdateRequest request = UpdateFactory.create(query);
+		SimpleAuthenticator auth = new SimpleAuthenticator(user, password.toCharArray());
+		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, endpoint + "/sparql-auth", auth);
+		processor.execute();
 	}
 
 	public String getEndpoint() {

@@ -84,14 +84,14 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
     	String rawUri = Constants.VKGMT_Namespace + escepeUri(layout.getName());
     	layout.setUri(getUniqueId(rawUri));
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
-		insertQuery.append("INSERT DATA { <").append(layout.getUri()).append("> ");
+		insertQuery.append("INSERT DATA { <").append(layout.getUri()).append(">\n");
 		
-		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append("; ");
-		insertQuery.append(" ").append(Constants.RDFS_LABEL).append(" '").append(layout.getName()).append("'; ");
-		insertQuery.append(" ").append(NAMESPACES).append(" '").append(layout.getNamespacesAsString()).append("'; ");
-		insertQuery.append(" ").append(FILTER_PROPAGATION).append(" '").append(layout.getFilterPropagation()).append("'; ");
-		insertQuery.append(" ").append(HEIGHT).append(" '").append(layout.getHeight()).append("'; ");
-		insertQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'. ");
+		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.ScreenLayoutType).append(";\n");
+		insertQuery.append(" ").append(Constants.RDFS_LABEL).append(" '").append(layout.getName()).append("';\n");
+		insertQuery.append(" ").append(NAMESPACES).append(" '").append(layout.getNamespacesAsString()).append("';\n");
+		insertQuery.append(" ").append(FILTER_PROPAGATION).append(" '").append(layout.getFilterPropagation()).append("';\n");
+		insertQuery.append(" ").append(HEIGHT).append(" '").append(layout.getHeight()).append("';\n");
+		insertQuery.append(" ").append(WIDTH).append(" '").append(layout.getWidth()).append("'.\n");
     	
         for (BlockLayout block: layout.getBlockLayouts()) {
             blockDao.insertOrUpdate(block, layout);
@@ -108,7 +108,7 @@ public class ScreenLayoutDao extends AbstractDao<ScreenLayout> {
 			insertQuery.append(" <").append(layout.getUri()).append("> ").append(Constants.LineLayoutProperty).append(" <").append(ll.getUri()).append("> . ");
 		}
 		
-		insertQuery.append(" }");
+		insertQuery.append("\n}");
     	
     	sparql.executeQuery(insertQuery.toString());
     }
