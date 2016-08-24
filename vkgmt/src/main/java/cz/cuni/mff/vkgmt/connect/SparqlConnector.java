@@ -34,9 +34,6 @@ public class SparqlConnector {
 	@Value("${sparql.endpoint.pass}")
 	private String password = "";
 	
-	@Value("${sparql.endpoint.db.port}")
-	private String dbPort = "";
-	
 	public SparqlConnector() {
 	}
 	
