@@ -47,9 +47,16 @@
 			Discard changes
 		</a>
 
+		<div ng-repeat="table in dataModel.tables" class="disabledTable" ng-if="table.disabled"
+			style="left: {{layouts[table.type.type].left}}px;
+				top: {{layouts[table.type.type].top}}px;
+				width: {{layouts[table.type.type].width}}px;
+				height: {{layouts[table.type.type].height + 85}}px;">
+			<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+		</div>	
+		
 		<table ng-repeat="table in dataModel.tables" class="vkgmt_table"
-			style="
-				background-color: {{layouts[table.type.type].background}};
+			style="background-color: {{layouts[table.type.type].background}};
 				color: {{layouts[table.type.type].fontColor}};
 				font-size: {{layouts[table.type.type].fontSize}}px;
 				left: {{layouts[table.type.type].left}}px;
@@ -91,13 +98,14 @@
 						{{property.value}}
 						
 						<span class="error" ng-repeat="error in property.errors"
-							ng-title="error.description"
+							ng-attr-title="{{error.description}}"
 							ng-click="errorClicked(error, property); $event.stopPropagation();"
 							ng-style="getLiteralErrorClass(error);">!</span>
 							
 						<div ng-if="$last">
 							<div ng-repeat="op in instance.objectProperties">
 								<div class="error" ng-repeat="error in op.errors" 
+									ng-attr-title="{{error.description}}"
 									ng-click="errorClicked(error, op); $event.stopPropagation();"
 									ng-style="getObjectErrorClass(error);">!</div>
 							</div>

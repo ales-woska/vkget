@@ -516,14 +516,13 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		
 	};
 	
-	$scope.loadingStack = [];
-	
 	$scope.loadTableData = function(request, instance) {
-		
-		$scope.loadingStack.push(request.tableType);
+		var table = $scope.getTableByType(request.tableType);
+		table.disabled = true;
 		
 		$http.post($scope.dataServiceUrl + '/table', request)
         .success(function (data, status, headers, config) {
+        	table.disabled = false;
         	var newInstances = data;
         	var added = 0;
 			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
@@ -548,6 +547,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
     				type: 'danger'
     	    	};
         	$scope.messages.push(message);
+        	table.disabled = false;
         });
 	};
 	

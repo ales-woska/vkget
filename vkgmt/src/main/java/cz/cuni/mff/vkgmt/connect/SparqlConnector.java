@@ -1,5 +1,6 @@
 package cz.cuni.mff.vkgmt.connect;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.atlas.web.auth.SimpleAuthenticator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ public class SparqlConnector {
 	@Value("${sparql.endpoint.url}")
 	private String endpoint = "";
 	
+	@Value("${sparql.endpoint.url.auth}")
+	private String endpointAuth = "";
+	
 	@Value("${sparql.endpoint.graph}")
 	private String graph = "";
 	
@@ -48,7 +52,7 @@ public class SparqlConnector {
 
 	public ResultSet query(String sparqlQuery) {
 		Query query = QueryFactory.create(sparqlQuery);
-		QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint + "/sparql", query);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint, query);
 		ResultSet results = qexec.execSelect();
 		return results;
 	}
@@ -71,8 +75,13 @@ public class SparqlConnector {
 			query = sparqlQuery.replace("INSERT {", "INSERT { GRAPH <" + graph + "> {").replace("} WHERE", "}} WHERE");
 		}
 		UpdateRequest request = UpdateFactory.create(query);
-		SimpleAuthenticator auth = new SimpleAuthenticator(user, password.toCharArray());
-		UpdateProcessor processor = UpdateExecutionFactory.createRemote(request, endpoint + "/sparql-auth", auth);
+		UpdateProcessor processor = null;
+		if (StringUtils.isNotEmpty(user)) {
+			SimpleAuthenticator auth = new SimpleAuthenticator(user, password.toCharArray());
+			processor = UpdateExecutionFactory.createRemote(request, endpointAuth, auth);
+		} else {
+			processor = UpdateExecutionFactory.createRemote(request, endpointAuth);
+		}
 		processor.execute();
 	}
 
