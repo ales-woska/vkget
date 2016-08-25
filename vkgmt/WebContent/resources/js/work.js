@@ -361,14 +361,26 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			$('#layoutLoading').hide();
 			$('#layoutSelect').show();
 			$scope.layout = $scope.layouts[0].uri.uri;
-	    });
+    });
 	
-	$scope.reloadTable = function(instanceTable, instance) {
+	$scope.selectInstance = function(table, instance) {
+		if (table.selectedInstance == instance) {
+			delete table.selectedInstance;
+		} else {
+			table.selectedInstance = instance;
+			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
+				$scope.dataModel.tables[i].notPropagated = true;
+			}
+			$scope.reloadTable(table, [instance]);
+		}
+	};
+	
+	$scope.reloadTable = function(instanceTable, instances) {
 		for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 			var lineLayout = $scope.screenLayout.lineLayouts[i];
 			if (lineLayout.fromType.type == instanceTable.type.type) {
 				var tableType = lineLayout.toType.type;
-				if (!tableType || !instance || !instance.objectProperties) {
+				if (!tableType || !instances) {
 					continue;
 				}
 				
@@ -377,11 +389,17 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					uriFilters: {},
 					columnFilters: {}				
 				};
-				for (var j = 0; j < instance.objectProperties.length; j++) {
-					var objectProperty = instance.objectProperties[j];
-					var uri = objectProperty.subjectUri.uri;
-					var property = objectProperty.property.property;
-					filter.uriFilters[property] = uri;
+				for (var ii = 0; ii < instances.length; ii++) {
+					var instance = instances[ii];
+					if (!instance.objectProperties) {
+						continue;
+					}
+					for (var j = 0; j < instance.objectProperties.length; j++) {
+						var objectProperty = instance.objectProperties[j];
+						var uri = objectProperty.subjectUri.uri;
+						var property = objectProperty.property.property;
+						filter.uriFilters[property] = uri;
+					}
 				}
 				
 				var layoutUri = $scope.screenLayout.uri.uri;
@@ -392,12 +410,12 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					connectionInfo: $scope.connectionInfo,
 					layoutUri: layoutUri
 				};
-				$scope.loadTableData(request, instance);
+				$scope.loadTableData(request, $scope.screenLayout.filterPropagation == 'ALL');
 				
 			} else if (lineLayout.toType.type == instanceTable.type.type) {
 				var tableType = lineLayout.fromType.type;
 				var property = lineLayout.property.property;
-				if (!tableType || !property || !instance || !instance.uri) {
+				if (!tableType || !property || !instances) {
 					continue;
 				}
 				
@@ -406,7 +424,14 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					uriFilters: {},
 					columnFilters: {}				
 				};
-				filter.uriFilters[property] = instance.uri.uri;
+
+				for (var ii = 0; ii < instances.length; ii++) {
+					var instance = instances[ii];
+					if (!instance.uri) {
+						continue;
+					}
+					filter.uriFilters[property] = instance.uri.uri;
+				}
 				
 				var layoutUri = $scope.screenLayout.uri.uri;
 				
@@ -417,7 +442,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 					layoutUri: layoutUri
 				};
 				
-				$scope.loadTableData(request, instance);
+				$scope.loadTableData(request, $scope.screenLayout.filterPropagation == 'ALL');
 			}
 		}
 	};
@@ -452,7 +477,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			layoutUri: layoutUri
 		};
 		
-		$scope.loadTableData(request, null);
+		$scope.loadTableData(request, false);
 		
 	};
 	
@@ -512,17 +537,19 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 			layoutUri: layoutUri
 		};
 		
-		$scope.loadTableData(request, null);
+		$scope.loadTableData(request, false);
 		
 	};
 	
-	$scope.loadTableData = function(request, instance) {
+	$scope.loadTableData = function(request, propagate) {
 		var table = $scope.getTableByType(request.tableType);
+		if (table.disabled) {
+			return;
+		}
 		table.disabled = true;
 		
 		$http.post($scope.dataServiceUrl + '/table', request)
         .success(function (data, status, headers, config) {
-        	table.disabled = false;
         	var newInstances = data;
         	var added = 0;
 			for (var i = 0; i < $scope.dataModel.tables.length; i++) {
@@ -539,6 +566,20 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
         	if (added == 0 && request.filter.offset > 0) {
         		alert("No more data satisfying filters.");
         	}
+        	
+    		if (propagate && table.notPropagated) {
+				table.notPropagated = false;
+				var instances = [];
+				for (var i = 0; i < table.instances.length; i++) {
+					var instance = table.instances[i];
+					if ($scope.filterInstances(instance)) {
+						instances.push(instance);
+					}
+				}
+				$scope.reloadTable(table, instances);
+			}
+    		
+        	table.disabled = false;
         })
         .error(function (data, status, header, config) {
         	var message = {
@@ -687,15 +728,6 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.mySorter = function(item) {
 		var sortByColumn = $scope.sort.column;
 		return item.literalProperties[sortByColumn].value;
-	};
-	
-	$scope.selectInstance = function(table, instance) {
-		if (table.selectedInstance == instance) {
-			delete table.selectedInstance;
-		} else {
-			table.selectedInstance = instance;
-			$scope.reloadTable(table, instance, null);
-		}
 	};
 	
 	$scope.filterLineLayouts = function(lineLayout) {
