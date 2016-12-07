@@ -1,15 +1,15 @@
-var serverAddress = 'http://localhost:8080/vkgmt';
+var serverAddress = 'http://localhost:8123/vkgmt';
 var endpointList = [
     'http://localhost:3030/data',
     'http://linked.opendata.cz/sparql',
     'http://dbpedia.org/sparql'
 ];
 var predefinedLangs = [
-     {value: 'cz', label: 'Czech'},
-     {value: 'de', label: 'Deutch'},
-     {value: 'en', label: 'English'},
-     {value: 'fr', label: 'French'},
-     {value: 'es', label: 'Spanish'},
+	{value: 'cz', label: 'Czech'},
+	{value: 'de', label: 'Deutch'},
+	{value: 'en', label: 'English'},
+	{value: 'fr', label: 'French'},
+	{value: 'es', label: 'Spanish'},
 ];
 var predefinedNamespaces = {
 	"dc": "http://purl.org/dc/elements/1.1/",

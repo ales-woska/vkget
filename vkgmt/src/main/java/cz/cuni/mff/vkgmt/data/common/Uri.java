@@ -20,7 +20,7 @@ public class Uri {
 	
 	@Override
 	public String toString() {
-		return uri;
+		return "<" + uri + ">";
 	}
 	
 	@Override

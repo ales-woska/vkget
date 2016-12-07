@@ -62,8 +62,8 @@ public class DataControllerTest {
 		LoadTableData loadTableData = new LoadTableData();
 		Type tableType = new Type("", "");
 		RdfFilter filter = new RdfFilter();
-		String endpoint = "http://some-endpoint.com:123";
-		EndpointType type = EndpointType.jena;
+//		String endpoint = "http://some-endpoint.com:123";
+//		EndpointType type = EndpointType.jena;
 		Uri layoutUri = new Uri("http://some-uri#aaa");
 		loadTableData.setTableType(tableType);
 		loadTableData.setFilter(filter);

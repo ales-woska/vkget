@@ -32,6 +32,7 @@ import cz.cuni.mff.vkgmt.data.model.RdfInstance;
 import cz.cuni.mff.vkgmt.data.model.RdfLiteralProperty;
 import cz.cuni.mff.vkgmt.data.model.RdfObjectProperty;
 import cz.cuni.mff.vkgmt.data.model.RdfTable;
+import cz.cuni.mff.vkgmt.utils.SparqlSelectQueryBuilder;
 
 /**
  * Implementation of @see DataConnector for common types of endpoints.
@@ -168,46 +169,46 @@ public class DefaultDataConnector implements DataConnector {
 	}
 	
 	private String getErrorsQuery(RdfTable table, String namedGraph, Map<String, String> namespaces) {
-		StringBuilder query = new StringBuilder("PREFIX daq: <http://purl.org/eis/vocab/daq#>\n");
-		query.append("PREFIX dc: <http://purl.org/dc/elements/1.1/>\n");
-		query.append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
+		SparqlSelectQueryBuilder queryBuilder = new SparqlSelectQueryBuilder();
+
+		queryBuilder.addNamespace("daq", "<http://purl.org/eis/vocab/daq#>");
+		queryBuilder.addNamespace("dc", "<http://purl.org/dc/elements/1.1/>");
+		queryBuilder.addNamespace("rdf", "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>");
 		for (String prefix: namespaces.keySet()) {
 			String namespace = namespaces.get(prefix);
-			query.append("PREFIX ").append(prefix).append(": <").append(namespace).append(">\n");
-		}
-		query.append("SELECT ?uri ?subject ?property ?object ?value ?severity ?desc ");
-		
-
-		if (StringUtils.isNotEmpty(namedGraph)) {
-			query.append(" FROM NAMED <").append(namedGraph).append("> WHERE { GRAPH <").append(namedGraph).append("> {\n");
-		} else {
-			query.append(" WHERE {\n");
+			queryBuilder.addNamespace(prefix, namespace);
 		}
 		
-		query.append("?uri a daq:Observation .\n");
-		query.append("?uri dc:description ?desc .\n");
-		query.append("?uri daq:problemDescription _:node1 .\n");
-		query.append(" _:node1 a rdf:Statement .\n");
-		query.append(" _:node1 rdf:subject ?subject .\n");
-		query.append(" _:node1 rdf:predicate ?property .\n");
-		query.append(" _:node1 rdf:object ?object .\n");
-		query.append("?uri daq:value ?value .\n");
-		query.append("?uri daq:severity ?severity .\n");
-		query.append("?subject a ").append(table.getType().getType()).append(" .\n");
-	
+		queryBuilder.addSelect("uri");
+		queryBuilder.addSelect("subject");
+		queryBuilder.addSelect("property");
+		queryBuilder.addSelect("object");
+		queryBuilder.addSelect("value");
+		queryBuilder.addSelect("severity");
+		queryBuilder.addSelect("descs");
+		
+		queryBuilder.setGraph(namedGraph);
+		
+		queryBuilder.addWhere("?uri", "a", "daq:Observation");
+		queryBuilder.addWhere("?uri", "dc:description", "?desc");
+		queryBuilder.addWhere("?uri", "daq:problemDescription", "_:node1");
+		queryBuilder.addWhere("_:node1", "a", "rdf:Statement");
+		queryBuilder.addWhere("_:node1", "rdf:subject", "?subject");
+		queryBuilder.addWhere("_:node1", "rdf:predicate", "?property");
+		queryBuilder.addWhere("_:node1", "rdf:object", "?object");
+		queryBuilder.addWhere("?uri", "daq:value", "?value");
+		queryBuilder.addWhere("?uri", "daq:severity", "?severity");
+		queryBuilder.addWhere("?subject", "a", table.getType().getType());
+		
 		if (table.getInstances() != null && table.getInstances().size() > 0) {
-			query.append("VALUES ?subject {\n");
+			List<String> values = new ArrayList<String>();
 			for (RdfInstance instance: table.getInstances()) {
-				query.append("<").append(instance.getUri().getUri()).append("> ");
+				values.add(instance.getUri().toString());
 			}
-			query.append("\n}\n");
+			queryBuilder.addWhereValue("?subject", values);
 		}
 		
-		if (StringUtils.isNotEmpty(namedGraph)) {
-			query.append("}\n");
-		}
-		query.append("}\n");
-		return query.toString();
+		return queryBuilder.toString();
 	}
 	
 	/**
@@ -321,24 +322,20 @@ public class DefaultDataConnector implements DataConnector {
 	 * @return
 	 */
 	protected String constructTableQuery(String namedGraph, BlockLayout blockLayout, Map<String, String> namespaces, List<LineLayout> lineLayouts, RdfFilter filter) {
-		StringBuilder sb = new StringBuilder();
+		SparqlSelectQueryBuilder queryBuilder = new SparqlSelectQueryBuilder();
+		
 		for (String prefix: namespaces.keySet()) {
 			String namespace = namespaces.get(prefix);
-			sb.append("PREFIX ").append(prefix).append(": <").append(namespace).append(">\n");
-		}
-		sb.append("\n");
-		sb.append("SELECT DISTINCT * ");
-		
-		if (StringUtils.isNotEmpty(namedGraph)) {
-			sb.append(" FROM NAMED <").append(namedGraph).append("> WHERE {{ GRAPH <").append(namedGraph).append("> {\n");
-		} else {
-			sb.append(" WHERE {{\n");
+			queryBuilder.addNamespace(prefix, namespace);
 		}
 		
-		sb.append("\t?uri rdf:type ").append(blockLayout.getForType()).append(" .\n");
+		queryBuilder.setSelectDistinct(true);
+		queryBuilder.selectAll();
+		queryBuilder.setGraph(namedGraph);
+		
+		queryBuilder.addWhere("?uri", "rdf:type", blockLayout.getForType().toString());
 		
 		Map<Property, String> propertyVarMap = new HashMap<Property, String>();
-		
 		int j = 0;
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 			if (columnLayout.isUriColumn()) {
@@ -346,7 +343,7 @@ public class DefaultDataConnector implements DataConnector {
 			}
 			String property = "y" + j++;
 			propertyVarMap.put(columnLayout.getProperty(), property);
-			sb.append("\tOPTIONAL { ?uri ").append(columnLayout.getProperty()).append(" ?").append(property).append(" . }\n");
+			queryBuilder.addWhereOptional("?uri", columnLayout.getProperty().toString(), property);
 		}
 		
 		for (LineLayout lineLayout: lineLayouts) {
@@ -354,7 +351,7 @@ public class DefaultDataConnector implements DataConnector {
 			if (lineLayout.getFromType().equals(blockLayout.getForType())) {
 				
 				String varTo = "y" + j++;
-				sb.append("\tOPTIONAL { ?uri ").append(lineLayout.getProperty()).append(" ?").append(varTo).append(" . }\n");
+				queryBuilder.addWhereOptional("?uri", lineLayout.getProperty().toString(), "?" + varTo);
 				
 				// filter out not selected instances
 				if (filter != null && filter.getUriFilters() != null) {
@@ -364,7 +361,7 @@ public class DefaultDataConnector implements DataConnector {
 							if (uriValue == null) {
 								continue;
 							}
-							sb.append("\t?uri ").append(uriProperty.getProperty()).append(" <").append(uriValue.getUri()).append("> .\n");
+							queryBuilder.addWhere("?uri", uriProperty.getProperty(), uriValue.getUri());
 						}
 					}
 				}
@@ -380,15 +377,12 @@ public class DefaultDataConnector implements DataConnector {
 							if (uriValue == null) {
 								continue;
 							}
-							sb.append("\t<").append(uriValue.getUri()).append("> ").append(uriProperty.getProperty()).append(" ?uri .\n");
+							queryBuilder.addWhere(uriValue.toString(), uriProperty.getProperty().toString(), "?uri");
 						}
 					}
 				}
 			}
 		}
-		
-		
-		sb.append("} FILTER (1=1 ");
 		
 		for (ColumnLayout columnLayout: blockLayout.getProperties()) {
 			if (columnLayout.isUriColumn()) {
@@ -397,7 +391,8 @@ public class DefaultDataConnector implements DataConnector {
 			if (StringUtils.isNotEmpty(columnLayout.getLabel().getLang()) && !columnLayout.getLabel().getLang().equals("null")) {
 				String varName = propertyVarMap.get(columnLayout.getProperty());
 				String lang = columnLayout.getLabel().getLang();
-				sb.append(" && (lang(?").append(varName).append(") = '' || lang(?").append(varName).append(") = '").append(lang).append("') ");
+				String langFilter = createLangFilter(varName, lang);
+				queryBuilder.addFilter(langFilter);
 			}
 		}
 		
@@ -410,28 +405,29 @@ public class DefaultDataConnector implements DataConnector {
 				if (filterValue.isEmpty()) {
 					continue;
 				}
-				appendContainsFunction(sb, propertyVarMap, property, filterValue);
+				String contains = createContainsFilter(propertyVarMap, property, filterValue);
+				queryBuilder.addFilter(contains);
 			}
 		}
 		
-		sb.append(") ");
-		
-		int limit = this.limit;
 		if (filter != null && filter.getLimit() > 0) {
 			limit = filter.getLimit();
+			queryBuilder.setLimit(filter.getLimit());
 		}
-		if (StringUtils.isNotEmpty(namedGraph)) {
-			sb.append(" }\n");
-		}
-		sb.append("\n} ORDER BY ?uri LIMIT ").append(limit).append(" OFFSET ").append(filter.getOffset());
-		String query = sb.toString();
+		queryBuilder.setOffset(filter.getOffset());
+		
+		String query = queryBuilder.toString();
 		logger.debug(query);
 		return query;
 	}
 	
-	protected void appendContainsFunction(StringBuilder sb, Map<Property, String> propertyVarMap, Property property, String filterValue) {
+	protected String createContainsFilter(Map<Property, String> propertyVarMap, Property property, String filterValue) {
 		String varName = propertyVarMap.get(property);
-		sb.append(" && (regex(str(?").append(varName).append("), '").append(filterValue).append("', 'i')) ");
+		return "(regex(str(?" + varName + "), '" + filterValue + "', 'i'))";
+	}
+	
+	protected String createLangFilter(String varName, String lang) {
+		return "(lang(?" + varName + ") = '' || lang(?" + varName + ") = '" + lang + "')";
 	}
 	
 	protected String getLabel(Label label, String type) {
