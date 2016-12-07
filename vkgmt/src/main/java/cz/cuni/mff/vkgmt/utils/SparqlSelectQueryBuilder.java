@@ -29,6 +29,19 @@ public class SparqlSelectQueryBuilder {
 			this.var = var;
 			this.values.addAll(values);
 		}
+		
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("VALUES ");
+			sb.append(var);
+			sb.append(" {\n");
+			for (String value: values) {
+				sb.append(" ").append(value);
+			}
+			sb.append("\n}\n");
+			return sb.toString();
+		}
 	}
 	
 	private class WhereClause {
@@ -152,13 +165,7 @@ public class SparqlSelectQueryBuilder {
 		}
 		
 		if (values != null) {
-			sb.append("VALUES ");
-				sb.append(values.var);
-			sb.append(" {\n");
-			for (String value: values.values) {
-				sb.append(value);
-			}
-			sb.append("\n}\n");
+			values.toString();
 		}
 		
 		sb.append("}\n");

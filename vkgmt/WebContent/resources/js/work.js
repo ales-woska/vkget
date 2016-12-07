@@ -939,19 +939,19 @@ function getCommonErrorStyle(error) {
 }
 
 function error($scope, data, status) {
+	var message = null;
 	if (status == '500') {
-		var message = {
+		message = {
 		    caption : 'Internal server error.',
 		    text : 'Entered data are correct but there was an error on the server site.',
 		    type : 'danger'
 		};
-		$scope.messages.push(message);
 	} else {
-		var message = {
+		message = {
 		    caption : data.error,
 		    text : data.message,
 		    type : 'danger'
 		};
-		$scope.messages.push(message);
 	}
+	$scope.messages.push(message);
 }
