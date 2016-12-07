@@ -76,5 +76,9 @@ public class Property {
     public int hashCode() {
         return toString().hashCode();
     }
+	
+	public boolean isUriProperty() {
+		return "URI".equals(this.toString());
+	}
 
 }

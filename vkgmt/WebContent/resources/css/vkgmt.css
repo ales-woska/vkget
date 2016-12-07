@@ -214,3 +214,7 @@ input.filter {
     text-align: center;
     padding-top: 90px;
 }
+
+.messages {
+	margin: 10px;
+}

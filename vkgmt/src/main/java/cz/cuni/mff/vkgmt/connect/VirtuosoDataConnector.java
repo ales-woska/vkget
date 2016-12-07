@@ -27,6 +27,6 @@ public class VirtuosoDataConnector extends DefaultDataConnector {
 	@Override
 	protected String createContainsFilter(Map<Property, String> propertyVarMap, Property property, String filterValue) {
 		String varName = propertyVarMap.get(property);
-		return "(contains(lcase(?" + varName + "), '" + filterValue.toLowerCase() + "'))";
+		return "(contains(lcase(" + varName + "), '" + filterValue.toLowerCase() + "'))";
 	}	
 }

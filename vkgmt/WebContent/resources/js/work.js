@@ -582,12 +582,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
         	table.disabled = false;
         })
         .error(function (data, status, header, config) {
-        	var message = {
-    				caption: data.error,
-    				text: data.message,
-    				type: 'danger'
-    	    	};
-        	$scope.messages.push(message);
+        	error($scope, data, status);
         	table.disabled = false;
         });
 	};
@@ -646,23 +641,13 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 						$('#workspace').height($scope.screenLayout.height);
 				    })
 			        .error(function (data, status, header, config) {
-			        	var message = {
-			    				caption: data.error,
-			    				text: data.message,
-			    				type: 'danger'
-			    	    	};
-			        	$scope.messages.push(message);
+			        	error($scope, data, status);
 						$('#loading').hide();
 			        });
 				
 		    })
 	        .error(function (data, status, header, config) {
-	        	var message = {
-	    				caption: data.error,
-	    				text: data.message,
-	    				type: 'danger'
-	    	    	};
-	        	$scope.messages.push(message);
+	        	error($scope, data, status);
 				$('#loading').hide();
 	        });
 	};
@@ -951,4 +936,22 @@ function getCommonErrorStyle(error) {
 	}
 	
 	return style;
+}
+
+function error($scope, data, status) {
+	if (status == '500') {
+		var message = {
+		    caption : 'Internal server error.',
+		    text : 'Entered data are correct but there was an error on the server site.',
+		    type : 'danger'
+		};
+		$scope.messages.push(message);
+	} else {
+		var message = {
+		    caption : data.error,
+		    text : data.message,
+		    type : 'danger'
+		};
+		$scope.messages.push(message);
+	}
 }

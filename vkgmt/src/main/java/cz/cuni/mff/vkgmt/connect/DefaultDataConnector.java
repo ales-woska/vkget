@@ -171,9 +171,9 @@ public class DefaultDataConnector implements DataConnector {
 	private String getErrorsQuery(RdfTable table, String namedGraph, Map<String, String> namespaces) {
 		SparqlSelectQueryBuilder queryBuilder = new SparqlSelectQueryBuilder();
 
-		queryBuilder.addNamespace("daq", "<http://purl.org/eis/vocab/daq#>");
-		queryBuilder.addNamespace("dc", "<http://purl.org/dc/elements/1.1/>");
-		queryBuilder.addNamespace("rdf", "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>");
+		queryBuilder.addNamespace("daq", "http://purl.org/eis/vocab/daq#");
+		queryBuilder.addNamespace("dc", "http://purl.org/dc/elements/1.1/");
+		queryBuilder.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 		for (String prefix: namespaces.keySet()) {
 			String namespace = namespaces.get(prefix);
 			queryBuilder.addNamespace(prefix, namespace);
@@ -185,7 +185,7 @@ public class DefaultDataConnector implements DataConnector {
 		queryBuilder.addSelect("object");
 		queryBuilder.addSelect("value");
 		queryBuilder.addSelect("severity");
-		queryBuilder.addSelect("descs");
+		queryBuilder.addSelect("desc");
 		
 		queryBuilder.setGraph(namedGraph);
 		
@@ -249,11 +249,11 @@ public class DefaultDataConnector implements DataConnector {
 				if (columnLayout.isUriColumn()) {
 					RdfLiteralProperty rdfProperty = new RdfLiteralProperty();
 					rdfProperty.setProperty(columnLayout.getProperty());
-					rdfProperty.setValue(subjectUri.getUri());
+					rdfProperty.setValue(subjectUri.toString());
 					instance.addPropertyIfNotPresent(rdfProperty);
 					continue;
 				}
-				propertyName = "y" + j++;
+				propertyName = "?y" + j++;
 				
 				RDFNode rdfNode = solution.get(propertyName);
 				Object value = null;
@@ -282,7 +282,7 @@ public class DefaultDataConnector implements DataConnector {
 					continue;
 				}
 
-				String varTo = "y" + j++;
+				String varTo = "?y" + j++;
 				
 				RDFNode rdfNode = solution.get(varTo);
 				Uri uri = null;
@@ -341,7 +341,7 @@ public class DefaultDataConnector implements DataConnector {
 			if (columnLayout.isUriColumn()) {
 				continue;
 			}
-			String property = "y" + j++;
+			String property = "?y" + j++;
 			propertyVarMap.put(columnLayout.getProperty(), property);
 			queryBuilder.addWhereOptional("?uri", columnLayout.getProperty().toString(), property);
 		}
@@ -350,8 +350,8 @@ public class DefaultDataConnector implements DataConnector {
 			// include all properties
 			if (lineLayout.getFromType().equals(blockLayout.getForType())) {
 				
-				String varTo = "y" + j++;
-				queryBuilder.addWhereOptional("?uri", lineLayout.getProperty().toString(), "?" + varTo);
+				String varTo = "?y" + j++;
+				queryBuilder.addWhereOptional("?uri", lineLayout.getProperty().toString(), varTo);
 				
 				// filter out not selected instances
 				if (filter != null && filter.getUriFilters() != null) {
@@ -361,7 +361,7 @@ public class DefaultDataConnector implements DataConnector {
 							if (uriValue == null) {
 								continue;
 							}
-							queryBuilder.addWhere("?uri", uriProperty.getProperty(), uriValue.getUri());
+							queryBuilder.addWhere("?uri", uriProperty.getProperty(), uriValue.toString());
 						}
 					}
 				}
@@ -422,12 +422,17 @@ public class DefaultDataConnector implements DataConnector {
 	}
 	
 	protected String createContainsFilter(Map<Property, String> propertyVarMap, Property property, String filterValue) {
-		String varName = propertyVarMap.get(property);
-		return "(regex(str(?" + varName + "), '" + filterValue + "', 'i'))";
+		String varName = "";
+		if (property.isUriProperty()) {
+			varName = "?uri";
+		} else {
+			varName = propertyVarMap.get(property);
+		}
+		return "(regex(str(" + varName + "), '" + filterValue + "', 'i'))";
 	}
 	
 	protected String createLangFilter(String varName, String lang) {
-		return "(lang(?" + varName + ") = '' || lang(?" + varName + ") = '" + lang + "')";
+		return "(lang(" + varName + ") = '' || lang(" + varName + ") = '" + lang + "')";
 	}
 	
 	protected String getLabel(Label label, String type) {

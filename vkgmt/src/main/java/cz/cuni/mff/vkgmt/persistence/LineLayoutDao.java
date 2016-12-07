@@ -59,7 +59,7 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> ?property ?value . "
+				+ uri + " ?property ?value . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlockQuery);
 		LineLayout layout = new LineLayout();
@@ -115,7 +115,7 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 		
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
 		insertQuery.append("INSERT DATA { ");
-		insertQuery.append("<").append(layout.getUri().getUri()).append("> ");
+		insertQuery.append(layout.getUri());
 		
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.LineLayoutType).append("; ");
 		insertQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
@@ -142,8 +142,8 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
     @Override
 	public void update(LineLayout layout) {
 		StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("DELETE { <").append(layout.getUri().getUri()).append("> ?p ?o } ");
-		updateQuery.append("INSERT { <").append(layout.getUri().getUri()).append("> ");
+		updateQuery.append("DELETE { ").append(layout.getUri()).append(" ?p ?o } ");
+		updateQuery.append("INSERT { ").append(layout.getUri()).append(" ");
 		
 		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.LineLayoutType).append("; ");
 		updateQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
@@ -158,7 +158,7 @@ public class LineLayoutDao extends AbstractDao<LineLayout> {
 		updateQuery.append(" ").append(LABEL_TYPE).append(" '").append(layout.getLabel().getType()).append("'; ");
 		updateQuery.append(" ").append(LABEL_LANG).append(" '").append(layout.getLabel().getLang()).append("'; ");
 		updateQuery.append(" ").append(POINTS).append(" '").append(layout.getPointsAsString()).append("'. ");
-		updateQuery.append(" } WHERE { <").append(layout.getUri().getUri()).append("> ?p ?o . }");
+		updateQuery.append(" } WHERE { ").append(layout.getUri()).append(" ?p ?o . }");
     	
     	sparql.executeQuery(updateQuery.toString());
     }

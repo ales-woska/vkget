@@ -66,7 +66,7 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		String loadBlockQuery = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri.getUri() + "> ?property ?value . "
+				+ uri + " ?property ?value . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlockQuery);
 		BlockLayout layout = new BlockLayout();
@@ -122,7 +122,7 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
     	String loadBlocksForScreen = 
 				Constants.PREFIX_PART
 				+ "SELECT DISTINCT * WHERE { "
-				+ " <" + uri + "> " + Constants.ColumnLayoutProperty + " ?uri . "
+				+ uri + " " + Constants.ColumnLayoutProperty + " ?uri . "
 				+ "}";
 		ResultSet results = sparql.query(loadBlocksForScreen);
 		List<ColumnLayout> layouts = new ArrayList<ColumnLayout>();
@@ -145,7 +145,7 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
     	
 		StringBuilder insertQuery = new StringBuilder(Constants.PREFIX_PART);
 		insertQuery.append("INSERT DATA { ");
-		insertQuery.append("<").append(layout.getUri().getUri()).append("> ");
+		insertQuery.append(layout.getUri());
 		
 		insertQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.BlockLayoutType).append("; ");
 		insertQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
@@ -168,7 +168,7 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		}
 
 		for (ColumnLayout cl: layout.getProperties()) {
-			insertQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.ColumnLayoutProperty).append(" <").append(cl.getUri().getUri()).append("> . ");
+			insertQuery.append(" ").append(layout.getUri()).append(" ").append(Constants.ColumnLayoutProperty).append(" ").append(cl.getUri()).append(" . ");
 		}
 		
 		insertQuery.append(" }");
@@ -183,8 +183,8 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
     @Override
     public void update(BlockLayout layout) {
     	StringBuilder updateQuery = new StringBuilder(Constants.PREFIX_PART);
-		updateQuery.append("DELETE { <").append(layout.getUri().getUri()).append("> ?p ?o } ");
-		updateQuery.append("INSERT { <").append(layout.getUri().getUri()).append("> ");
+		updateQuery.append("DELETE { ").append(layout.getUri()).append(" ?p ?o } ");
+		updateQuery.append("INSERT { ").append(layout.getUri()).append(" ");
 
 		updateQuery.append(" ").append(Constants.RDF_TYPE).append(" ").append(Constants.BlockLayoutType).append("; ");
 		updateQuery.append(" ").append(FONT_COLOR).append(" '").append(layout.getFontColor()).append("'; ");
@@ -207,10 +207,10 @@ public class BlockLayoutDao extends AbstractDao<BlockLayout> {
 		}
 
 		for (ColumnLayout cl: layout.getProperties()) {
-			updateQuery.append(" <").append(layout.getUri().getUri()).append("> ").append(Constants.ColumnLayoutProperty).append(" <").append(cl.getUri().getUri()).append("> . ");
+			updateQuery.append(" ").append(layout.getUri()).append(" ").append(Constants.ColumnLayoutProperty).append(" ").append(cl.getUri()).append(" . ");
 		}
 		
-		updateQuery.append(" } WHERE { <").append(layout.getUri().getUri()).append("> ?p ?o . }");
+		updateQuery.append(" } WHERE { ").append(layout.getUri()).append(" ?p ?o . }");
 		
 		sparql.executeQuery(updateQuery.toString());
     }

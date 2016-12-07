@@ -43,36 +43,36 @@ public class DataServiceImpl implements DataService {
 			
 			if (change.getProperty() == null && change.getNewValue() == null && change.getOldValue() == null) {
 				result.append("DELETE WHERE {\n");
-				result.append("<").append(change.getUri().getUri()).append("> ?p ?o .\n");
+				result.append(change.getUri()).append(" ?p ?o .\n");
 				result.append("}\n");
 				
 			} else if (oldValueEmpty && !newValueEmpty) {
-				result.append("INSERT DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("INSERT DATA {\n\t").append(change.getUri()).append(" ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
-					result.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+					result.append(" ").append((Uri)change.getNewValue()).append(" .\n");
 				} else {
 					result.append(" '").append(change.getNewValue()).append("' .\n");
 				}
 				result.append("}\n");
 			} else if (newValueEmpty && !oldValueEmpty) {
-				result.append("DELETE DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("DELETE DATA {\n\t").append(change.getUri()).append(" ").append(change.getProperty());
 				if (change.getOldValue() instanceof Uri) {
-					result.append(" <").append((Uri)change.getOldValue()).append("> .\n");
+					result.append(" ").append((Uri)change.getOldValue()).append(" .\n");
 				} else {
 					result.append(" '").append(change.getOldValue()).append("' .\n");
 				}
 				result.append("}\n");
 			} else {
-				result.append("DELETE DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("DELETE DATA {\n\t").append(change.getUri()).append(" ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
-					result.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+					result.append(" ").append((Uri)change.getNewValue()).append(" .\n");
 				} else {
 					result.append(" '").append(change.getNewValue()).append("' .\n");
 				}
 				result.append("}\n");
-				result.append("INSERT DATA {\n\t<").append(change.getUri()).append("> ").append(change.getProperty());
+				result.append("INSERT DATA {\n\t").append(change.getUri()).append(" ").append(change.getProperty());
 				if (change.getNewValue() instanceof Uri) {
-					result.append(" <").append((Uri)change.getNewValue()).append("> .\n");
+					result.append(" ").append((Uri)change.getNewValue()).append(" .\n");
 				} else {
 					result.append(" '").append(change.getNewValue()).append("' .\n");
 				}
