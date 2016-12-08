@@ -78,7 +78,9 @@
 				<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
 			</div>
 			
-			<div id="editLayoutArea" style="display: none; width: {{screenLayout.width}}px; height: {{screenLayout.height}}px;"
+			<div id="editLayoutArea"
+					style="display: none;"
+					ng-style="{'width': screenLayout.width, 'height': screenLayout.height}"
 			 		ng-mousemove="onMouseMove($event);">
 			 		
 				<div ng-repeat="blockLayout in screenLayout.blockLayouts" 

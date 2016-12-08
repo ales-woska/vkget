@@ -118,8 +118,11 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 					$scope.screenLayout.height = minWorkspaceHeight;
 				}
 				
-				$('#editLayoutArea').toggle();
-				$('#editLayoutLoading').toggle();
+				var $editLayoutArea = $('#editLayoutArea');
+				$editLayoutArea.width($scope.screenLayout.width);
+				$editLayoutArea.height($scope.screenLayout.height);
+				$editLayoutArea.show();
+				$('#editLayoutLoading').hide();
 			});
 	}
 	
