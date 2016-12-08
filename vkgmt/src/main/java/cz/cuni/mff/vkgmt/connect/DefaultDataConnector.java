@@ -391,8 +391,10 @@ public class DefaultDataConnector implements DataConnector {
 			if (StringUtils.isNotEmpty(columnLayout.getLabel().getLang()) && !columnLayout.getLabel().getLang().equals("null")) {
 				String varName = propertyVarMap.get(columnLayout.getProperty());
 				String lang = columnLayout.getLabel().getLang();
-				String langFilter = createLangFilter(varName, lang);
-				queryBuilder.addFilter(langFilter);
+				if (StringUtils.isNotEmpty(lang)) {
+					String langFilter = createLangFilter(varName, lang);
+					queryBuilder.addFilter(langFilter);
+				}
 			}
 		}
 		
