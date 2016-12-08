@@ -67,12 +67,18 @@ div.vkgmt_line_title {
 	position: absolute;
 }
 
-#myholder {
+#editLayoutArea, #editLayoutLoading {
 	border: 1px solid gray;
 	margin: 10px;
 	width: 1560px;
 	height: 600px;
 	position: relative;
+}
+
+#editLayoutLoading {
+	background: rgba(155, 155, 155, 0.5);
+	padding-top: 10px;
+	padding-left: 10px;
 }
 
 #addTableButton {
@@ -137,7 +143,7 @@ svg {
 	height: 100%;
 }
 
-#myholder polyline:hover {
+#editLayoutArea polyline:hover {
 	stroke: red;
 	cursor: pointer;
 }

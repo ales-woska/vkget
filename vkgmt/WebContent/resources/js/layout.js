@@ -29,6 +29,8 @@ app.controller('layoutController', function($scope, $http, $location) {
 	$http.get($scope.layoutsServiceUri)
     .then(function(response) {
         $scope.layouts = response.data;
+    	$('#layoutListLoading').toggle();
+    	$('#layoutList').toggle();
     });
 	
 	$scope.removeLayout = function(screenLayout) {

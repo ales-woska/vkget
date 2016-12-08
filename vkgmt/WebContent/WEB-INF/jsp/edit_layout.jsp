@@ -74,11 +74,16 @@
 		</div>
 	
 		<div>
-			<div id="myholder" style="width: {{screenLayout.width}}px; height: {{screenLayout.height}}px;">
+			<div id="editLayoutLoading">
+				<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+			</div>
+			
+			<div id="editLayoutArea" style="display: none; width: {{screenLayout.width}}px; height: {{screenLayout.height}}px;"
+			 		ng-mousemove="onMouseMove($event);">
+			 		
 				<div ng-repeat="blockLayout in screenLayout.blockLayouts" 
 					ng-dblclick="openModal(blockLayout);"
 					ng-mousedown="onMouseDown($event, blockLayout);"
-					ng-mousemove="onMouseMove($event);"
 					ng-mouseup="onMouseUp($event);"
 					ng-mouseleave="onMousUp($event);"
 					class="vkgmt-block"

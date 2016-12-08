@@ -43,7 +43,12 @@
 				<h1>List of available layouts</h1>
 			</div>
 			
-			<div class="row">
+			
+			<div id="layoutListLoading">
+				<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading...
+			</div>
+			
+			<div id="layoutList" style="display: none;" class="row">
 				<div class="list-group">
 					<div ng-repeat="screenLayout in layouts" class="list-group-item">
 						<a target="_self" href="edit_layout.html?uri={{screenLayout.uri.uri | urlencode }}">{{screenLayout.name}}</a>

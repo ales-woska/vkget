@@ -85,7 +85,7 @@
 </div>
 
 <div class="modal-footer">
-	<input type="button" ng-click="removeLine({lineLayout: lineLayout})" class="btn btn-default btn-danger" value="Delete" />
+	<input type="button" ng-show="lineLayout.points.length > 0" ng-click="removeLine({lineLayout: lineLayout})" class="btn btn-default btn-danger" value="Delete" />
 	<input type="submit" class="btn btn-default" value="Save" />
 </div>
 

@@ -102,22 +102,25 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	if (uri) {
 		uri = window.encodeURIComponent(uri);
 		$http.get($scope.layoutServiceUri + "?uri=" + uri).then(
-				function(response) {
-					$scope.uri = uri;
-					var screenLayout = response.data;
-					for (var i in screenLayout.lineLayouts) {
-						initLines(screenLayout.lineLayouts[i]);
-						polyline(screenLayout.lineLayouts[i]);
-					}
-					$scope.screenLayout = screenLayout;
-					
-					if ($scope.screenLayout.width < minWorkspaceWidth) {
-						$scope.screenLayout.width = minWorkspaceWidth;
-					}
-					if ($scope.screenLayout.height < minWorkspaceHeight) {
-						$scope.screenLayout.height = minWorkspaceHeight;
-					}
-				});
+			function(response) {
+				$scope.uri = uri;
+				var screenLayout = response.data;
+				for (var i in screenLayout.lineLayouts) {
+					initLines(screenLayout.lineLayouts[i]);
+					polyline(screenLayout.lineLayouts[i]);
+				}
+				$scope.screenLayout = screenLayout;
+				
+				if ($scope.screenLayout.width < minWorkspaceWidth) {
+					$scope.screenLayout.width = minWorkspaceWidth;
+				}
+				if ($scope.screenLayout.height < minWorkspaceHeight) {
+					$scope.screenLayout.height = minWorkspaceHeight;
+				}
+				
+				$('#editLayoutArea').toggle();
+				$('#editLayoutLoading').toggle();
+			});
 	}
 	
 	function initLines(lineLayout) {
@@ -134,14 +137,9 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		lineLayout.lines = lines;
 	}
 	
-	$scope.mouseDown = false;
 	$scope.mouseDownBL = null;
 	$scope.top = 0;
 	$scope.left = 0;
-	$scope.offsetTop = 0;
-	$scope.offsetLeft = 0;
-	$scope.parentWidth = 0;
-	$scope.parentHeight = 0;
 	$scope.langs = predefinedLangs;
 	
 	$scope.updateForType = function(forType) {
@@ -345,30 +343,23 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.onMouseDown = function(event, blockLayout) {
-		if ($scope.mouseDown == false) {
-			$scope.mouseDown = true;
-			$scope.left = event.screenX - blockLayout.left - event.offsetX;
-			$scope.top = event.screenY - blockLayout.top - event.offsetY;
-			$scope.offsetLeft = event.offsetX;
-			$scope.offsetTop = event.offsetY;
-			$scope.mouseDownEl = event.toElement;
+		if ($scope.mouseDownBL == null) {
+			$scope.left = event.offsetX;
+			$scope.top = event.offsetY;
 			$scope.mouseDownBL = blockLayout;			
-			$scope.parentWidth = event.toElement.parentElement.offsetWidth;
-			$scope.parentHeight = event.toElement.parentElement.offsetHeight;
 		}
 	};
 	
 	$scope.onMouseMove = function(event) {
-		if (event && $scope.mouseDown == true) {
-			var left = $scope.left;
-			var top = $scope.top;
-			var newLeft = (event.screenX - $scope.offsetLeft) - left;
-			var newTop = (event.screenY - $scope.offsetTop) - top;
+		if (event && $scope.mouseDownBL != null) {
+			var left = event.pageX - $("#editLayoutArea").offset().left;
+			var top = event.pageY - $("#editLayoutArea").offset().top;
+			var newLeft = left - $scope.left;
+			var newTop = top - $scope.top;
 
 			var points = [];
 			var diffPointXs  = [];
 			var diffPointYs = [];
-			
 			
 			for (var i = 0; i < $scope.screenLayout.lineLayouts.length; i++) {
 				var lineLayout = $scope.screenLayout.lineLayouts[i];
@@ -387,17 +378,21 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 				polyline(lineLayout);
 			}
 			
+			var parent = $(event.currentTarget);
+			var areaWidth = parent.width();
+			var areaHeight = parent.height();
+			
 			if (newLeft < 0) {
 				$scope.mouseDownBL.left = 0;
-			} else if ((newLeft + $scope.mouseDownBL.width) > $scope.parentWidth) {
-				$scope.mouseDownBL.left = $scope.parentWidth - $scope.mouseDownBL.width;
+			} else if ((newLeft + $scope.mouseDownBL.width) > areaWidth) {
+				$scope.mouseDownBL.left = areaWidth - $scope.mouseDownBL.width;
 			} else {
 				$scope.mouseDownBL.left = newLeft;
 			}
 			if (newTop < 0) {
 				$scope.mouseDownBL.top = 0;
-			} else if ((newTop + $scope.mouseDownBL.height) > $scope.parentHeight) {
-				$scope.mouseDownBL.top = $scope.parentHeight - $scope.mouseDownBL.height;
+			} else if ((newTop + $scope.mouseDownBL.height) > areaHeight) {
+				$scope.mouseDownBL.top = areaHeight - $scope.mouseDownBL.height;
 			} else {
 				$scope.mouseDownBL.top = newTop;
 			}
@@ -410,7 +405,6 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.onMouseUp = function(event) {
-		$scope.mouseDown = false;
 		$scope.mouseDownBL = null;
 	};
 	
@@ -469,12 +463,11 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
         	} else {
         		text = data;
         	}
-        	var message = {
-				caption: caption,
-				text: text,
-				type: 'danger'
-	    	};
-	    	$scope.messages.push(message);
+        	var data = {
+    			error: caption,
+        		message: text
+        	};
+        	error($scope, data, status);
         });
 	};
 	
@@ -488,15 +481,17 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 	};
 	
 	$scope.removeTable = function(blockLayout) {
-		for (var i in $scope.screenLayout.lineLayouts) {
-			var ll = $scope.screenLayout.lineLayouts[i];
-			if (ll.fromType.type == blockLayout.forType.type || ll.toType.type == blockLayout.forType.type) {
-				$scope.screenLayout.lineLayouts.splice(i, 1);
+		if (confirm("Are you sure to remove this block?")) {
+			for (var i in $scope.screenLayout.lineLayouts) {
+				var ll = $scope.screenLayout.lineLayouts[i];
+				if (ll.fromType.type == blockLayout.forType.type || ll.toType.type == blockLayout.forType.type) {
+					$scope.screenLayout.lineLayouts.splice(i, 1);
+				}
 			}
+			
+			var index = $scope.screenLayout.blockLayouts.indexOf(blockLayout);
+			$scope.screenLayout.blockLayouts.splice(index, 1);
 		}
-		
-		var index = $scope.screenLayout.blockLayouts.indexOf(blockLayout);
-		$scope.screenLayout.blockLayouts.splice(index, 1);
 	};
 	
 	function newScreenLayout() {
@@ -598,3 +593,21 @@ app.controller('layoutController', function($scope, $location, $window, $http) {
 		return newLineLayout;
 	}
 });
+
+function error($scope, data, status) {
+	var message = null;
+	if (status == '500') {
+		message = {
+		    caption : 'Internal server error.',
+		    text : 'Entered data are correct but there was an error on the server site.',
+		    type : 'danger'
+		};
+	} else {
+		message = {
+		    caption : data.error,
+		    text : data.message,
+		    type : 'danger'
+		};
+	}
+	$scope.messages.push(message);
+};

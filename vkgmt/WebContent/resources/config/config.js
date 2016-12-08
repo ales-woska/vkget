@@ -1,7 +1,7 @@
 var serverAddress = 'http://localhost:8123/vkgmt';
 var endpointList = [
-    'http://localhost:3030/data',
     'http://linked.opendata.cz/sparql',
+    'http://localhost:3030/data',
     'http://dbpedia.org/sparql'
 ];
 var predefinedLangs = [

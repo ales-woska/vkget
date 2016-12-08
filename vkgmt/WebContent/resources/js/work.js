@@ -39,8 +39,8 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 	$scope.storedEndpoints = endpointList;
 	
 	$scope.connectionInfo = {
-		endpoint: '',
-		type: 'other',
+		endpoint: 'http://linked.opendata.cz/sparql',
+		type: 'virtuoso',
 		useNamedGraph: false,
 		useAutorization: false,
 		namedGraph: '',
@@ -330,7 +330,7 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
             $('#updateScriptTextarea').show();
             
         }, function(response) {
-            alert('ERROR');
+        	error($scope, response.data, response.status);
         });
 		$('#changesModal').modal('show');
 	};
@@ -564,7 +564,12 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 				}
 			}
         	if (added == 0 && request.filter.offset > 0) {
-        		alert("No more data satisfying filters.");
+        		message = {
+    			    caption : 'No more data.',
+    			    text : 'There are no other data satysfying current filter for table ' + table.label + '.',
+    			    type : 'info'
+    			};
+        		$scope.messages.push(message);
         	}
         	
     		if (propagate && table.notPropagated) {
@@ -600,8 +605,15 @@ app.controller('dataController', function($scope, $http, $filter, $window, $loca
 		var password = $scope.connectionInfo.password;
 		var layoutUri = $scope.layout;
 	
-		$http.get($scope.dataServiceUrl + "?endpoint="+endpoint+"&type="+type+"&useNamedGraph="+useNamedGraph+
-				"&useAuthorization="+useAuthorization+"&namedGraph="+namedGraph+"&username="+username+"&password="+password+"&layoutUri=" + layoutUri)
+		$http.get($scope.dataServiceUrl
+				+ "?endpoint=" + endpoint
+				+ "&type=" + type
+				+ "&useNamedGraph="+ useNamedGraph
+				+ "&useAuthorization=" + useAuthorization
+				+ "&namedGraph=" + namedGraph
+				+ "&username=" + username
+				+ "&password=" + password
+				+ "&layoutUri=" + layoutUri)
 		    .success(function(response) {
 		    	var dataModel = response;
 				for (var i = 0; i < dataModel.tables.length; i++) {
@@ -954,4 +966,4 @@ function error($scope, data, status) {
 		};
 	}
 	$scope.messages.push(message);
-}
+};
